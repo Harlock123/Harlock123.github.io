@@ -34,7 +34,7 @@
       "blurb": "Bounce off the octagon's walls while droids lay mines. Spawn protection and explosions included." },
     { "repo": "AVAGunner", "genre": "arcade", "original": "Tailgunner", "publisher": "Cinematronics", "year": 1979, "shot": "Images/AVAGunner_20260203_002449.png",
       "blurb": "Defend the rear of your ship in 3D vector space. Now with Capitol Ship mini-bosses, turrets and missiles." },
-    { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "placeholder": "invader",
+    { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
       "blurb": "Party creation, towns, dungeons, gem socketing and an OpenAL soundtrack." },
@@ -46,7 +46,7 @@
       "blurb": "Angband 4.2 in C#. Its game data is checked against 4.2.5 on every build." },
     { "repo": "AVAFlight-Starflight", "name": "AVAFlight", "genre": "space", "original": "Starflight", "publisher": "Binary Systems", "year": 1986, "shot": "docs/screenshots/08_terrain_vehicle.png",
       "blurb": "Crew, starships, alien diplomacy, planet surveys by terrain vehicle, and real-time combat." },
-    { "repo": "AVAElite", "genre": "space", "original": "Elite", "publisher": "Acornsoft", "year": 1984, "placeholder": "elite",
+    { "repo": "AVAElite", "genre": "space", "original": "Elite", "publisher": "Acornsoft", "year": 1984, "shot": "Images/AVAElite-title.png",
       "blurb": "Trading, docking and dogfights across eight galaxies, rendered in wireframe." }
   ],
 
