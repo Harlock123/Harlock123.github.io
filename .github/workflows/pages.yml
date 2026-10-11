@@ -1,0 +1,51 @@
+# Builds the site from data/portfolio.json plus live GitHub data (repo details, newest release
+# downloads, screenshots) and deploys it to GitHub Pages. Runs on every push, once a day so new game
+# releases show up on their own, and on demand (Actions tab, or a "portfolio-refresh" repository_dispatch).
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [portfolio-refresh]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04  # pinned: ubuntu-latest moves to 26 on 2026-10-19
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Install ImageMagick (screenshot resizing)
+        run: command -v magick || (sudo apt-get update && sudo apt-get install -y imagemagick && sudo ln -sf "$(command -v convert)" /usr/local/bin/magick)
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node scripts/build.mjs
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04  # pinned: ubuntu-latest moves to 26 on 2026-10-19
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -1,0 +1,75 @@
+{
+  "owner": "Harlock123",
+  "profile": {
+    "name": "Lonnie Allen Watson",
+    "title": "Technological fossil",
+    "lede": "Software architect, at the keyboard since grade school in the late '70s. These days I rebuild the arcade and RPG classics I grew up on in C# and Avalonia, so they run natively on Windows, macOS and Linux, Intel or ARM.",
+    "about": [
+      "I'm now an old architect in a small piece of a very large company that bought us about twelve years ago. I've been into computers since grade school in the late '70s, and I still like building things end to end.",
+      "At work I'm focused on modernization. At home it's local LLMs, single-board computers, and recreating the games that got me hooked, built from their documented behavior and released for every platform I can reach."
+    ],
+    "card": [
+      ["Class", "Architect"],
+      ["Since", "Late 1970s"],
+      ["Weapons", "C#, .NET, Avalonia"]
+    ],
+    "photo": "images/me.jpg",
+    "resume": "Lonnie_Watson_Resume_Current.pdf",
+    "github": "https://github.com/Harlock123",
+    "linkedin": "https://www.linkedin.com/in/lonnie-watson-0bbb317"
+  },
+
+  "games": [
+    { "repo": "AVADefend", "genre": "arcade", "original": "Defender", "publisher": "Williams", "year": 1981, "shot": "screenshots/gameplay.png",
+      "blurb": "Defender rebuilt from the original's documented behaviour: smart bombs, hyperspace, humanoid rescues and the hall of fame." },
+    { "repo": "AVATron", "genre": "arcade", "original": "Robotron: 2084", "publisher": "Williams", "year": 1982, "shot": "docs/images/grunt-swarm.png",
+      "blurb": "Twin-stick arena shooter. Save the last human family from wave after wave of grunts, brains and enforcers." },
+    { "repo": "AVATempest", "genre": "arcade", "original": "Tempest", "publisher": "Atari", "year": 1981, "shot": "Images/AVATempest_Playing_2026-01-31_175711.png",
+      "blurb": "Ride the rim of the tube in red vector wireframe, with gamepad support and the warp between levels." },
+    { "repo": "AVALander", "genre": "arcade", "original": "Lunar Lander", "publisher": "Atari", "year": 1979, "shot": "Images/AVALANDER1.png",
+      "blurb": "Wireframe terrain, a fuel gauge and a landing pad. Watch your vertical speed, and the asteroids." },
+    { "repo": "AvaRoids", "genre": "arcade", "original": "Asteroids", "publisher": "Atari", "year": 1979, "shot": "Images/AVAROIDS1.png",
+      "blurb": "Inertia, wraparound space, saucers with an alert siren, and controller support." },
+    { "repo": "AVARace", "genre": "arcade", "original": "Omega Race", "publisher": "Midway", "year": 1981, "shot": "Images/SCREENSHOT1.png",
+      "blurb": "Bounce off the octagon's walls while droids lay mines. Spawn protection and explosions included." },
+    { "repo": "AVAGunner", "genre": "arcade", "original": "Tailgunner", "publisher": "Cinematronics", "year": 1979, "shot": "Images/AVAGunner_20260203_002449.png",
+      "blurb": "Defend the rear of your ship in 3D vector space. Now with Capitol Ship mini-bosses, turrets and missiles." },
+    { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "placeholder": "invader",
+      "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
+    { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
+      "blurb": "Party creation, towns, dungeons, gem socketing and an OpenAL soundtrack." },
+    { "repo": "AVABardsTale", "genre": "rpg", "original": "The Bard's Tale", "publisher": "Interplay", "year": 1985, "shot": "SCREENSHOTS/catacombs.png",
+      "blurb": "Skara Brae and its catacombs, procedural music that darkens as you descend, and a second tower to delve." },
+    { "repo": "AVAMMB1", "genre": "rpg", "original": "Party RPG classic", "after": "After a 1986 classic", "year": 1986, "shot": "docs/screenshots/08-dungeon.png",
+      "blurb": "First-person party dungeon crawl with towns, automap, riddles, daily challenges and a map editor." },
+    { "repo": "AVABand", "genre": "rpg", "original": "Angband", "publisher": "Angband team", "year": 1990, "shot": "screenshots/dungeon-tiles.png",
+      "blurb": "Angband 4.2 in C#. Its game data is checked against 4.2.5 on every build." },
+    { "repo": "AVAFlight-Starflight", "name": "AVAFlight", "genre": "space", "original": "Starflight", "publisher": "Binary Systems", "year": 1986, "shot": "docs/screenshots/08_terrain_vehicle.png",
+      "blurb": "Crew, starships, alien diplomacy, planet surveys by terrain vehicle, and real-time combat." },
+    { "repo": "AVAElite", "genre": "space", "original": "Elite", "publisher": "Acornsoft", "year": 1984, "placeholder": "elite",
+      "blurb": "Trading, docking and dogfights across eight galaxies, rendered in wireframe." }
+  ],
+
+  "tools": [
+    { "repo": "AVASvgMaker", "blurb": "Visio-style diagram editor. Reads .vsdx; exports SVG, PNG, PDF, Mermaid and .vsdx." },
+    { "repo": "DirOpusReImagined", "name": "DORI", "blurb": "Directory Opus reimagined: a cross-platform file explorer in .NET and Avalonia." },
+    { "repo": "AVAQueryBuilder", "blurb": "Graphical query builder for Microsoft SQL Server." },
+    { "repo": "AVASdCanvas", "blurb": "Structured drawing canvas that code can populate and users can interact with." },
+    { "repo": "AvaloniaDiagramerControl", "blurb": "The VB.Net-era LineChart control, rebuilt for Windows, macOS and Linux." },
+    { "repo": "Avalonia3DCanvas", "blurb": "3D object viewer for Avalonia and .NET 9." },
+    { "repo": "AvaloniaTimeLineControl", "blurb": "Timeline control for Avalonia applications." }
+  ],
+
+  "work": [
+    { "name": "CARES", "kind": "Behavioral health EHR", "private": true,
+      "blurb": "Electronic health records with reporting, records management and a web portal.",
+      "links": [["Overview PDF", "docs/CARES V2.pdf"], ["Screens PDF", "docs/SomeCaresScreenShotsPHIMasked.pdf"]] },
+    { "name": "Cares Query Reporter", "kind": "Query builder", "private": true,
+      "blurb": "Point-and-click database queries, with client-specific builds.",
+      "links": [["HCQU PDF", "docs/NEW_HCQU_reporter.pdf"], ["Older HCQU PDF", "docs/HCQU_reporter.pdf"], ["TAI PDF", "docs/TAIQUERYREPORTER.pdf"]] },
+    { "name": "CODE Complete", "kind": "Data-access framework", "repo": "CodeComplete",
+      "blurb": "A database abstraction tool that grew into a full data-access code generator." },
+    { "name": "Code Generation API", "kind": "REST service", "repo": "CodeGenAPI",
+      "blurb": "CODE Complete's generation as a RESTful API for enterprise deployment." }
+  ]
+}
