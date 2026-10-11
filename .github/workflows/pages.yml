@@ -40,6 +40,47 @@ jobs:
         with:
           path: dist
 
+  # Copies the same build to harlock123.com (IONOS, IIS) over FTPS. Only adds or replaces files: anything
+  # else on the server (default.htm, web.config, logs, the zips in docs/) is left alone. index.html goes
+  # last, so the live page never points at a screenshot or script that hasn't arrived yet.
+  ftp:
+    needs: build
+    runs-on: ubuntu-24.04  # pinned: ubuntu-latest moves to 26 on 2026-10-19
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/artifact
+      - name: Upload to harlock123.com
+        env:
+          FTP_HOST: access988536050.webspace-data.io
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          if [ -z "$FTP_USER" ] || [ -z "$FTP_PASSWORD" ]; then
+            echo "::notice::FTP_USER / FTP_PASSWORD secrets not set; skipping the harlock123.com upload."
+            exit 0
+          fi
+          mkdir site && tar -xf "$RUNNER_TEMP/artifact/artifact.tar" -C site
+          umask 077
+          printf 'machine %s login %s password "%s"\n' "$FTP_HOST" "$FTP_USER" "${FTP_PASSWORD//\"/\\\"}" > "$RUNNER_TEMP/netrc"
+          cd site
+          # GitHub-Pages-only files and the old github.io images stay off the IIS site.
+          { find . -type f ! -name .nojekyll ! -name CNAME ! -path './images/*' -o -type f -path ./images/me.jpg \
+              | sed 's|^\./||' | grep -vx index.html | sort; echo index.html; } |
+          while IFS= read -r f; do
+            echo "upload $f"
+            curl -sS --fail --netrc-file "$RUNNER_TEMP/netrc" --ssl-reqd --ftp-create-dirs \
+              --retry 3 --retry-all-errors --connect-timeout 30 \
+              -T "$f" "ftps://$FTP_HOST:990/$(printf '%s' "$f" | sed 's/ /%20/g')"
+          done
+          rm -f "$RUNNER_TEMP/netrc"
+      - name: Check harlock123.com
+        run: |
+          curl -sSf -o /dev/null https://harlock123.com/
+          curl -sSf https://harlock123.com/ | grep -q "Built $(date -u +%F) from GitHub" \
+            || echo "::warning::harlock123.com answered, but not with today's build (a cache may still be serving the old page)."
+
   deploy:
     needs: build
     runs-on: ubuntu-24.04  # pinned: ubuntu-latest moves to 26 on 2026-10-19

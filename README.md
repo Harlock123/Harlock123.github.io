@@ -5,7 +5,12 @@ games, tools and work.
 
 The page is built, not hand-edited. `scripts/build.mjs` reads `data/portfolio.json`, asks GitHub for each
 repo's description, newest release downloads and screenshot, and writes a static site to `dist/`. The
-`Pages` workflow runs it on every push, once a day, and on demand, then deploys `dist/` to GitHub Pages.
+`Pages` workflow runs it on every push, once a day, and on demand, then deploys `dist/` to GitHub Pages
+and uploads the same files to [harlock123.com](https://harlock123.com/) (IONOS, IIS) over FTPS.
+
+The FTPS login is in the repo secrets `FTP_USER` and `FTP_PASSWORD`; without them the upload is skipped.
+The upload only adds or replaces files, so anything else on the server (`default.htm`, `web.config`, logs,
+other downloads) is left alone.
 
 ## Adding or changing something
 
