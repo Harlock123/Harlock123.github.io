@@ -179,6 +179,8 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>/* The IIS host has no URL Rewrite module, so web.config can't redirect http to https; do it here. */
+if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(location.hostname)) location.replace("https:" + location.href.slice(5));</script>
 <title>${esc(p.name)} · Harlock123</title>
 <meta name="description" content="${esc(p.lede)}">
 <meta property="og:title" content="${esc(p.name)} · Harlock123">
