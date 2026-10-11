@@ -118,9 +118,65 @@
   // ---------- Attract-mode vector scene ----------
   const cv = document.getElementById("attract"), cx = cv.getContext("2d");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let W = 0, H = 0, ridge = [], rocks = [], stars = [], visible = true, running = false, last = 0;
+  let W = 0, H = 0, ridge = [], rocks = [], sparks = [], stars = [], visible = true, running = false, last = 0, spawnWait = 0;
   const t0 = performance.now();
   const rand = (a, b) => a + Math.random() * (b - a);
+
+  // Rocks come in three sizes, like the arcade game: big ones split into two medium, medium into two
+  // small, and small ones burst into sparks. Fragments ignore collisions for a moment so they can separate.
+  const BIG = 26, SMALLEST = 11, MAX_ROCKS = 14;
+  function makeRock(x, y, size, vx, vy, immune = 0) {
+    const n = 9;
+    return { x, y, size, vx, vy, immune, a: rand(0, 6.3), va: rand(-.3, .3) * (BIG / size) ** .5,
+             pts: Array.from({ length: n }, (_, i) => [i / n * Math.PI * 2, size * rand(.7, 1.1)]) };
+  }
+  function drift(speedLo, speedHi) {
+    const ang = rand(0, Math.PI * 2), sp = rand(speedLo, speedHi);
+    return [Math.cos(ang) * sp, Math.sin(ang) * sp * .6];
+  }
+  const bigRocks = () => W < 600 ? 3 : 5;
+  function burst(x, y, n, speed) {
+    for (let i = 0; i < n; i++) {
+      const ang = rand(0, Math.PI * 2), sp = rand(speed * .4, speed);
+      sparks.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: rand(.5, 1.1), age: 0 });
+    }
+  }
+  function shatter(r, from) {
+    // Push the pieces away from whatever hit this rock, plus a little sideways spread.
+    let dx = r.x - from.x, dy = r.y - from.y; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+    burst(r.x, r.y, r.size >= SMALLEST * 1.6 ? 12 : 18, 90);
+    if (r.size < SMALLEST * 1.6 || rocks.length >= MAX_ROCKS) return [];
+    const size = r.size * .58;
+    return [1, -1].map(side => {
+      const kick = rand(14, 24), spread = rand(6, 12) * side;
+      return makeRock(r.x + dx * size * .5 - dy * size * side * .6, r.y + dy * size * .5 + dx * size * side * .6, size,
+                      r.vx * .5 + dx * kick - dy * spread, r.vy * .5 + dy * kick + dx * spread, 2);
+    });
+  }
+  function collide() {
+    for (let i = 0; i < rocks.length; i++) {
+      const a = rocks[i];
+      if (a.immune > 0) continue;
+      for (let j = i + 1; j < rocks.length; j++) {
+        const b = rocks[j];
+        if (b.immune > 0) continue;
+        if (Math.hypot(a.x - b.x, a.y - b.y) < (a.size + b.size) * .8) {
+          const pieces = [...shatter(a, b), ...shatter(b, a)];
+          rocks.splice(j, 1); rocks.splice(i, 1);
+          rocks.push(...pieces);
+          return; // one collision per frame is plenty; the list just changed
+        }
+      }
+    }
+  }
+  function replenish(dt) {
+    // Keep a few big rocks around: when collisions have used them up, float a new one in from a side.
+    spawnWait -= dt;
+    if (spawnWait > 0 || rocks.filter(r => r.size >= BIG * .9).length >= bigRocks() || rocks.length >= MAX_ROCKS) return;
+    spawnWait = rand(2, 5);
+    const left = Math.random() < .5, [vx, vy] = drift(9, 16);
+    rocks.push(makeRock(left ? -38 : W + 38, rand(0, H * .55), rand(BIG, 40), Math.abs(vx) * (left ? 1 : -1), vy, 1));
+  }
 
   function layout() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -131,11 +187,11 @@
     const padAt = Math.floor(ridge.length * .72); // a flat landing pad
     if (ridge[padAt + 1]) ridge[padAt + 1][1] = ridge[padAt][1];
     stars = Array.from({ length: Math.round(W * H / 9000) }, () => [rand(0, W), rand(0, H * .62), rand(.3, 1)]);
-    rocks = Array.from({ length: W < 600 ? 4 : 7 }, () => {
-      const n = 9, r = rand(14, 40);
-      return { x: rand(0, W), y: rand(0, H * .55), vx: rand(-12, 12), vy: rand(-7, 7), a: rand(0, 6.3), va: rand(-.3, .3),
-               pts: Array.from({ length: n }, (_, i) => [i / n * Math.PI * 2, r * rand(.7, 1.1)]) };
+    rocks = Array.from({ length: bigRocks() + 3 }, (_, i) => {
+      const [vx, vy] = drift(8, 16);
+      return makeRock(rand(0, W), rand(0, H * .55), i < bigRocks() ? rand(BIG, 40) : rand(16, 24), vx, vy);
     });
+    sparks = [];
   }
   const beam = (color, blur) => { cx.strokeStyle = color; cx.shadowColor = color; cx.shadowBlur = blur; };
 
@@ -159,18 +215,33 @@
     }
 
     // asteroids
-    beam("rgba(213,227,238,.85)", 6); cx.lineWidth = 1.5;
-    for (const r of rocks) {
-      if (!still) {
+    if (!still) {
+      for (const r of rocks) {
         // Drift, wrapping around a band 40px wider than the screen on each side so rocks leave and re-enter smoothly.
         const spanX = W + 80, spanY = H * .6;
         r.x = (((r.x + 40 + r.vx * dt) % spanX) + spanX) % spanX - 40;
         r.y = (((r.y + r.vy * dt) % spanY) + spanY) % spanY;
         r.a += r.va * dt;
+        r.immune -= dt;
       }
+      collide();
+      replenish(dt);
+    }
+    beam("rgba(213,227,238,.85)", 6); cx.lineWidth = 1.5;
+    for (const r of rocks) {
       cx.beginPath();
       r.pts.forEach(([ang, rad], i) => { const X = r.x + Math.cos(ang + r.a) * rad, Y = r.y + Math.sin(ang + r.a) * rad; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
       cx.closePath(); cx.stroke();
+    }
+
+    // collision sparks
+    sparks = sparks.filter(sp => (sp.age += dt) < sp.life);
+    for (const sp of sparks) {
+      sp.x += sp.vx * dt; sp.y += sp.vy * dt;
+      const fade = 1 - sp.age / sp.life;
+      beam(`rgba(255,200,120,${fade})`, 12);
+      cx.lineWidth = 2;
+      cx.beginPath(); cx.moveTo(sp.x, sp.y); cx.lineTo(sp.x - sp.vx * .1, sp.y - sp.vy * .1); cx.stroke();
     }
 
     // mountains and the landing pad
