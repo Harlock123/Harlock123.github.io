@@ -161,7 +161,13 @@
     // asteroids
     beam("rgba(213,227,238,.85)", 6); cx.lineWidth = 1.5;
     for (const r of rocks) {
-      if (!still) { r.x = (r.x + r.vx * dt + W + 80) % (W + 80) - 40; r.y = (r.y + r.vy * dt + H * .6) % (H * .6); r.a += r.va * dt; }
+      if (!still) {
+        // Drift, wrapping around a band 40px wider than the screen on each side so rocks leave and re-enter smoothly.
+        const spanX = W + 80, spanY = H * .6;
+        r.x = (((r.x + 40 + r.vx * dt) % spanX) + spanX) % spanX - 40;
+        r.y = (((r.y + r.vy * dt) % spanY) + spanY) % spanY;
+        r.a += r.va * dt;
+      }
       cx.beginPath();
       r.pts.forEach(([ang, rad], i) => { const X = r.x + Math.cos(ang + r.a) * rad, Y = r.y + Math.sin(ang + r.a) * rad; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
       cx.closePath(); cx.stroke();

@@ -8,6 +8,7 @@
 import { readFile, writeFile, mkdir, cp, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { join, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -173,6 +174,9 @@ const p = cfg.profile;
 const oldest = Math.min(...games.map(g => g.year));
 const platformsPerGame = Math.max(0, ...games.map(g => Object.keys(g.info.downloads).length));
 const built = new Date().toISOString().slice(0, 10);
+// Content hashes on the CSS and JS links, so browsers fetch a new copy as soon as either file changes.
+const version = async f => createHash("sha256").update(await readFile(join(root, f))).digest("hex").slice(0, 10);
+const cssVersion = await version("site/style.css"), jsVersion = await version("site/app.js");
 
 const html = `<!doctype html>
 <html lang="en">
@@ -191,7 +195,7 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:wght@400;500;600&family=VT323&display=swap">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=${cssVersion}">
 </head>
 <body>
 <div id="top" class="crt">
@@ -326,7 +330,7 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
   </div>
 </footer>
 </div>
-<script src="app.js"></script>
+<script src="app.js?v=${jsVersion}"></script>
 </body>
 </html>
 `;
