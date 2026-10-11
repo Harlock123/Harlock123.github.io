@@ -118,7 +118,7 @@
   // ---------- Attract-mode vector scene ----------
   const cv = document.getElementById("attract"), cx = cv.getContext("2d");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let W = 0, H = 0, ridge = [], rocks = [], stars = [], visible = true;
+  let W = 0, H = 0, ridge = [], rocks = [], stars = [], visible = true, running = false, last = 0;
   const t0 = performance.now();
   const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -133,7 +133,7 @@
     stars = Array.from({ length: Math.round(W * H / 9000) }, () => [rand(0, W), rand(0, H * .62), rand(.3, 1)]);
     rocks = Array.from({ length: W < 600 ? 4 : 7 }, () => {
       const n = 9, r = rand(14, 40);
-      return { x: rand(0, W), y: rand(0, H * .55), vx: rand(-14, 14), vy: rand(-8, 8), a: rand(0, 6.3), va: rand(-.4, .4),
+      return { x: rand(0, W), y: rand(0, H * .55), vx: rand(-12, 12), vy: rand(-7, 7), a: rand(0, 6.3), va: rand(-.3, .3),
                pts: Array.from({ length: n }, (_, i) => [i / n * Math.PI * 2, r * rand(.7, 1.1)]) };
     });
   }
@@ -141,6 +141,10 @@
 
   function frame(now) {
     const t = (now - t0) / 1000;
+    // Seconds since the last frame, so the rocks drift at the same speed on 60 Hz and 144 Hz screens.
+    // Capped so a long pause (hidden tab, scrolled away) doesn't make them jump.
+    const dt = last ? Math.min((now - last) / 1000, .05) : 0;
+    last = now;
     cx.clearRect(0, 0, W, H);
     cx.shadowBlur = 0;
     for (const [x, y, b] of stars) { cx.fillStyle = `rgba(213,227,238,${b * (.6 + .4 * Math.sin(t * 2 + x))})`; cx.fillRect(x, y, 1.5, 1.5); }
@@ -157,7 +161,7 @@
     // asteroids
     beam("rgba(213,227,238,.85)", 6); cx.lineWidth = 1.5;
     for (const r of rocks) {
-      if (!still) { r.x = (r.x + r.vx / 60 + W + 80) % (W + 80) - 40; r.y = (r.y + r.vy / 60 + H * .6) % (H * .6); r.a += r.va / 60; }
+      if (!still) { r.x = (r.x + r.vx * dt + W + 80) % (W + 80) - 40; r.y = (r.y + r.vy * dt + H * .6) % (H * .6); r.a += r.va * dt; }
       cx.beginPath();
       r.pts.forEach(([ang, rad], i) => { const X = r.x + Math.cos(ang + r.a) * rad, Y = r.y + Math.sin(ang + r.a) * rad; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
       cx.closePath(); cx.stroke();
@@ -189,19 +193,30 @@
     g.addColorStop(0, "rgba(5,8,13,.82)"); g.addColorStop(1, "rgba(5,8,13,0)");
     cx.fillStyle = g; cx.fillRect(0, 0, W, H);
 
-    if (!still && visible) requestAnimationFrame(frame);
+  }
+
+  // One animation loop at most: it stops while the hero is off screen and restarts when it's back.
+  function loop(now) {
+    frame(now);
+    if (!still && visible) requestAnimationFrame(loop);
+    else { running = false; last = 0; }
+  }
+  function start() {
+    if (running) return;
+    running = true;
+    requestAnimationFrame(loop);
   }
 
   layout();
-  requestAnimationFrame(frame);
+  start();
   // Stop drawing while the hero is scrolled out of view.
   new IntersectionObserver(([e]) => {
     const was = visible; visible = e.isIntersecting;
-    if (visible && !was && !still) requestAnimationFrame(frame);
+    if (visible && !was) start();
   }).observe(cv);
   let rz;
   addEventListener("resize", () => {
     clearTimeout(rz);
-    rz = setTimeout(() => { layout(); if (still || !visible) requestAnimationFrame(frame); }, 150);
+    rz = setTimeout(() => { layout(); if (still || !visible) requestAnimationFrame(frame); else start(); }, 150);
   });
 })();
