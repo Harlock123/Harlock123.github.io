@@ -36,6 +36,8 @@
       "blurb": "Defend the rear of your ship in 3D vector space. Now with Capitol Ship mini-bosses, turrets and missiles." },
     { "repo": "AVACastle", "genre": "arcade", "original": "Star Castle", "publisher": "Cinematronics", "year": 1980, "shot": "Images/AVACastle-mines.png",
       "blurb": "Shoot through three counter-rotating rings to hit the cannon, while it fires through the gaps and homing mines close in." },
+    { "repo": "AVATrek", "genre": "arcade", "original": "Star Trek: Strategic Operations Simulator", "publisher": "Sega", "year": 1983, "shot": "Images/AVATrek-battle.png",
+      "blurb": "Command the Enterprise from a 3D main viewer and tactical scanner against Klingons, anti-matter saucers and Nomad, docking at starbases to refill." },
     { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
