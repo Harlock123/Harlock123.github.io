@@ -185,6 +185,14 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
 .tool .titlebar span { margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tool .pane { aspect-ratio: 16 / 9; background: #000; }
 .tool .pane img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Drawn text for a tool with no screenshot, sized to the window so a line of about 38 characters fits. */
+.tool .pane { container-type: inline-size; }
+.tool .screen {
+  margin: 0; height: 100%; padding: 5cqw 5cqw 0; overflow: hidden; white-space: pre;
+  font: 4.4cqw/1.3 var(--hud); color: var(--text);
+  background: radial-gradient(ellipse at 50% 40%, #0c1a26, #000 75%);
+}
+.tool .screen b { font-weight: 400; color: var(--cyan); text-shadow: 0 0 6px rgba(92,225,255,.5); }
 .tool:hover .window { border-color: var(--cyan); box-shadow: 0 0 22px rgba(92,225,255,.25); }
 .tool .highlights { list-style: none; margin: -4px 0 14px; padding: 0; font-size: 14px; color: var(--dim); }
 .tool .highlights li { position: relative; padding-left: 16px; margin: 3px 0; }

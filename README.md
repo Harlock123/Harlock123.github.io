@@ -19,7 +19,9 @@ Edit `data/portfolio.json`:
 - **games**: `repo`, `genre` (`arcade`, `rpg` or `space`, which drive the filter buttons), the `original`
   game, its `publisher` and `year`, a `blurb`, and `shot`: a screenshot's path inside that repo. A game
   without a screenshot can use `"placeholder": "invader"` or `"elite"` for drawn wireframe art.
-- **tools**: `repo` and a `blurb`.
+- **tools**: `repo`, a `blurb`, its `kind` and `tags`, three `highlights`, and `shot`: a screenshot's path
+  inside that repo. A tool without a screenshot can give `screen` instead: a few lines of text drawn in
+  its window, the first of them a heading.
 - **work**: `name`, `kind`, `blurb`, plus `repo` for a public repo or `"private": true`, and any `links`.
 
 Downloads need no configuration. The build picks each repo's rolling `latest` release if it has one,

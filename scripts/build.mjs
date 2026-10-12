@@ -162,9 +162,13 @@ function gameCard(g) {
 // A tool's card: its screenshot in an application window's frame, what it is and what it's built on, three
 // highlights from its README, and the same source and download buttons as a game.
 function toolCard(t) {
+  // A tool without a screenshot can give "screen": a few lines of text drawn in its window instead,
+  // the first of them a heading row.
   const shot = t.shotFile
     ? `<img src="${esc(t.shotFile)}" alt="${esc(t.name)} screenshot" loading="lazy" width="720" height="405"${FitStyle(t.shotFit)}>`
-    : "";
+    : t.screen?.length
+      ? `<pre class="screen" role="img" aria-label="${esc(t.name)} at work">${t.screen.map((l, i) => i === 0 ? `<b>${esc(l)}</b>` : esc(l)).join("\n")}</pre>`
+      : "";
   const tags = [t.kind, ...(t.tags ?? [])].filter(Boolean);
   return `
       <article class="cab tool" data-downloads='${esc(JSON.stringify(t.info.downloads))}'>
