@@ -42,6 +42,8 @@
       "blurb": "Dogfight TIE fighters, skim the Death Star's towers, then run the trench past Vader and put a torpedo down the exhaust port." },
     { "repo": "AVAZone", "genre": "arcade", "original": "Battlezone", "publisher": "Atari", "year": 1980, "shot": "Images/AVAZone-tank.png",
       "blurb": "Tank combat through the periscope on a wireframe plain: radar, tanks, missiles, supertanks and the saucer, under the volcano." },
+    { "repo": "AVASinstar", "genre": "arcade", "original": "Sinistar", "publisher": "Williams", "year": 1983, "shot": "Images/AVASinstar-alive.png",
+      "blurb": "Mine planetoids for Sinibombs while workers build the Sinistar piece by piece. Beware, I live!" },
     { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
