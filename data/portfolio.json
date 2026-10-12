@@ -46,6 +46,8 @@
       "blurb": "Mine planetoids for Sinibombs while workers build the Sinistar piece by piece. Beware, I live!" },
     { "repo": "AVABerzerk", "genre": "arcade", "original": "Berzerk", "publisher": "Stern", "year": 1980, "shot": "Images/AVABerzerk-demo.png",
       "blurb": "Shoot your way through a maze of electrified rooms and talking robots before Evil Otto bounces in. Intruder alert!" },
+    { "repo": "AVAMissile", "genre": "arcade", "original": "Missile Command", "publisher": "Atari", "year": 1980, "shot": "Images/AVAMissile-battle.png",
+      "blurb": "Defend six cities from warheads, MIRVs, bombers and smart bombs with three missile bases, until THE END." },
     { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
