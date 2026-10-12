@@ -65,13 +65,13 @@
   ],
 
   "tools": [
-    { "repo": "AVASvgMaker", "blurb": "Visio-style diagram editor. Reads .vsdx; exports SVG, PNG, PDF, Mermaid and .vsdx." },
-    { "repo": "DirOpusReImagined", "name": "DORI", "blurb": "Directory Opus reimagined: a cross-platform file explorer in .NET and Avalonia." },
-    { "repo": "AVAQueryBuilder", "blurb": "Graphical query builder for Microsoft SQL Server." },
-    { "repo": "AVASdCanvas", "blurb": "Structured drawing canvas that code can populate and users can interact with." },
-    { "repo": "AvaloniaDiagramerControl", "blurb": "The VB.Net-era LineChart control, rebuilt for Windows, macOS and Linux." },
-    { "repo": "Avalonia3DCanvas", "blurb": "3D object viewer for Avalonia and .NET 9." },
-    { "repo": "AvaloniaTimeLineControl", "blurb": "Timeline control for Avalonia applications." }
+    {"repo": "AVASvgMaker", "blurb": "Visio-style diagram editor. Reads .vsdx; exports SVG, PNG, PDF, Mermaid and .vsdx.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 9"], "shot": "Images/overview.png", "highlights": ["167 stencils: flowchart, BPMN, UML, network, electrical, logic and more", "Connectors that route themselves round shapes, and round each other", "Opens Visio, SVG and Mermaid; exports SVG, PNG, PDF and .vsdx"]},
+    {"repo": "DirOpusReImagined", "name": "DORI", "blurb": "Directory Opus reimagined: a cross-platform file explorer in .NET and Avalonia.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 8"], "shot": "ScreenShots/Thumbnail_View.png", "highlights": ["Two panels with folder tabs, after the Amiga's Directory Opus", "Compares and syncs folders, by date or by content hash", "Google Drive, OneDrive, Dropbox, S3 and 40 more, through rclone"]},
+    {"repo": "AVAQueryBuilder", "blurb": "Graphical query builder for Microsoft SQL Server.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 9", "SQL Server"], "shot": "Screenshots/SS1.png", "shotFit": "top", "highlights": ["Builds SELECT queries as a diagram of tables, joins and filters", "25+ derived fields, GROUP BY with HAVING, sorting, TOP and DISTINCT", "Finds SQL Servers on the network, runs the query and shows the rows"]},
+    {"repo": "AVASdCanvas", "blurb": "Structured drawing canvas that code can populate and users can interact with.", "kind": "Control", "tags": ["C#", "Avalonia", ".NET 9"], "shot": "Images/demo-overview.png", "shotFit": "top", "highlights": ["Graph-paper canvas of entities joined by arrowed connectors", "Snap to grid, automatic placement, and dragging with live connectors", "Click, double-click, right-click and hover events carry your metadata"]},
+    {"repo": "AvaloniaDiagramerControl", "blurb": "The VB.Net-era LineChart control, rebuilt for Windows, macOS and Linux.", "kind": "Control", "tags": ["C#", "Avalonia"], "shot": "screenshots/TEMP.png", "highlights": ["Up to ten data series, with polynomial trend lines", "Animated flashing to pick one series out of the rest", "Grid, knot markers and banded backgrounds; every colour and font styleable"]},
+    {"repo": "Avalonia3DCanvas", "blurb": "3D object viewer for Avalonia and .NET 9.", "kind": "Control", "tags": ["C#", "Avalonia", ".NET 9"], "shot": "Documents/Images/Screenshot1.png", "highlights": ["Loads .3DS, .OBJ, .STL, .PLY and .FBX models", "Wireframe drawing, centred and scaled to fit automatically", "Smooth rotation on all three axes, at any speed"]},
+    {"repo": "AvaloniaTimeLineControl", "blurb": "Timeline control for Avalonia applications.", "kind": "Control", "tags": ["C#", "Avalonia"], "shot": "ScreenShots/Screenshot1.png", "shotFit": "left", "highlights": ["Up to ten timeline rows side by side", "30 chicklet styles: ten colours, each a box, a circle or a triangle", "Wheel and keyboard scrolling, weekends, month labels and overlap markers"]}
   ],
 
   "work": [

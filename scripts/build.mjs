@@ -70,9 +70,10 @@ const hasMagick = (() => { try { execFileSync("magick", ["-version"], { stdio: "
 
 // Screenshot from the repo, made 16:9 and shrunk; copied as-is when ImageMagick isn't installed.
 // "fit" says how a picture of another shape becomes 16:9: cropped from the middle (the default), cropped
-// keeping the top ("top") or the bottom ("bottom") for games with their readouts there, or shown whole
+// keeping the top ("top") or the bottom ("bottom") for games with their readouts there, or one end of a
+// very wide picture ("left", "right"), or shown whole
 // ("contain") with black filling the sides, for games on a black screen.
-const FITS = { center: "center", top: "north", bottom: "south" };
+const FITS = { center: "center", top: "north", bottom: "south", left: "west", right: "east" };
 async function screenshot(repo, branch, path, fit = "center") {
   const raw = await gh(`repos/${owner}/${repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${branch}`,
                        "application/vnd.github.raw");
@@ -96,7 +97,9 @@ async function screenshot(repo, branch, path, fit = "center") {
 // Matches the fit in the browser too, for when the picture was copied as-is.
 const FitStyle = fit => fit === "contain" ? ' style="object-fit: contain"'
   : fit === "top" ? ' style="object-position: top"'
-  : fit === "bottom" ? ' style="object-position: bottom"' : "";
+  : fit === "bottom" ? ' style="object-position: bottom"'
+  : fit === "left" ? ' style="object-position: left"'
+  : fit === "right" ? ' style="object-position: right"' : "";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const href = s => esc(encodeURI(s));
@@ -122,7 +125,7 @@ async function gather(list, withShot) {
   return out;
 }
 const games = await gather(cfg.games, true);
-const tools = await gather(cfg.tools, false);
+const tools = await gather(cfg.tools, true);
 const work = await gather(cfg.work, false);
 
 // ---------- Render ----------
@@ -156,14 +159,25 @@ function gameCard(g) {
       </article>`;
 }
 
+// A tool's card: its screenshot in an application window's frame, what it is and what it's built on, three
+// highlights from its README, and the same source and download buttons as a game.
 function toolCard(t) {
-  const n = Object.keys(t.info.downloads).length;
+  const shot = t.shotFile
+    ? `<img src="${esc(t.shotFile)}" alt="${esc(t.name)} screenshot" loading="lazy" width="720" height="405"${FitStyle(t.shotFit)}>`
+    : "";
+  const tags = [t.kind, ...(t.tags ?? [])].filter(Boolean);
   return `
-      <a href="${esc(t.info.url)}">
-        <strong>${esc(t.name)}</strong>
-        <span>${esc(t.blurb ?? t.info.description ?? "")}</span>
-        ${n ? `<em>${n} platform downloads</em>` : ""}
-      </a>`;
+      <article class="cab tool" data-downloads='${esc(JSON.stringify(t.info.downloads))}'>
+        <div class="window">
+          <div class="titlebar"><i></i><i></i><i></i><span>${esc(t.name)}</span></div>
+          <div class="pane">${shot}</div>
+        </div>
+        <h3>${esc(t.name)}</h3>
+        ${tags.length ? `<div class="after">${tags.map(esc).join(" · ")}</div>` : ""}
+        <p class="desc">${esc(t.blurb ?? t.info.description ?? "")}</p>
+        ${t.highlights?.length ? `<ul class="highlights">${t.highlights.map(h => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
+        <div class="acts">${downloadBlock(t)}</div>
+      </article>`;
 }
 
 function workCard(j) {
@@ -282,7 +296,7 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
         <h2 id="tools-title">The <em>workbench</em></h2>
         <p>Editors, controls and utilities, also cross-platform with Avalonia.</p>
       </div>
-      <div class="bench">${tools.map(toolCard).join("")}
+      <div class="cabinets bench">${tools.map(toolCard).join("")}
       </div>
     </div>
   </section>
