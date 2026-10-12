@@ -252,7 +252,10 @@
 
     // the lander: descends toward the pad, then starts over
     const cycle = 14, p = still ? .55 : (t % cycle) / cycle;
-    const lx = px + 20 + Math.sin(p * 6) * 30 * (1 - p), ly = H * .12 + (py - 22 - H * .12) * Math.min(1, p * 1.15);
+    // q runs 0 to 1 over the descent and holds at 1 once landed, so the lander sits still on the pad.
+    // Resting height: the feet (ly + 14) sit on the pad, allowing for half of each line's width.
+    const q = Math.min(1, p * 1.15), rest = py - 14 - 2.3;
+    const lx = px + 20 + Math.sin(q * 6) * 30 * (1 - q), ly = H * .12 + (rest - H * .12) * q;
     beam("#5ce1ff", 12); cx.lineWidth = 1.6;
     cx.beginPath();
     cx.moveTo(lx - 9, ly - 8); cx.lineTo(lx + 9, ly - 8); cx.lineTo(lx + 12, ly); cx.lineTo(lx - 12, ly); cx.closePath();
