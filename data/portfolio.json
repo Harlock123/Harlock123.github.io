@@ -52,6 +52,8 @@
       "blurb": "Fight the star's pull, raze bunkered planets, tractor fuel aboard and escape the reactor before it blows." },
     { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
+    { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
+      "blurb": "The 50-level dungeon rebuilt room for room, in real time, with a Modern mode that adds an automap and no time limit." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
       "blurb": "Party creation, towns, dungeons, gem socketing and an OpenAL soundtrack." },
     { "repo": "AVABardsTale", "genre": "rpg", "original": "The Bard's Tale", "publisher": "Interplay", "year": 1985, "shot": "SCREENSHOTS/catacombs.png",
