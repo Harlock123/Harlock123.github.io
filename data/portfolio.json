@@ -38,6 +38,8 @@
       "blurb": "Shoot through three counter-rotating rings to hit the cannon, while it fires through the gaps and homing mines close in." },
     { "repo": "AVATrek", "genre": "arcade", "original": "Star Trek: Strategic Operations Simulator", "publisher": "Sega", "year": 1983, "shot": "Images/AVATrek-battle.png",
       "blurb": "Command the Enterprise from a 3D main viewer and tactical scanner against Klingons, anti-matter saucers and Nomad, docking at starbases to refill." },
+    { "repo": "AVAWars", "genre": "arcade", "original": "Star Wars", "publisher": "Atari", "year": 1983, "shot": "Images/AVAWars-trench.png",
+      "blurb": "Dogfight TIE fighters, skim the Death Star's towers, then run the trench past Vader and put a torpedo down the exhaust port." },
     { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
