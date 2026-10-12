@@ -68,8 +68,12 @@ async function repoInfo(repo) {
 
 const hasMagick = (() => { try { execFileSync("magick", ["-version"], { stdio: "ignore" }); return true; } catch { return false; } })();
 
-// Screenshot from the repo, cropped to 16:9 and shrunk; copied as-is when ImageMagick isn't installed.
-async function screenshot(repo, branch, path) {
+// Screenshot from the repo, made 16:9 and shrunk; copied as-is when ImageMagick isn't installed.
+// "fit" says how a picture of another shape becomes 16:9: cropped from the middle (the default), cropped
+// keeping the top ("top") or the bottom ("bottom") for games with their readouts there, or shown whole
+// ("contain") with black filling the sides, for games on a black screen.
+const FITS = { center: "center", top: "north", bottom: "south" };
+async function screenshot(repo, branch, path, fit = "center") {
   const raw = await gh(`repos/${owner}/${repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${branch}`,
                        "application/vnd.github.raw");
   await mkdir(join(dist, "shots"), { recursive: true });
@@ -81,10 +85,18 @@ async function screenshot(repo, branch, path) {
   const src = join(dist, "shots", `${repo}.src${extname(path)}`);
   const name = `shots/${repo}.jpg`;
   await writeFile(src, raw);
-  execFileSync("magick", [src, "-resize", "720x405^", "-gravity", "center", "-extent", "720x405", "-quality", "78", "-strip", join(dist, name)]);
+  const shape = fit === "contain"
+    ? ["-resize", "720x405", "-background", "black", "-gravity", "center"]
+    : ["-resize", "720x405^", "-gravity", FITS[fit] ?? "center"];
+  execFileSync("magick", [src, ...shape, "-extent", "720x405", "-quality", "78", "-strip", join(dist, name)]);
   await rm(src);
   return name;
 }
+
+// Matches the fit in the browser too, for when the picture was copied as-is.
+const FitStyle = fit => fit === "contain" ? ' style="object-fit: contain"'
+  : fit === "top" ? ' style="object-position: top"'
+  : fit === "bottom" ? ' style="object-position: bottom"' : "";
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const href = s => esc(encodeURI(s));
@@ -100,7 +112,7 @@ async function gather(list, withShot) {
     if (!item.repo) { out.push(item); continue; }
     try {
       const info = await repoInfo(item.repo);
-      const shot = withShot && item.shot ? await screenshot(item.repo, info.branch, item.shot) : null;
+      const shot = withShot && item.shot ? await screenshot(item.repo, info.branch, item.shot, item.shotFit) : null;
       out.push({ ...item, name: item.name ?? item.repo, info, shotFile: shot });
     } catch (e) {
       failures.push(`${item.repo}: ${e.message}`);
@@ -132,7 +144,7 @@ function downloadBlock(item) {
 function gameCard(g) {
   const after = g.after ?? `After ${g.original} · ${g.publisher}`;
   const tube = g.shotFile
-    ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405">`
+    ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405"${FitStyle(g.shotFit)}>`
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   return `
       <article class="cab" data-f="${esc(g.genre)}" data-downloads='${esc(JSON.stringify(g.info.downloads))}'>
