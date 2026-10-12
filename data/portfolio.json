@@ -52,6 +52,8 @@
       "blurb": "Fight the star's pull, raze bunkered planets, tractor fuel aboard and escape the reactor before it blows." },
     { "repo": "AVAInvaders", "genre": "arcade", "original": "Space Invaders", "publisher": "Taito", "year": 1978, "shot": "Images/AVAInvaders-gameplay.png",
       "blurb": "The march of the invaders, synthesised sound effects and full gamepad support." },
+    { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
+      "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
       "blurb": "The 50-level dungeon rebuilt room for room, in real time, with a Modern mode that adds an automap and no time limit." },
     { "repo": "AVAUltima3", "genre": "rpg", "original": "Ultima III: Exodus", "publisher": "Origin", "year": 1983, "shot": "Screenshots/Overworld_2026-02-20.png",
