@@ -17,7 +17,7 @@ other downloads) is left alone.
 
 Edit `data/portfolio.json`:
 
-- **games**: `repo`, `genre` (`arcade`, `rpg` or `space`, which drive the filter buttons), the `original`
+- **games**: `repo`, `genre` (`arcade`, `rpg`, `space` or `strategy`, which drive the filter buttons), the `original`
   game, its `publisher` and `year`, a `blurb`, and `shot`: a screenshot's path inside that repo. A game
   without a screenshot can use `"placeholder": "invader"` or `"elite"` for drawn wireframe art.
 - **tools**: `repo`, a `blurb`, its `kind` and `tags`, three `highlights`, and `shot`: a screenshot's path

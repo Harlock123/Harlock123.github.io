@@ -383,6 +383,7 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
         <button class="chip" data-f="arcade" aria-pressed="false">Arcade</button>
         <button class="chip" data-f="rpg" aria-pressed="false">RPG</button>
         <button class="chip" data-f="space" aria-pressed="false">Space sim</button>
+        <button class="chip" data-f="strategy" aria-pressed="false">Strategy</button>
       </div>
 
       <div class="cabinets" id="cabinets">${games.map(g => gameCard(g).replace('<article class="cab"', `<article id="game-${esc(g.repo)}" class="cab"`)).join("")}
