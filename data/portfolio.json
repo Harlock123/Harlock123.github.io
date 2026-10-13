@@ -82,6 +82,8 @@
       "blurb": "Break every brick through twelve original rounds with lasers, three balls and the way out at the side, then face the Monolith; mouse or keyboard." },
     { "repo": "AVAScramble", "genre": "arcade", "original": "Scramble", "publisher": "Konami", "year": 1981, "shot": "Images/AVAScramble-caves.png", "shotFit": "contain",
       "blurb": "Fly six stages of mountains, caves, city and maze to the enemy base, laser ahead and bombs below, hitting fuel tanks to keep the gauge from running dry." },
+    { "repo": "AVABubble", "genre": "arcade", "original": "Bubble Bobble", "publisher": "Taito", "year": 1986, "shot": "Images/AVABubble-fruit.png", "shotFit": "contain",
+      "blurb": "Blow bubbles to trap the monsters, then pop a crowd at once for double, double, double; collect EXTEND and keep ahead of the Shade." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
