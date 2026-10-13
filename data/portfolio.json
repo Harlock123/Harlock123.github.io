@@ -68,6 +68,8 @@
       "blurb": "Hop five frogs home across the traffic and the river: ride logs and diving turtles, dodge the snake and the crocodiles, and beat the clock." },
     { "repo": "AVADigDug", "genre": "arcade", "original": "Dig Dug", "publisher": "Namco", "year": 1982, "shot": "Images/AVADigDug-pumping.png", "shotFit": "contain",
       "blurb": "Tunnel through four layers of earth, pump the monsters up until they pop, dodge the fire, and drop rocks on whatever's below." },
+    { "repo": "AVABurgerT", "genre": "arcade", "original": "BurgerTime", "publisher": "Data East", "year": 1982, "shot": "Images/AVABurgerT-kitchen.png", "shotFit": "contain",
+      "blurb": "Walk the burger layers down the floors onto the plates while a sausage, an egg and a pickle chase you; pepper them, squash them, or take them for a ride." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
