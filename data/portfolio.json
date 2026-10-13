@@ -76,6 +76,8 @@
       "blurb": "Draw lines across the open field and close them on the border to claim ground, while the qix tumbles about and the sparx run the border after you." },
     { "repo": "AVALodeRunner", "genre": "arcade", "original": "Lode Runner", "publisher": "Broderbund", "year": 1983, "shot": "Images/AVALodeRunner-trapped.png", "shotFit": "contain",
       "blurb": "Gather every piece of gold and climb out the top; dig holes to trap the guards. Eight original levels and a level editor for making your own." },
+    { "repo": "AVAXevious", "genre": "arcade", "original": "Xevious", "publisher": "Namco", "year": 1982, "shot": "Images/AVAXevious-mothership.png", "shotFit": "contain",
+      "blurb": "Zap what flies and bomb what's on the ground through the sight ahead; find the hidden Sol towers and bring down the Andor Genesis by its core." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
