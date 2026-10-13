@@ -4,7 +4,8 @@ Source for [harlock123.github.io](https://harlock123.github.io/): a retro vector
 games, tools and work.
 
 The page is built, not hand-edited. `scripts/build.mjs` reads `data/portfolio.json`, asks GitHub for each
-repo's description, newest release downloads and screenshot, and writes a static site to `dist/`. The
+repo's description, newest release downloads and screenshot, asks nuget.org for the published packages,
+and writes a static site to `dist/`. The
 `Pages` workflow runs it on every push, once a day, and on demand, then deploys `dist/` to GitHub Pages
 and uploads the same files to [harlock123.com](https://harlock123.com/) (IONOS, IIS) over FTPS.
 
@@ -23,6 +24,12 @@ Edit `data/portfolio.json`:
   inside that repo. A tool without a screenshot can give `screen` instead: a few lines of text drawn in
   its window, the first of them a heading.
 - **work**: `name`, `kind`, `blurb`, plus `repo` for a public repo or `"private": true`, and any `links`.
+- **nuget**: the NuGet account (`owner`). Every package it owns is listed in the "On NuGet" section with
+  its version, frameworks, downloads and a `dotnet add package` line, read fresh at each build, so new
+  packages and versions need no editing. Under `packages`, a package can be given a `repo` (when its
+  NuGet page has no project link), its own `blurb`, or `"hide": true`. A workbench tool with the same
+  repo gets an "On NuGet" badge linking to it. If nuget.org can't be reached, the build uses the
+  `nuget.json` the live site last published, and failing that leaves the section out.
 
 Downloads need no configuration. The build picks each repo's rolling `latest` release if it has one,
 otherwise its newest release, and offers the `.zip` / `.tar.gz` for each platform it finds

@@ -208,6 +208,32 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
 .job .links a { text-decoration: none; }
 .job .links a:hover { color: var(--magenta); }
 
+/* ---------- NuGet packages ---------- */
+.pkg { display: flex; flex-direction: column; }
+.pkg h3 { color: var(--cyan); overflow-wrap: anywhere; }
+.pkg .install {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 4px 6px 4px 12px;
+  border: 1px solid var(--line); background: #000;
+}
+.pkg .install code {
+  flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap;
+  font-family: var(--hud); font-size: 19px; color: var(--green);
+}
+.pkg .links { margin-top: auto; align-items: baseline; }
+.pkg .count { margin-left: auto; color: var(--amber); }
+.copy {
+  flex: none; font-family: var(--hud); font-size: 17px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--cyan); background: none; border: 1px solid var(--line); padding: 0 10px; cursor: pointer;
+}
+.copy:hover { border-color: var(--cyan); box-shadow: 0 0 10px rgba(92,225,255,.3); }
+.copy.done { color: var(--green); border-color: var(--green); }
+.nuget-badge {
+  align-self: flex-start; margin-top: 6px; padding: 0 8px; text-decoration: none;
+  font-family: var(--hud); font-size: 17px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--green); border: 1px solid rgba(114,255,143,.45);
+}
+.nuget-badge:hover { box-shadow: 0 0 10px rgba(114,255,143,.4); }
+
 /* ---------- High-score table ---------- */
 .scores-box { overflow-x: auto; border: 1px solid var(--line); background: #000; padding: 20px clamp(12px, 3vw, 32px); }
 .scores-box h3 {

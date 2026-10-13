@@ -300,3 +300,25 @@
     rz = setTimeout(() => { layout(); if (still || !visible) requestAnimationFrame(frame); else start(); }, 150);
   });
 })();
+
+// ---------- Copy buttons on the NuGet install lines ----------
+(() => {
+  for (const btn of document.querySelectorAll("button.copy[data-copy]")) {
+    btn.hidden = false;
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        btn.textContent = "Copied";
+        btn.classList.add("done");
+        setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("done"); }, 1600);
+      } catch {
+        // No clipboard: select the command so it can be copied by hand.
+        const code = btn.parentElement.querySelector("code");
+        const range = document.createRange();
+        range.selectNodeContents(code);
+        getSelection().removeAllRanges();
+        getSelection().addRange(range);
+      }
+    });
+  }
+})();

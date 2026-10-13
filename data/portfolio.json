@@ -96,6 +96,12 @@
     {"repo": "SyntaxColorizer", "blurb": "Syntax-highlighting text box for Avalonia, with no dependencies beyond Avalonia itself.", "kind": "Control", "tags": ["C#", "Avalonia", ".NET 8", "NuGet"], "shot": "docs/images/Screenshot1.png", "shotFit": "top", "highlights": ["Highlights 38 languages as you type, from C# and Rust to T-SQL and Mermaid", "14 built-in colour themes, and line numbers you can switch off", "Linting with your own rules, and an MVVM-friendly design"]}
   ],
 
+  "nuget": {
+    "owner": "Lonnie_Watson",
+    "packages": {
+      "LawTreeView": { "repo": "lawtreeview" }
+    }
+  },
   "work": [
     { "name": "CARES", "kind": "Behavioral health EHR", "private": true,
       "blurb": "Electronic health records with reporting, records management and a web portal.",

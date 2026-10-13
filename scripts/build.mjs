@@ -1,5 +1,6 @@
 // Builds the site into dist/: reads data/portfolio.json, asks GitHub for each repo's details, newest
-// release downloads and screenshot, and renders one static index.html. No npm packages needed.
+// release downloads and screenshot, asks nuget.org for the published packages, and renders one static
+// index.html. No npm packages needed.
 //
 //   GITHUB_TOKEN=... node scripts/build.mjs      (locally: GITHUB_TOKEN=$(gh auth token) node scripts/build.mjs)
 //
@@ -128,6 +129,69 @@ const games = await gather(cfg.games, true);
 const tools = await gather(cfg.tools, true);
 const work = await gather(cfg.work, false);
 
+// ---------- NuGet ----------
+// Every package the NuGet account owns, read live from nuget.org at each build (so a new package or
+// version shows up by itself): version, downloads, target frameworks. Published as nuget.json too; if
+// nuget.org can't be reached, the copy the live site last published is used, and failing that the
+// section is left out. A NuGet hiccup never stops the build. data/portfolio.json can override a
+// package's "repo" (when its NuGet page has no project link) or "blurb", or "hide" it.
+const NUGET_SITE = "https://harlock123.github.io/nuget.json";
+
+async function getJson(url) {
+  const res = await fetch(url, { headers: { "User-Agent": "harlock123-site" } });
+  if (!res.ok) throw new Error(`${url}: ${res.status} ${res.statusText}`);
+  return res.json();
+}
+
+async function nugetLive(account) {
+  const index = await getJson("https://api.nuget.org/v3/index.json");
+  const service = (...types) => types.map(t => index.resources.find(r => r["@type"] === t)?.["@id"]).find(Boolean);
+  const search = service("SearchQueryService/3.5.0", "SearchQueryService");
+  const registrations = service("RegistrationsBaseUrl/3.6.0", "RegistrationsBaseUrl");
+  const found = await getJson(`${search}?q=owner:${encodeURIComponent(account)}&take=100&semVerLevel=2.0.0`);
+  const out = [];
+  for (const p of found.data) {
+    // The registration lists every version; its catalog entry for the current one names the frameworks.
+    const reg = await getJson(`${registrations}${p.id.toLowerCase()}/index.json`);
+    const entries = [];
+    for (const page of reg.items) entries.push(...(page.items ?? (await getJson(page["@id"])).items));
+    const entry = entries.map(e => e.catalogEntry).find(e => e.version === p.version) ?? entries.at(-1)?.catalogEntry;
+    out.push({
+      id: p.id, version: p.version, description: p.description, downloads: p.totalDownloads,
+      projectUrl: p.projectUrl || null, published: entry?.published?.slice(0, 10) ?? null,
+      frameworks: [...new Set((entry?.dependencyGroups ?? []).map(g => g.targetFramework).filter(Boolean))],
+    });
+  }
+  return out.sort((a, b) => b.downloads - a.downloads || a.id.localeCompare(b.id));
+}
+
+async function nugetPackages(n) {
+  if (!n?.owner) return [];
+  let list;
+  try {
+    list = await nugetLive(n.owner);
+  } catch (e) {
+    console.warn(`warning: nuget.org: ${e.message}; using the live site's last copy`);
+    try { list = (await getJson(NUGET_SITE)).packages; }
+    catch (e2) { console.warn(`warning: ${e2.message}; leaving the NuGet section out`); return []; }
+  }
+  await writeFile(join(dist, "nuget.json"), JSON.stringify({ owner: n.owner, built: new Date().toISOString(), packages: list }, null, 2));
+  return list
+    .filter(p => !n.packages?.[p.id]?.hide)
+    .map(p => {
+      const extra = n.packages?.[p.id] ?? {};
+      const fromUrl = p.projectUrl?.match(/github\.com\/[^/]+\/([^/#?]+)/i)?.[1]?.replace(/\.git$/, "");
+      const repo = extra.repo ?? fromUrl ?? null;
+      return { ...p, repo, source: repo ? `https://github.com/${owner}/${repo}` : null, blurb: extra.blurb ?? null };
+    });
+}
+
+const packages = await nugetPackages(cfg.nuget);
+// A workbench card for the same repo gets a badge pointing at its package.
+for (const t of tools)
+  t.nuget = packages.find(p => p.repo && t.repo && p.repo.toLowerCase() === t.repo.toLowerCase()) ?? null;
+const packageDownloads = packages.reduce((n, p) => n + p.downloads, 0);
+
 // ---------- Render ----------
 function downloadBlock(item) {
   const d = item.info?.downloads ?? {};
@@ -178,9 +242,40 @@ function toolCard(t) {
         </div>
         <h3>${esc(t.name)}</h3>
         ${tags.length ? `<div class="after">${tags.map(esc).join(" · ")}</div>` : ""}
+        ${t.nuget ? `<a class="nuget-badge" href="#pkg-${esc(t.nuget.id)}">On NuGet · v${esc(t.nuget.version)} · ${esc(thousands(t.nuget.downloads))} downloads</a>` : ""}
         <p class="desc">${esc(t.blurb ?? t.info.description ?? "")}</p>
         ${t.highlights?.length ? `<ul class="highlights">${t.highlights.map(h => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
         <div class="acts">${downloadBlock(t)}</div>
+      </article>`;
+}
+
+// "net9.0" reads as ".NET 9"; "netstandard2.0" as ".NET Standard 2.0".
+const framework = f => f.replace(/^net(\d+)\.0(?:-.*)?$/, ".NET $1").replace(/^netstandard/, ".NET Standard ").replace(/^netcoreapp/, ".NET Core ");
+const thousands = n => n.toLocaleString("en-US");
+// NuGet descriptions run long: keep whole sentences up to about two lines.
+function shortDescription(text, max = 210) {
+  const t = String(text ?? "").replace(/\s+/g, " ").trim();
+  if (t.length <= max) return t;
+  const sentences = t.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [];
+  let out = "";
+  for (const s of sentences) { if ((out + s).length > max) break; out += s; }
+  return out.trim() || t.slice(0, max - 1).replace(/\s+\S*$/, "") + "…";
+}
+
+function packageCard(p) {
+  const install = `dotnet add package ${p.id}`;
+  const facts = [`v${p.version}`, ...p.frameworks.map(framework)];
+  return `
+      <article class="job pkg" id="pkg-${esc(p.id)}">
+        <div class="kind">NuGet · ${facts.map(esc).join(" · ")}</div>
+        <h3>${esc(p.id)}</h3>
+        <p>${esc(p.blurb ?? shortDescription(p.description))}</p>
+        <div class="install"><code>${esc(install)}</code><button class="copy" type="button" data-copy="${esc(install)}" hidden>Copy</button></div>
+        <div class="links">
+          <a href="https://www.nuget.org/packages/${esc(p.id)}">NuGet</a>${p.source ? `
+          <a href="${esc(p.source)}">Source</a>` : ""}
+          <span class="count">${esc(thousands(p.downloads))} downloads</span>
+        </div>
       </article>`;
 }
 
@@ -235,7 +330,8 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
     <div class="one-up">1UP <b>HARLOCK123</b></div>
     <nav aria-label="Sections">
       <a href="#games">Games</a>
-      <a href="#tools">Tools</a>
+      <a href="#tools">Tools</a>${packages.length ? `
+      <a href="#nuget">NuGet</a>` : ""}
       <a href="#work">Work</a>
       <a href="#scores">Hi-Scores</a>
       <a href="#about">About</a>
@@ -253,7 +349,8 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
     <ul class="stats">
       <li><b>${games.length}</b>games</li>
       <li><b>${platformsPerGame}</b>platforms each</li>
-      <li><b>${tools.length}</b>tools &amp; controls</li>
+      <li><b>${tools.length}</b>tools &amp; controls</li>${packages.length ? `
+      <li><b>${packages.length}</b>NuGet packages</li>` : ""}
       <li><b>${oldest}</b>oldest original</li>
     </ul>
     <div class="ctas">
@@ -305,7 +402,18 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
     </div>
   </section>
 
-  <section class="block" id="work" aria-labelledby="work-title">
+${packages.length ? `  <section class="block" id="nuget" aria-labelledby="nuget-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="nuget-title">On <em>NuGet</em></h2>
+        <p>Avalonia controls, ready to add to a project of your own: ${packages.length} packages, ${esc(thousands(packageDownloads))} downloads so far.</p>
+      </div>
+      <div class="work pkgs">${packages.map(packageCard).join("")}
+      </div>
+    </div>
+  </section>
+
+` : ""}  <section class="block" id="work" aria-labelledby="work-title">
     <div class="wrap">
       <div class="sec-head">
         <h2 id="work-title">Day <em>job</em></h2>
@@ -355,7 +463,7 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
 
 <footer>
   <div class="wrap">
-    <span class="stamp">Built ${built} from GitHub</span>
+    <span class="stamp">Built ${built} from GitHub${packages.length ? " and NuGet" : ""}</span>
     <span>Unofficial fan recreations; not affiliated with the original publishers. Trademarks belong to their owners.</span>
   </div>
 </footer>
@@ -373,7 +481,7 @@ if (existsSync(join(root, "images"))) await cp(join(root, "images"), join(dist, 
 await writeFile(join(dist, ".nojekyll"), "");
 if (cfg.cname) await writeFile(join(dist, "CNAME"), cfg.cname + "\n");
 
-console.log(`Built dist/: ${games.length} games, ${tools.length} tools, ${work.length} work projects.`);
+console.log(`Built dist/: ${games.length} games, ${tools.length} tools, ${packages.length} NuGet packages, ${work.length} work projects.`);
 if (failures.length) {
   console.error(`\n${failures.length} repo(s) could not be read:\n  ${failures.join("\n  ")}`);
   process.exit(1);
