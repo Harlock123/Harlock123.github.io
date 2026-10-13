@@ -62,6 +62,8 @@
       "blurb": "Drive the moon buggy from A to Z: jump craters and mines, shoot rocks and tanks ahead and saucers overhead, and beat the clock to each checkpoint." },
     { "repo": "AVAPacMan", "genre": "arcade", "original": "Pac-Man", "publisher": "Namco", "year": 1980, "shot": "Images/AVAPacMan-play.png", "shotFit": "contain",
       "blurb": "Clear an original maze while four ghosts hunt you, each its own way; eat an energizer and turn the chase round. Fruit, coffee breaks and a rising siren." },
+    { "repo": "AVAKong", "genre": "arcade", "original": "Donkey Kong", "publisher": "Nintendo", "year": 1981, "shot": "Images/AVAKong-girders.png", "shotFit": "contain",
+      "blurb": "Climb the building site to rescue the captive: jump the ape's barrels, grab a hammer, ride the lifts and pull every rivet to bring him down." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
