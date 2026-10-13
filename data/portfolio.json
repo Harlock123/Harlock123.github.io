@@ -86,6 +86,8 @@
       "blurb": "Blow bubbles to trap the monsters, then pop a crowd at once for double, double, double; collect EXTEND and keep ahead of the Shade." },
     { "repo": "AVAGauntlet", "genre": "arcade", "original": "Gauntlet", "publisher": "Atari Games", "year": 1985, "shot": "Images/AVAGauntlet-horde.png", "shotFit": "contain",
       "blurb": "Choose warrior, valkyrie, wizard or elf and fight down through endless dungeons; shoot the generators, find food and keys, and only magic stops Death." },
+    { "repo": "AVARadiance", "genre": "rpg", "original": "Pool of Radiance", "publisher": "SSI", "year": 1988, "shot": "Images/AVARadiance-battle.png", "shotFit": "contain",
+      "blurb": "A company of six takes back the ruined city of Corvane for its council: first-person streets, tactical grid battles, memorised spells, and the Hollow Regent waiting at the Lumen Well." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
