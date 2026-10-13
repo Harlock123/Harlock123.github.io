@@ -86,6 +86,8 @@
       "blurb": "Blow bubbles to trap the monsters, then pop a crowd at once for double, double, double; collect EXTEND and keep ahead of the Shade." },
     { "repo": "AVAGauntlet", "genre": "arcade", "original": "Gauntlet", "publisher": "Atari Games", "year": 1985, "shot": "Images/AVAGauntlet-horde.png", "shotFit": "contain",
       "blurb": "Choose warrior, valkyrie, wizard or elf and fight down through endless dungeons; shoot the generators, find food and keys, and only magic stops Death." },
+    { "repo": "AVATimePilot", "genre": "arcade", "original": "Time Pilot", "publisher": "Konami", "year": 1982, "shot": "Images/AVATimePilot-1943.png", "shotFit": "contain",
+      "blurb": "Your plane holds the centre while the sky wheels round it: dogfight through 1917, 1943, 1966, 1988 and 2061, down each era's great ship, and warp ahead." },
     { "repo": "AVARadiance", "genre": "rpg", "original": "Pool of Radiance", "publisher": "SSI", "year": 1988, "shot": "Images/AVARadiance-battle.png", "shotFit": "contain",
       "blurb": "A company of six takes back the ruined city of Corvane for its council: first-person streets, tactical grid battles, memorised spells, and the Hollow Regent waiting at the Lumen Well." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
