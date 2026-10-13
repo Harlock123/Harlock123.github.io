@@ -58,6 +58,8 @@
       "blurb": "Flap your ostrich above the buzzard riders: the higher lance wins. Grab the eggs before they hatch; two can play at once." },
     { "repo": "AVACentipede", "genre": "arcade", "original": "Centipede", "publisher": "Atari", "year": 1980, "shot": "Images/AVACentipede-creatures.png", "shotFit": "contain",
       "blurb": "Shoot the centipede apart in a field of mushrooms while the spider, flea and scorpion close in. Steer with the mouse like a trackball." },
+    { "repo": "AVAMoonPatrol", "genre": "arcade", "original": "Moon Patrol", "publisher": "Irem", "year": 1982, "shot": "Images/AVAMoonPatrol-jump.png", "shotFit": "bottom",
+      "blurb": "Drive the moon buggy from A to Z: jump craters and mines, shoot rocks and tanks ahead and saucers overhead, and beat the clock to each checkpoint." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
