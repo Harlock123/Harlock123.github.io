@@ -66,6 +66,8 @@
       "blurb": "Climb the building site to rescue the captive: jump the ape's barrels, grab a hammer, ride the lifts and pull every rivet to bring him down." },
     { "repo": "AVAFrogger", "genre": "arcade", "original": "Frogger", "publisher": "Konami", "year": 1981, "shot": "Images/AVAFrogger-level3.png", "shotFit": "contain",
       "blurb": "Hop five frogs home across the traffic and the river: ride logs and diving turtles, dodge the snake and the crocodiles, and beat the clock." },
+    { "repo": "AVADigDug", "genre": "arcade", "original": "Dig Dug", "publisher": "Namco", "year": 1982, "shot": "Images/AVADigDug-pumping.png", "shotFit": "contain",
+      "blurb": "Tunnel through four layers of earth, pump the monsters up until they pop, dodge the fire, and drop rocks on whatever's below." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
       "blurb": "Six adventurers, a ten-level wireframe maze, and the mad archmage Morthrain waiting at the bottom." },
     { "repo": "AVAGard", "genre": "rpg", "original": "Telengard", "publisher": "Avalon Hill", "year": 1982, "shot": "docs/screenshots/dungeon.png", "shotFit": "top",
