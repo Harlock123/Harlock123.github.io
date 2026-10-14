@@ -90,6 +90,8 @@
       "blurb": "Your plane holds the centre while the sky wheels round it: dogfight through 1917, 1943, 1966, 1988 and 2061, down each era's great ship, and warp ahead." },
     { "repo": "AVA1942", "genre": "arcade", "original": "1942", "publisher": "Capcom", "year": 1984, "shot": "Images/AVA1942-great-bomber.png", "shotFit": "contain",
       "blurb": "Take off from the carrier and fight up the ocean through fighter waves, red squadrons and bombers; loop out of trouble, down the great bomber and land on the next carrier." },
+    { "repo": "AVASPYHunter", "genre": "arcade", "original": "Spy Hunter", "publisher": "Bally Midway", "year": 1983, "shot": "Images/AVASPYHunter-razorwheel.png", "shotFit": "contain",
+      "blurb": "Drive a road that forks, bridges and turns to river: run raiders off it, dodge blades, gunmen and the helicopter's bombs, take oil, smoke and missiles from the armoury van, and spare the innocent." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
