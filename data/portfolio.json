@@ -94,6 +94,8 @@
       "blurb": "Drive a road that forks, bridges and turns to river: run raiders off it, dodge blades, gunmen and the helicopter's bombs, take oil, smoke and missiles from the armoury van, and spare the innocent." },
     { "repo": "AVARampage", "genre": "arcade", "original": "Rampage", "publisher": "Bally Midway", "year": 1986, "shot": "Images/AVARampage-climbing.png", "shotFit": "contain",
       "blurb": "Be a giant bear, crocodile or rat: climb the buildings and punch them down, eat the people in the windows, swat helicopters and stamp on soldiers, and flatten a new city every day." },
+    { "repo": "AVAPaperboy", "genre": "arcade", "original": "Paperboy", "publisher": "Atari Games", "year": 1985, "shot": "Images/AVAPaperboy-throw.png", "shotFit": "contain",
+      "blurb": "Ride Larkspur Lane Monday to Sunday throwing papers into subscribers' mailboxes: miss one and they cancel, break their window and they cancel too, while dogs, cars, mowers and a tornado get in the way." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
