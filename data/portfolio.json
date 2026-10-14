@@ -104,6 +104,8 @@
       "blurb": "Four games on a neon grid each level: a light-cycle race, a tank maze with bouncing shots, a gate to reach through swarming grid bugs, and a spinning shield to shoot through into the core." },
     { "repo": "AVAElevatorAction", "genre": "arcade", "original": "Elevator Action", "publisher": "Taito", "year": 1983, "shot": "Images/AVAElevatorAction-gunfight.png", "shotFit": "contain",
       "blurb": "Work down an office tower from the roof to the getaway car, riding the lifts and grabbing the secret papers behind every red door, while agents in black hats shoot high and low. Shoot the lamps down on them." },
+    { "repo": "AVAPolePosition", "genre": "arcade", "original": "Pole Position", "publisher": "Namco", "year": 1982, "shot": "Images/AVAPolePosition-bend.png", "shotFit": "contain",
+      "blurb": "Qualify with one flying lap for a place on the grid, then race four laps of a pseudo-3D circuit against seven cars: change gear, brake for the bends, and keep off the billboards before the clock runs out." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
