@@ -98,6 +98,8 @@
       "blurb": "Sail west for the Crown to a new continent every game: chart its coasts, trade with six peoples, found trading posts, and seek the seven golden cities over a twenty-year career." },
     { "repo": "AVAArchon", "genre": "strategy", "original": "Archon: The Light and the Dark", "publisher": "Free Fall Associates", "year": 1983, "shot": "Images/AVAArchon-arena.png", "shotFit": "contain",
       "blurb": "Dawn against Dusk on a board of shifting light: every capture is a real-time duel in the arena, with seven spells per leader, five power points to hold, and a computer foe that knows its odds." },
+    { "repo": "AVADungeonSeige", "genre": "rpg", "original": "Dungeon Siege", "publisher": "Gas Powered Games", "year": 2002, "shot": "screenshots/braak-fight.png", "shotFit": "contain",
+      "blurb": "The opening chapter on the road to Glacern: pausable real-time party combat, skills that rise by use instead of classes, and one continuous world that streams in with no loading screens." },
     { "repo": "AVARadiance", "genre": "rpg", "original": "Pool of Radiance", "publisher": "SSI", "year": 1988, "shot": "Images/AVARadiance-battle.png", "shotFit": "contain",
       "blurb": "A company of six takes back the ruined city of Corvane for its council: first-person streets, tactical grid battles, memorised spells, and the Hollow Regent waiting at the Lumen Well." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
