@@ -17,9 +17,17 @@ other downloads) is left alone.
 
 Edit `data/portfolio.json`:
 
-- **games**: `repo`, `genre` (`arcade`, `rpg`, `space` or `strategy`, which drive the filter buttons), the `original`
-  game, its `publisher` and `year`, a `blurb`, and `shot`: a screenshot's path inside that repo. A game
-  without a screenshot can use `"placeholder": "invader"` or `"elite"` for drawn wireframe art.
+- **games**: `repo`, `genre` (`arcade`, `rpg`, `space` or `strategy`), for an arcade game its `style`
+  (`shooter`, `scroller`, `maze`, `platform` or `driving`), the `original` game, its `publisher` and
+  `year`, a `blurb`, and `shot`: a screenshot's path inside that repo. The genres and styles make the
+  filter buttons, each with its count. A game without a screenshot can use `"placeholder": "invader"` or
+  `"elite"` for drawn wireframe art.
+
+The games show as compact tiles by default; a tile opens the full card in a panel. The **DETAIL**
+button in the header switches to the full cards, and the page remembers the choice. Above the games,
+a search box matches the name, original, publisher and year, and a menu sorts them: newest first (by
+the repo's creation date), by original title, by year, or by publisher. The five newest games carry a
+NEW badge.
 - **tools**: `repo`, a `blurb`, its `kind` and `tags`, three `highlights`, and `shot`: a screenshot's path
   inside that repo. A tool without a screenshot can give `screen` instead: a few lines of text drawn in
   its window, the first of them a heading.

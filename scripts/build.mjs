@@ -62,7 +62,7 @@ async function repoInfo(repo) {
   }
   return {
     url: meta.html_url, description: meta.description, branch: meta.default_branch, private: meta.private,
-    pushed: meta.pushed_at, stars: meta.stargazers_count,
+    pushed: meta.pushed_at, created: meta.created_at, stars: meta.stargazers_count,
     releaseUrl: release?.html_url ?? null, releaseTag: release?.tag_name ?? null, downloads: downloads(release),
   };
 }
@@ -208,15 +208,26 @@ function downloadBlock(item) {
         </details>`;
 }
 
-function gameCard(g) {
+// The filter buttons: arcade games split by style, the rest by genre.
+const STYLES = { shooter: "Shooters", scroller: "Scrolling shooters", maze: "Maze & puzzle", platform: "Platform & action", driving: "Driving & flying" };
+const GENRES = { arcade: "All arcade", rpg: "RPG", strategy: "Strategy", space: "Space sim" };
+// The games added most recently get a NEW badge.
+const NEW_COUNT = 5;
+
+function gameCard(g, isNew) {
   const after = g.after ?? `After ${g.original} · ${g.publisher}`;
+  // What the search box matches, and what the sort menu sorts by.
+  const search = [g.name, g.original, g.publisher, g.year, GENRES[g.genre], STYLES[g.style], g.genre].filter(Boolean).join(" ").toLowerCase();
   const tube = g.shotFile
     ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405"${FitStyle(g.shotFit)}>`
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   return `
-      <article class="cab" data-f="${esc(g.genre)}" data-downloads='${esc(JSON.stringify(g.info.downloads))}'>
-        <div class="tube">${tube}<span class="year">${esc(g.year)}</span></div>
+      <article class="cab" data-genre="${esc(g.genre)}" data-style="${esc(g.style ?? "")}" data-search="${esc(search)}"
+        data-original="${esc(g.original)}" data-publisher="${esc(g.publisher)}" data-year="${esc(g.year)}" data-created="${esc(g.info.created ?? "")}"
+        data-downloads='${esc(JSON.stringify(g.info.downloads))}'>
+        <div class="tube">${tube}<span class="year">${esc(g.year)}</span>${isNew ? `<span class="new">NEW</span>` : ""}</div>
         <h3>${esc(g.name)}</h3>
+        <button class="open" type="button" aria-label="More about ${esc(g.name)}"></button>
         <div class="after">${esc(after)}</div>
         <p class="desc">${esc(g.blurb ?? g.info.description)}</p>
         <div class="acts">${downloadBlock(g)}</div>
@@ -297,6 +308,7 @@ const scoreRows = [...games].sort((a, b) => a.year - b.year || a.original.locale
 
 const p = cfg.profile;
 const oldest = Math.min(...games.map(g => g.year));
+const newest = new Set([...games].filter(g => g.info.created).sort((a, b) => b.info.created.localeCompare(a.info.created)).slice(0, NEW_COUNT).map(g => g.repo));
 const platformsPerGame = Math.max(0, ...games.map(g => Object.keys(g.info.downloads).length));
 const built = new Date().toISOString().slice(0, 10);
 // Content hashes on the CSS and JS links, so browsers fetch a new copy as soon as either file changes.
@@ -321,6 +333,8 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Audiowide&family=Chakra+Petch:wght@400;500;600&family=VT323&display=swap">
 <link rel="stylesheet" href="style.css?v=${cssVersion}">
+<script>/* Compact tiles unless the visitor chose the full cards, set before the page paints. */
+try { if (localStorage.getItem("view") !== "full") document.documentElement.classList.add("compact"); } catch { document.documentElement.classList.add("compact"); }</script>
 </head>
 <body>
 <div id="top" class="crt">
@@ -336,6 +350,7 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
       <a href="#scores">Hi-Scores</a>
       <a href="#about">About</a>
     </nav>
+    <button class="crt-toggle" id="viewToggle" aria-pressed="false" title="Show every game in full, or as compact tiles that open when clicked">DETAIL</button>
     <button class="crt-toggle" id="crtToggle" aria-pressed="true" title="Turn the scanline effect on or off">CRT</button>
   </div>
 </header>
@@ -378,16 +393,37 @@ if (location.protocol === "http:" && !/^(localhost|127\\.0\\.0\\.1)$/.test(locat
         <span class="note" id="platformNote">Download buttons below are set for this machine. Change it to grab a build for another computer.</span>
       </div>
 
-      <div class="filters" role="group" aria-label="Filter games">
-        <button class="chip" data-f="all" aria-pressed="true">All</button>
-        <button class="chip" data-f="arcade" aria-pressed="false">Arcade</button>
-        <button class="chip" data-f="rpg" aria-pressed="false">RPG</button>
-        <button class="chip" data-f="space" aria-pressed="false">Space sim</button>
-        <button class="chip" data-f="strategy" aria-pressed="false">Strategy</button>
+      <div class="finder">
+        <label class="search"><span class="sr">Search the games</span>
+          <input type="search" id="gameSearch" placeholder="Search: name, original, publisher, year" autocomplete="off" spellcheck="false">
+        </label>
+        <label class="sort">Sort
+          <select id="gameSort">
+            <option value="new">Newest first</option>
+            <option value="az">Original A–Z</option>
+            <option value="year">Oldest original first</option>
+            <option value="publisher">Publisher</option>
+          </select>
+        </label>
+        <span class="shown" id="gameCount" aria-live="polite">${games.length} games</span>
       </div>
 
-      <div class="cabinets" id="cabinets">${games.map(g => gameCard(g).replace('<article class="cab"', `<article id="game-${esc(g.repo)}" class="cab"`)).join("")}
+      <div class="filters" role="group" aria-label="Filter games">
+        <button class="chip" data-f="all" aria-pressed="true">All <b>${games.length}</b></button>${[
+          ["arcade", GENRES.arcade, games.filter(g => g.genre === "arcade").length],
+          ...Object.entries(STYLES).map(([k, l]) => [k, l, games.filter(g => g.style === k).length]),
+          ...["rpg", "strategy", "space"].map(k => [k, GENRES[k], games.filter(g => g.genre === k).length]),
+        ].filter(([, , n]) => n > 0).map(([k, l, n]) => `
+        <button class="chip${STYLES[k] ? " sub" : ""}" data-f="${k}" aria-pressed="false">${esc(l)} <b>${n}</b></button>`).join("")}
       </div>
+
+      <div class="cabinets" id="cabinets">${games.map(g => gameCard(g, newest.has(g.repo)).replace('<article class="cab"', `<article id="game-${esc(g.repo)}" class="cab"`)).join("")}
+      </div>
+      <p class="no-match" id="noMatch" hidden>No game matches that. Try another word, or press <b>All</b>.</p>
+      <dialog class="game-dialog" id="gameDialog" aria-label="Game details">
+        <button class="close btn ghost" type="button" aria-label="Close">✕</button>
+        <div class="body"></div>
+      </dialog>
       <p class="linux-note">On Linux some games need <code>aplay</code> for sound, or SDL2 for gamepads on ARM. Each game's README says which.</p>
     </div>
   </section>

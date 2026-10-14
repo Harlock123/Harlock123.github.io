@@ -70,14 +70,79 @@
     paint();
   });
 
-  // ---------- Filters ----------
+  // ---------- Finding a game: filter buttons, search and sort ----------
   const chips = [...document.querySelectorAll(".chip")];
   const cabinets = document.getElementById("cabinets");
+  const all = [...cabinets.children];
+  all.forEach((card, i) => card.dataset.order = i);
+  const search = document.getElementById("gameSearch"), sort = document.getElementById("gameSort");
+  const count = document.getElementById("gameCount"), noMatch = document.getElementById("noMatch");
+  let filter = "all";
+  const byText = k => (a, b) => a.dataset[k].localeCompare(b.dataset[k], undefined, { sensitivity: "base" });
+  const SORTS = {
+    // Newest repo first; the order in portfolio.json breaks ties and covers any without a date.
+    new: (a, b) => (b.dataset.created || "").localeCompare(a.dataset.created || "") || a.dataset.order - b.dataset.order,
+    az: byText("original"),
+    year: (a, b) => a.dataset.year - b.dataset.year || byText("original")(a, b),
+    publisher: (a, b) => byText("publisher")(a, b) || a.dataset.year - b.dataset.year,
+  };
+  function apply() {
+    const words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const card of all) {
+      const inGroup = filter === "all" || card.dataset.genre === filter || card.dataset.style === filter;
+      const ok = inGroup && words.every(w => card.dataset.search.includes(w));
+      card.hidden = !ok;
+      if (ok) shown++;
+    }
+    const sorted = [...all].sort(SORTS[sort.value] ?? SORTS.new);
+    if (sorted.some((c, i) => cabinets.children[i] !== c)) cabinets.append(...sorted);
+    count.textContent = `${shown} ${shown === 1 ? "game" : "games"}`;
+    noMatch.hidden = shown > 0;
+  }
   for (const chip of chips) chip.addEventListener("click", () => {
     for (const c of chips) c.setAttribute("aria-pressed", String(c === chip));
-    const f = chip.dataset.f;
-    for (const card of cabinets.children) card.hidden = !(f === "all" || card.dataset.f === f);
+    filter = chip.dataset.f;
+    apply();
   });
+  search.addEventListener("input", apply);
+  sort.value = store.get("sort") || "new";
+  sort.addEventListener("change", () => { store.set("sort", sort.value); apply(); });
+  apply();
+
+  // ---------- Compact tiles or full cards ----------
+  const html = document.documentElement, viewBtn = document.getElementById("viewToggle");
+  const setView = full => { html.classList.toggle("compact", !full); viewBtn.setAttribute("aria-pressed", String(full)); };
+  setView(store.get("view") === "full");
+  viewBtn.addEventListener("click", () => {
+    const full = html.classList.contains("compact");
+    setView(full);
+    store.set("view", full ? "full" : "compact");
+  });
+
+  // A compact tile opens the whole card in a panel.
+  const dialog = document.getElementById("gameDialog"), dialogBody = dialog.querySelector(".body");
+  cabinets.addEventListener("click", e => {
+    const open = e.target.closest(".open");
+    if (!open || !html.classList.contains("compact")) return;
+    const card = open.closest(".cab").cloneNode(true);
+    card.removeAttribute("id");
+    card.hidden = false;
+    card.querySelector(".open")?.remove();
+    card.querySelectorAll("canvas[data-placeholder]").forEach(cv => drawPlaceholder(cv, cv.dataset.placeholder));
+    dialogBody.replaceChildren(card);
+    dialog.showModal();
+  });
+  dialog.querySelector(".close").addEventListener("click", () => dialog.close());
+  // A click on the dimmed page around the panel closes it too.
+  dialog.addEventListener("click", e => { if (e.target === dialog) dialog.close(); });
+  // A link to a game (from the high-score table, say) shows it whatever the filter.
+  function reveal() {
+    const target = location.hash.startsWith("#game-") && document.getElementById(location.hash.slice(1));
+    if (target?.hidden) { search.value = ""; chips[0].click(); }
+  }
+  addEventListener("hashchange", reveal);
+  reveal();
 
   // ---------- CRT toggle ----------
   const root = document.getElementById("top"), crtBtn = document.getElementById("crtToggle");

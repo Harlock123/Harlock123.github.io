@@ -168,6 +168,62 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
 .cab details a { font-family: var(--hud); font-size: 18px; text-decoration: none; }
 .cab details a:hover { color: var(--magenta); }
 
+/* ---------- Finding a game ---------- */
+.finder { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 14px;
+  font-family: var(--hud); font-size: 22px; text-transform: uppercase; }
+.finder .search { flex: 1 1 280px; min-width: 0; }
+.finder input {
+  width: 100%; font: inherit; font-size: 21px; text-transform: none; color: var(--text);
+  background: #000; border: 1px solid var(--line); padding: 4px 12px;
+}
+.finder input::placeholder { color: var(--dim); }
+.finder input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 12px rgba(92,225,255,.3); }
+.finder .sort { color: var(--dim); display: flex; gap: 10px; align-items: center; }
+.finder select {
+  font: inherit; font-size: 20px; color: var(--amber); background: var(--screen);
+  border: 1px solid var(--line); padding: 2px 6px; text-transform: uppercase;
+}
+.finder .shown { color: var(--amber); font-variant-numeric: tabular-nums; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.chip b { font-weight: 400; color: var(--amber); margin-left: 4px; }
+.chip[aria-pressed="true"] b { color: var(--screen); }
+.chip.sub { border-style: dashed; }
+.no-match { font-family: var(--hud); font-size: 24px; color: var(--dim); text-transform: uppercase; }
+.no-match b { color: var(--cyan); font-weight: 400; }
+.cab .tube .new {
+  position: absolute; top: 8px; left: 10px; z-index: 2; padding: 0 8px;
+  font-family: var(--hud); font-size: 20px; color: var(--screen); background: var(--green);
+  box-shadow: 0 0 10px rgba(114,255,143,.6);
+}
+
+/* Compact tiles: the screen and the name only; the whole tile opens the full card. Scoped to the grid, so
+   the card shown in the panel keeps everything. */
+.cab .open { display: none; }
+.compact .cabinets { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 18px 14px; }
+.compact .cabinets .cab { position: relative; }
+.compact .cabinets .cab .desc, .compact .cabinets .cab .acts { display: none; }
+.compact .cabinets .cab h3 { font-size: 15px; margin: 8px 0 0; overflow-wrap: anywhere; }
+.compact .cabinets .cab .after { font-size: 16px; line-height: 1.2; }
+.compact .cabinets .cab .tube::before, .compact .cabinets .cab .tube::after { width: 10px; height: 10px; }
+.compact .cabinets .cab .tube .year, .compact .cabinets .cab .tube .new { font-size: 16px; top: 4px; padding: 0 5px; }
+.compact .cabinets .cab .tube .year { right: 5px; }
+.compact .cabinets .cab .tube .new { left: 5px; }
+.compact .cabinets .cab .open {
+  display: block; position: absolute; inset: 0; z-index: 3; cursor: pointer;
+  background: none; border: 0; padding: 0;
+}
+.compact .cabinets .cab:hover h3 { color: var(--magenta); }
+
+/* The full card of a compact tile, in a panel over the page. */
+.game-dialog {
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 22px;
+  color: var(--text); background: var(--panel); border: 1px solid var(--cyan);
+  box-shadow: 0 0 40px rgba(92,225,255,.25);
+}
+.game-dialog::backdrop { background: rgba(0,0,0,.72); }
+.game-dialog .close { position: absolute; top: 8px; right: 8px; z-index: 5; padding: 0 10px; background: var(--panel); }
+.game-dialog .cab h3 { margin-top: 14px; }
+
 /* ---------- Tools bench & work ---------- */
 /* Tools sit on the same grid as the games, but in an application window rather than an arcade tube. */
 .tool .window {
@@ -273,7 +329,7 @@ img { max-width: 100%; }
   .hud { position: static; }
   .hud .wrap { font-size: 19px; gap: 6px 14px; }
   .hud nav { order: 3; flex-basis: 100%; margin-left: 0; gap: 4px 14px; }
-  .crt-toggle { margin-left: auto; }
+  #viewToggle { margin-left: auto; }
 }
 
 footer { margin-top: clamp(56px, 8vw, 96px); border-top: 1px solid var(--line); }
