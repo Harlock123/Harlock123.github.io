@@ -611,7 +611,327 @@
     },
   };
 
-  const scenes = [lander, asteroids, invaders];
+  // ----- Tempest: a claw on the rim of a tube, shooting down its lanes -----
+  // The tube is seen end on: an outer rim and a small far rim, joined lane by lane. Flippers climb out of the
+  // depths, flipping from lane to lane and leaving spikes; one that reaches the rim crawls round it towards the
+  // claw. The claw follows the nearest flipper and fires down its lane. The tube's shape changes each time.
+  const TUBES = [
+    n => Array.from({ length: n }, (_, i) => [Math.cos(i / n * Math.PI * 2 - Math.PI / 2), Math.sin(i / n * Math.PI * 2 - Math.PI / 2)]),
+    () => [[-1, -1], [-.5, -1], [0, -1], [.5, -1], [1, -1], [1, -.5], [1, 0], [1, .5], [1, 1], [.5, 1], [0, 1], [-.5, 1], [-1, 1], [-1, .5], [-1, 0], [-1, -.5]],
+    n => Array.from({ length: n }, (_, i) => { const a = i / n * Math.PI * 2 - Math.PI / 2, r = i % 2 ? .55 : 1; return [Math.cos(a) * r, Math.sin(a) * r]; }),
+    () => [[-.35, -1], [.35, -1], [.35, -.35], [1, -.35], [1, .35], [.35, .35], [.35, 1], [-.35, 1], [-.35, .35], [-1, .35], [-1, -.35], [-.35, -.35]],
+  ];
+  const tempest = {
+    name: "TEMPEST",
+    shape: -1,
+    layout() {
+      this.cxT = W < 700 ? W * .5 : W * .7; this.cyT = H * .5;
+      this.R = Math.min(H * .42, W < 700 ? W * .42 : W * .25);
+      this.build();
+    },
+    build() {
+      const pts = TUBES[Math.max(0, this.shape) % TUBES.length](16);
+      this.outer = pts.map(([x, y]) => [this.cxT + x * this.R, this.cyT + y * this.R]);
+      // The far rim, small and a little above centre, as if looking slightly down the tube.
+      this.inner = pts.map(([x, y]) => [this.cxT + x * this.R * .16, this.cyT - this.R * .06 + y * this.R * .16]);
+      this.n = pts.length;
+      this.claw = { lane: 0, at: 0, alive: true, wait: 0, fire: 0 };
+      this.flippers = []; this.shots = []; this.spikes = new Array(this.n).fill(0); this.sparks = []; this.spawn = .5;
+    },
+    start() { this.shape++; this.build(); },
+    // A point on a lane's edge `edge` (0..n) at depth d (0 far, 1 rim).
+    edgeAt(edge, d) {
+      const i = ((edge % this.n) + this.n) % this.n, o = this.outer[i], f = this.inner[i], e = d * d;
+      return [f[0] + (o[0] - f[0]) * e, f[1] + (o[1] - f[1]) * e];
+    },
+    // A point across a lane: `lane` may be fractional while something flips between lanes.
+    at(lane, across, d) {
+      const l = Math.floor(lane), frac = lane - l;
+      const p = (k, t) => { const a = this.edgeAt(k, d), b = this.edgeAt(k + 1, d); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; };
+      const a = p(l, across), b = p(l + 1, across);
+      return [a[0] + (b[0] - a[0]) * frac, a[1] + (b[1] - a[1]) * frac];
+    },
+    laneGap(a, b) { let d = b - a; if (d > this.n / 2) d -= this.n; if (d < -this.n / 2) d += this.n; return d; },
+    step(dt) {
+      const n = this.n, c = this.claw;
+      // New flippers from the far end.
+      this.spawn -= dt;
+      if (this.spawn <= 0 && this.flippers.length < 6) {
+        this.spawn = rand(.6, 1.3);
+        this.flippers.push({ lane: Math.floor(rand(0, n)), d: 0, speed: rand(.1, .2), flip: 0, dir: 1, wait: rand(.8, 2) });
+      }
+      for (const f of this.flippers) {
+        if (f.flip) {
+          // Mid-flip: when it lands it is in the next lane.
+          f.flip += dt * 3;
+          if (f.flip >= 1) { f.lane = ((f.lane + f.dir) % n + n) % n; f.flip = 0; }
+          continue;
+        }
+        if (f.d < 1) {
+          f.d = Math.min(1, f.d + f.speed * dt);
+          // Spikes grow behind a climbing flipper now and then.
+          if (Math.random() < .25 * dt) this.spikes[f.lane] = Math.min(.55, Math.max(this.spikes[f.lane], f.d));
+          f.wait -= dt;
+          if (f.wait <= 0) { f.wait = rand(1, 2.5); f.dir = Math.random() < .5 ? 1 : -1; f.flip = .001; }
+        } else {
+          // On the rim: flip round towards the claw.
+          f.wait -= dt;
+          if (f.wait <= 0) { f.wait = .45; f.dir = Math.sign(this.laneGap(f.lane, c.lane)) || 1; f.flip = .001; }
+          if (c.alive && f.lane === c.lane) {
+            c.alive = false; c.wait = 1.4; f.dead = true;
+            const [x, y] = this.at(c.lane, .5, 1);
+            sparkBurst(this.sparks, x, y, 24, 140, "255,225,74");
+          }
+        }
+      }
+      // The claw: round the rim to the most pressing flipper's lane, firing down it.
+      if (!c.alive) { c.wait -= dt; if (c.wait <= 0) { c.alive = true; this.flippers = this.flippers.filter(f => f.d < 1); } }
+      else {
+        const target = this.flippers.filter(f => !f.dead).sort((a, b) => b.d - a.d)[0];
+        let want = target ? target.lane : this.spikes.indexOf(Math.max(...this.spikes));
+        const gap = this.laneGap(c.lane, want);
+        c.at += dt;
+        if (gap !== 0 && c.at > .09) { c.at = 0; c.lane = ((c.lane + Math.sign(gap)) % n + n) % n; }
+        c.fire -= dt;
+        // It lets a flipper climb into view before firing on it.
+        if (gap === 0 && c.fire <= 0 && this.shots.length < 6 && (!target || target.d > .4)) { c.fire = .16; this.shots.push({ lane: c.lane, d: 1 }); }
+      }
+      // Shots down the lanes: they hit flippers, and wear spikes down.
+      for (const s of this.shots) {
+        s.d -= 1.9 * dt;
+        const f = this.flippers.find(f => !f.dead && f.lane === s.lane && (!f.flip || f.flip < .5) && Math.abs(f.d - s.d) < .07);
+        if (f) {
+          f.dead = true; s.dead = true;
+          const [x, y] = this.at(f.lane + (f.flip ? f.flip * f.dir : 0), .5, f.d);
+          sparkBurst(this.sparks, x, y, 14, 90, "255,74,74");
+        } else if (s.d < this.spikes[s.lane]) { this.spikes[s.lane] = Math.max(0, this.spikes[s.lane] - .08); s.dead = true; }
+        else if (s.d <= 0) s.dead = true;
+      }
+      this.shots = this.shots.filter(s => !s.dead);
+      this.flippers = this.flippers.filter(f => !f.dead);
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, 1);
+      const n = this.n;
+      // The tube: both rims and the lanes between them.
+      beam("#3a6cff", 10); cx.lineWidth = 1.4;
+      cx.beginPath();
+      for (const rim of [this.outer, this.inner]) { rim.forEach(([x, y], i) => i ? cx.lineTo(x, y) : cx.moveTo(x, y)); cx.closePath(); }
+      for (let i = 0; i < n; i++) { cx.moveTo(...this.inner[i]); cx.lineTo(...this.outer[i]); }
+      cx.stroke();
+      // Spikes.
+      beam("#72ff8f", 8); cx.lineWidth = 1.6;
+      cx.beginPath();
+      this.spikes.forEach((len, lane) => { if (len > .01) { cx.moveTo(...this.at(lane, .5, 0)); cx.lineTo(...this.at(lane, .5, len)); } });
+      cx.stroke();
+      // Flippers: a bow tie across the lane, turning end over end as they flip.
+      beam("#ff4a4a", 10); cx.lineWidth = 1.5;
+      for (const f of this.flippers) {
+        const lane = f.lane + (f.flip ? f.flip * f.dir : 0), w = .06 + .05 * f.d;
+        const tilt = f.flip ? Math.sin(f.flip * Math.PI) * w : 0;
+        const a = this.at(lane, .08, f.d - w + tilt), b = this.at(lane, .92, f.d + w - tilt);
+        const c2 = this.at(lane, .92, f.d - w), d2 = this.at(lane, .08, f.d + w);
+        cx.beginPath(); cx.moveTo(...a); cx.lineTo(...b); cx.lineTo(...c2); cx.lineTo(...d2); cx.closePath(); cx.stroke();
+      }
+      // Shots.
+      beam("#ffffff", 8); cx.fillStyle = "#ffffff";
+      for (const s of this.shots) { const [x, y] = this.at(s.lane, .5, s.d); cx.fillRect(x - 2, y - 2, 4, 4); }
+      // The claw on the rim.
+      const c = this.claw;
+      if (c.alive) {
+        beam("#ffe14a", 12); cx.lineWidth = 1.8;
+        const P = (across, d) => this.at(c.lane, across, d);
+        cx.beginPath();
+        // Sitting on the rim with its two jaws pointing down the lane.
+        cx.moveTo(...P(0, 1)); cx.lineTo(...P(.18, .955)); cx.lineTo(...P(.36, .978)); cx.lineTo(...P(.5, .945)); cx.lineTo(...P(.64, .978));
+        cx.lineTo(...P(.82, .955)); cx.lineTo(...P(1, 1)); cx.lineTo(...P(.5, .99)); cx.closePath();
+        cx.stroke();
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Battlezone: the view from a tank's periscope -----
+  // First person, in green wireframe: mountains on the horizon turn as the turret does, pyramids and blocks
+  // stand about the plain, and enemy tanks roll in. The turret swings onto the nearest, fires, and a hit sends
+  // the tank flying apart in lines. Now and then an enemy shell gets through and cracks the glass.
+  const TANK_V = [[-1.3, 0, -2], [1.3, 0, -2], [1.3, 0, 2.2], [-1.3, 0, 2.2], [-1.1, .7, -1.7], [1.1, .7, -1.7], [1.1, .7, 1.6], [-1.1, .7, 1.6],
+    [-1.3, .35, 2.6], [1.3, .35, 2.6], [-.6, .7, -.8], [.6, .7, -.8], [.6, .7, .6], [-.6, .7, .6], [-.5, 1.2, -.6], [.5, 1.2, -.6], [.5, 1.2, .4], [-.5, 1.2, .4],
+    [0, 1, .5], [0, 1, 3]];
+  const TANK_E = [[0, 1], [1, 2], [2, 3], [3, 0], [2, 9], [3, 8], [8, 9], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [9, 6], [8, 7],
+    [10, 11], [11, 12], [12, 13], [13, 10], [14, 15], [15, 16], [16, 17], [17, 14], [10, 14], [11, 15], [12, 16], [13, 17], [18, 19]];
+  const PYRAMID = { v: [[-1.5, 0, -1.5], [1.5, 0, -1.5], [1.5, 0, 1.5], [-1.5, 0, 1.5], [0, 3, 0]], e: [[0, 1], [1, 2], [2, 3], [3, 0], [0, 4], [1, 4], [2, 4], [3, 4]] };
+  const BLOCK = { v: [[-1.2, 0, -1.2], [1.2, 0, -1.2], [1.2, 0, 1.2], [-1.2, 0, 1.2], [-1.2, 2.4, -1.2], [1.2, 2.4, -1.2], [1.2, 2.4, 1.2], [-1.2, 2.4, 1.2]],
+                  e: [[0, 1], [1, 2], [2, 3], [3, 0], [4, 5], [5, 6], [6, 7], [7, 4], [0, 4], [1, 5], [2, 6], [3, 7]] };
+  const angleTo = (a, b) => Math.atan2(Math.sin(b - a), Math.cos(b - a));
+  const battlezone = {
+    name: "BATTLEZONE",
+    layout() {
+      this.horizon = H * .6; this.F = Math.min(W, H * 1.7) * .55; this.cxs = W < 700 ? W * .5 : W * .64;
+      if (!this.peaks) this.reset();
+    },
+    reset() {
+      this.h = 0; this.shell = null; this.enemyShells = []; this.bits = []; this.crack = 0; this.spawnWait = 0;
+      // Mountains all round the horizon, and a few things standing on the plain.
+      this.peaks = Array.from({ length: 72 }, () => rand(6, 34));
+      for (let i = 0; i < 72; i += 9) this.peaks[i] = rand(40, 64);
+      this.props = Array.from({ length: 16 }, (_, i) => { const a = rand(0, 6.3), d = rand(14, 70); return { x: Math.sin(a) * d, z: Math.cos(a) * d, m: i % 2 ? PYRAMID : BLOCK, yaw: rand(0, 1.6) }; });
+      this.tanks = [this.newTank(rand(-.8, .8)), this.newTank(rand(2, 4))];
+    },
+    newTank(bearing) { const d = rand(45, 60); return { x: Math.sin(bearing) * d, z: Math.cos(bearing) * d, yaw: bearing + Math.PI, fire: rand(4, 7) }; },
+    start() { if (!this.peaks) this.reset(); },
+    // World to camera: the player sits at the origin, looking along its heading.
+    cam(x, y, z) {
+      const s = Math.sin(this.h), c = Math.cos(this.h);
+      return [x * c - z * s, y - 1.1, x * s + z * c];
+    },
+    line(a, b) {
+      let [ax, ay, az] = a, [bx, by, bz] = b;
+      const near = .4;
+      if (az < near && bz < near) return;
+      if (az < near) { const k = (near - az) / (bz - az); ax += (bx - ax) * k; ay += (by - ay) * k; az = near; }
+      if (bz < near) { const k = (near - bz) / (az - bz); bx += (ax - bx) * k; by += (ay - by) * k; bz = near; }
+      cx.moveTo(this.cxs + ax / az * this.F, this.horizon - ay / az * this.F);
+      cx.lineTo(this.cxs + bx / bz * this.F, this.horizon - by / bz * this.F);
+    },
+    model(m, x, z, yaw, lift = 0) {
+      const s = Math.sin(yaw), c = Math.cos(yaw);
+      const pts = m.v.map(([vx, vy, vz]) => this.cam(x + vx * c + vz * s, vy + lift, z - vx * s + vz * c));
+      for (const [i, j] of m.e) this.line(pts[i], pts[j]);
+    },
+    step(dt) {
+      // Enemies roll in, turn to face the player, and fire now and then.
+      for (const tk of this.tanks) {
+        const d = Math.hypot(tk.x, tk.z), toMe = Math.atan2(-tk.x, -tk.z);
+        tk.yaw += Math.max(-.5 * dt, Math.min(.5 * dt, angleTo(tk.yaw, toMe)));
+        if (d > 18) { tk.x += Math.sin(tk.yaw) * 3 * dt; tk.z += Math.cos(tk.yaw) * 3 * dt; }
+        tk.fire -= dt;
+        if (tk.fire <= 0 && Math.abs(angleTo(tk.yaw, toMe)) < .15 && !this.crack) {
+          tk.fire = rand(6, 10);
+          this.enemyShells.push({ x: tk.x + Math.sin(tk.yaw) * 3, z: tk.z + Math.cos(tk.yaw) * 3, vx: Math.sin(tk.yaw) * 16, vz: Math.cos(tk.yaw) * 16 });
+        }
+      }
+      for (const es of this.enemyShells) { es.x += es.vx * dt; es.z += es.vz * dt; if (Math.hypot(es.x, es.z) < 1.5) { es.hit = true; this.crack = 1.8; this.crackAt = [rand(-.25, .25), rand(-.2, .2)]; } }
+      this.enemyShells = this.enemyShells.filter(es => !es.hit && Math.hypot(es.x, es.z) < 90);
+      if (this.crack > 0) {
+        this.crack -= dt;
+        if (this.crack <= 0) { this.crack = 0; this.tanks = this.tanks.map(() => this.newTank(rand(0, 6.3))); this.enemyShells = []; }
+        return;
+      }
+      // The turret: onto the nearest tank, then fire.
+      const target = this.tanks.slice().sort((a, b) => Math.hypot(a.x, a.z) - Math.hypot(b.x, b.z))[0];
+      if (target) {
+        const err = angleTo(this.h, Math.atan2(target.x, target.z));
+        this.h += Math.max(-.8 * dt, Math.min(.8 * dt, err));
+        if (Math.abs(err) < .02 && !this.shell) this.shell = { x: Math.sin(this.h) * 2, z: Math.cos(this.h) * 2, vx: Math.sin(this.h) * 45, vz: Math.cos(this.h) * 45, age: 0 };
+      }
+      if (this.shell) {
+        const sh = this.shell; sh.x += sh.vx * dt; sh.z += sh.vz * dt; sh.age += dt;
+        const hit = this.tanks.find(tk => Math.hypot(tk.x - sh.x, tk.z - sh.z) < 2.6);
+        if (hit) {
+          // The tank comes apart: every edge flies off on its own.
+          const s = Math.sin(hit.yaw), c = Math.cos(hit.yaw);
+          for (const [i, j] of TANK_E) {
+            const [ax, ay, az] = TANK_V[i], [bx, by, bz] = TANK_V[j];
+            this.bits.push({ a: [hit.x + ax * c + az * s, ay, hit.z - ax * s + az * c], b: [hit.x + bx * c + bz * s, by, hit.z - bx * s + bz * c],
+                             v: [rand(-5, 5), rand(4, 10), rand(-5, 5)], age: 0 });
+          }
+          this.tanks.splice(this.tanks.indexOf(hit), 1);
+          this.shell = null; this.spawnWait = 2.5;
+        } else if (sh.age > 2) this.shell = null;
+      }
+      this.spawnWait -= dt;
+      if (this.tanks.length < 2 && this.spawnWait <= 0) { this.tanks.push(this.newTank(this.h + rand(-2.5, 2.5))); this.spawnWait = 3; }
+      for (const b of this.bits) {
+        b.age += dt; b.v[1] -= 12 * dt;
+        for (const p of [b.a, b.b]) { p[0] += b.v[0] * dt; p[1] = Math.max(0, p[1] + b.v[1] * dt); p[2] += b.v[2] * dt; }
+      }
+      this.bits = this.bits.filter(b => b.age < 2.2);
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, .5);
+      const G = "#72ff8f";
+      // The horizon, the mountains beyond it (they turn with the turret but never come nearer), and a moon.
+      beam(G, 8); cx.lineWidth = 1.4;
+      cx.beginPath(); cx.moveTo(0, this.horizon); cx.lineTo(W, this.horizon); cx.stroke();
+      cx.beginPath();
+      let pen = false;
+      for (let i = 0; i <= 72; i++) {
+        const rel = angleTo(this.h, (i % 72) * Math.PI * 2 / 72);
+        if (Math.abs(rel) > 1.25) { pen = false; continue; }
+        const x = this.cxs + Math.tan(rel) * this.F, y = this.horizon - this.peaks[i % 72] * (H / 400);
+        pen ? cx.lineTo(x, y) : cx.moveTo(x, y); pen = true;
+      }
+      cx.stroke();
+      const moonRel = angleTo(this.h, 1.1);
+      if (Math.abs(moonRel) < 1.1) {
+        const mx = this.cxs + Math.tan(moonRel) * this.F, my = this.horizon - H * .32;
+        beam("#d5e3ee", 8); cx.lineWidth = 1.3;
+        cx.beginPath(); cx.arc(mx, my, 16, .6, 5.6); cx.arc(mx + 7, my - 3, 13, 5.2, 1.0, true); cx.stroke();
+      }
+      // The plain: obstacles, enemy tanks, shells and wreckage.
+      beam(G, 8); cx.lineWidth = 1.3;
+      cx.beginPath();
+      for (const pr of this.props) this.model(pr.m, pr.x, pr.z, pr.yaw);
+      for (const tk of this.tanks) this.model({ v: TANK_V, e: TANK_E }, tk.x, tk.z, tk.yaw);
+      cx.stroke();
+      beam("#ff4a4a", 10); cx.lineWidth = 1.6;
+      cx.beginPath();
+      for (const es of this.enemyShells) {
+        const p = [[0, .9, -.5], [0, .9, .5], [-.3, .9, 0], [.3, .9, 0]].map(([x, y, z]) => this.cam(es.x + x, y, es.z + z));
+        this.line(p[0], p[1]); this.line(p[2], p[3]);
+      }
+      cx.stroke();
+      if (this.shell) {
+        beam("#ffffff", 10); cx.lineWidth = 2;
+        cx.beginPath(); const sh = this.shell; this.line(this.cam(sh.x, .9, sh.z), this.cam(sh.x + sh.vx * .03, .9, sh.z + sh.vz * .03)); cx.stroke();
+      }
+      beam(G, 10); cx.lineWidth = 1.5;
+      for (const b of this.bits) {
+        cx.globalAlpha *= 1 - b.age / 2.2;
+        cx.beginPath(); this.line(this.cam(...b.a), this.cam(...b.b)); cx.stroke();
+        cx.globalAlpha /= Math.max(.001, 1 - b.age / 2.2);
+      }
+      // The gunsight.
+      beam(G, 8); cx.lineWidth = 1.5;
+      const sx = this.cxs, sy = this.horizon - 20;
+      cx.beginPath();
+      cx.moveTo(sx, sy - 40); cx.lineTo(sx, sy - 14); cx.moveTo(sx, sy + 14); cx.lineTo(sx, sy + 40);
+      cx.moveTo(sx - 30, sy - 40); cx.lineTo(sx + 30, sy - 40); cx.moveTo(sx - 30, sy + 40); cx.lineTo(sx + 30, sy + 40);
+      cx.moveTo(sx - 30, sy - 40); cx.lineTo(sx - 30, sy - 30); cx.moveTo(sx + 30, sy - 40); cx.lineTo(sx + 30, sy - 30);
+      cx.moveTo(sx - 30, sy + 40); cx.lineTo(sx - 30, sy + 30); cx.moveTo(sx + 30, sy + 40); cx.lineTo(sx + 30, sy + 30);
+      cx.stroke();
+      // The radar, with its sweep and a blip for each enemy.
+      const rx = W - 64, ry = 64, rr = 40;
+      beam("rgba(114,255,143,.8)", 6); cx.lineWidth = 1.2;
+      cx.beginPath(); cx.arc(rx, ry, rr, 0, Math.PI * 2); cx.moveTo(rx, ry - 4); cx.lineTo(rx, ry - rr); cx.stroke();
+      const sweep = t * 2.4;
+      beam(G, 6); cx.beginPath(); cx.moveTo(rx, ry); cx.lineTo(rx + Math.sin(sweep) * rr, ry - Math.cos(sweep) * rr); cx.stroke();
+      cx.fillStyle = "#ff4a4a"; cx.shadowColor = "#ff4a4a";
+      for (const tk of this.tanks) {
+        const d = Math.hypot(tk.x, tk.z), rel = angleTo(this.h, Math.atan2(tk.x, tk.z));
+        if (d > 80) continue;
+        const k = d / 80 * rr;
+        cx.fillRect(rx + Math.sin(rel) * k - 2, ry - Math.cos(rel) * k - 2, 4, 4);
+      }
+      // A hit: the glass cracks.
+      if (this.crack > 0) {
+        const [ox, oy] = this.crackAt, px = this.cxs + ox * W * .3, py = this.horizon + oy * H;
+        beam("rgba(213,227,238,.9)", 8); cx.lineWidth = 1.5;
+        cx.beginPath();
+        for (let i = 0; i < 9; i++) {
+          let a = i * .7 + 1.3 * Math.sin(i * 2.1), x = px, y = py;
+          cx.moveTo(x, y);
+          for (let k = 0; k < 4; k++) { a += Math.sin(i * 3 + k) * .4; x += Math.cos(a) * 60; y += Math.sin(a) * 60; cx.lineTo(x, y); }
+        }
+        cx.stroke();
+      }
+    },
+  };
+
+  const scenes = [lander, asteroids, invaders, tempest, battlezone];
   let showing = 0, sceneClock = 0, fading = null; // fading: the scene on its way out, and how far
 
   function layout() {
