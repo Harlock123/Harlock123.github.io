@@ -120,10 +120,10 @@
     store.set("view", full ? "full" : "compact");
   });
 
-  // A compact tile opens the whole card in a panel.
+  // A compact tile, a game's or a tool's, opens the whole card in a panel.
   const dialog = document.getElementById("gameDialog"), dialogBody = dialog.querySelector(".body");
-  cabinets.addEventListener("click", e => {
-    const open = e.target.closest(".open");
+  document.addEventListener("click", e => {
+    const open = e.target.closest(".cabinets .open");
     if (!open || !html.classList.contains("compact")) return;
     const card = open.closest(".cab").cloneNode(true);
     card.removeAttribute("id");
@@ -136,6 +136,8 @@
   dialog.querySelector(".close").addEventListener("click", () => dialog.close());
   // A click on the dimmed page around the panel closes it too.
   dialog.addEventListener("click", e => { if (e.target === dialog) dialog.close(); });
+  // A link to somewhere else on the page (a tool's NuGet badge) closes the panel on the way.
+  dialog.addEventListener("click", e => { if (e.target.closest('a[href^="#"]')) dialog.close(); });
   // A link to a game (from the high-score table, say) shows it whatever the filter.
   function reveal() {
     const target = location.hash.startsWith("#game-") && document.getElementById(location.hash.slice(1));

@@ -201,7 +201,8 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
 .cab .open { display: none; }
 .compact .cabinets { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 18px 14px; }
 .compact .cabinets .cab { position: relative; }
-.compact .cabinets .cab .desc, .compact .cabinets .cab .acts { display: none; }
+.compact .cabinets .cab .desc, .compact .cabinets .cab .acts,
+.compact .cabinets .cab .highlights, .compact .cabinets .cab .nuget-badge { display: none; }
 .compact .cabinets .cab h3 { font-size: 15px; margin: 8px 0 0; overflow-wrap: anywhere; }
 .compact .cabinets .cab .after { font-size: 16px; line-height: 1.2; }
 .compact .cabinets .cab .tube::before, .compact .cabinets .cab .tube::after { width: 10px; height: 10px; }

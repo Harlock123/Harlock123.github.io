@@ -252,6 +252,7 @@ function toolCard(t) {
           <div class="pane">${shot}</div>
         </div>
         <h3>${esc(t.name)}</h3>
+        <button class="open" type="button" aria-label="More about ${esc(t.name)}"></button>
         ${tags.length ? `<div class="after">${tags.map(esc).join(" · ")}</div>` : ""}
         ${t.nuget ? `<a class="nuget-badge" href="#pkg-${esc(t.nuget.id)}">On NuGet · v${esc(t.nuget.version)} · ${esc(thousands(t.nuget.downloads))} downloads</a>` : ""}
         <p class="desc">${esc(t.blurb ?? t.info.description ?? "")}</p>
@@ -420,7 +421,7 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
       <div class="cabinets" id="cabinets">${games.map(g => gameCard(g, newest.has(g.repo)).replace('<article class="cab"', `<article id="game-${esc(g.repo)}" class="cab"`)).join("")}
       </div>
       <p class="no-match" id="noMatch" hidden>No game matches that. Try another word, or press <b>All</b>.</p>
-      <dialog class="game-dialog" id="gameDialog" aria-label="Game details">
+      <dialog class="game-dialog" id="gameDialog" aria-label="Details">
         <button class="close btn ghost" type="button" aria-label="Close">✕</button>
         <div class="body"></div>
       </dialog>
