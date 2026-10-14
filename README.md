@@ -46,6 +46,11 @@ otherwise its newest release, and offers the `.zip` / `.tar.gz` for each platfor
 PDFs, the résumé and the portrait live in `static/` and are copied to the site root as-is. Page styles
 and behaviour are in `site/style.css` and `site/app.js`.
 
+Behind the hero, `site/app.js` plays little vector attract-mode scenes in turn, cross-fading every 15
+seconds (`SCENE_SECONDS`): the lunar lander, a ship clearing an asteroid field, and an invader formation
+against a cannon. Each is an object in the `scenes` list with `layout`, `start` and `draw`, so another
+can be added alongside them. A visitor who prefers reduced motion sees one still frame.
+
 ## Building locally
 
 ```bash

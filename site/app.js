@@ -182,157 +182,475 @@
   placeholders();
   document.fonts?.ready.then(placeholders); // redraw once VT323 has loaded
 
-  // ---------- Attract-mode vector scene ----------
+  // ---------- Attract-mode vector scenes ----------
+  // Three little vector games take turns behind the hero, cross-fading every SCENE_SECONDS: the lander
+  // coming down to its pad, a ship clearing an asteroid field, and an invader formation against a cannon.
+  // Each scene keeps its own state and clock, and only the one(s) on screen are stepped.
   const cv = document.getElementById("attract"), cx = cv.getContext("2d");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let W = 0, H = 0, ridge = [], rocks = [], sparks = [], stars = [], visible = true, running = false, last = 0, spawnWait = 0;
+  let W = 0, H = 0, stars = [], visible = true, running = false, last = 0;
   const t0 = performance.now();
   const rand = (a, b) => a + Math.random() * (b - a);
+  const wrap = (v, lo, span) => ((((v - lo) % span) + span) % span) + lo;
+  const beam = (color, blur) => { cx.strokeStyle = color; cx.shadowColor = color; cx.shadowBlur = blur; };
+  const SCENE_SECONDS = 15, FADE = 1.2;
 
-  // Rocks come in three sizes, like the arcade game: big ones split into two medium, medium into two
-  // small, and small ones burst into sparks. Fragments ignore collisions for a moment so they can separate.
-  const BIG = 26, SMALLEST = 11, MAX_ROCKS = 14;
-  function makeRock(x, y, size, vx, vy, immune = 0) {
-    const n = 9;
-    return { x, y, size, vx, vy, immune, a: rand(0, 6.3), va: rand(-.3, .3) * (BIG / size) ** .5,
-             pts: Array.from({ length: n }, (_, i) => [i / n * Math.PI * 2, size * rand(.7, 1.1)]) };
+  function drawStars(t, depth = .62) {
+    cx.shadowBlur = 0;
+    for (const [x, y, b] of stars) {
+      if (y > H * depth) continue;
+      cx.fillStyle = `rgba(213,227,238,${b * (.6 + .4 * Math.sin(t * 2 + x))})`;
+      cx.fillRect(x, y, 1.5, 1.5);
+    }
   }
-  function drift(speedLo, speedHi) {
-    const ang = rand(0, Math.PI * 2), sp = rand(speedLo, speedHi);
-    return [Math.cos(ang) * sp, Math.sin(ang) * sp * .6];
-  }
-  const bigRocks = () => W < 600 ? 3 : 5;
-  function burst(x, y, n, speed) {
+  const sparkBurst = (list, x, y, n, speed, color) => {
     for (let i = 0; i < n; i++) {
       const ang = rand(0, Math.PI * 2), sp = rand(speed * .4, speed);
-      sparks.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: rand(.5, 1.1), age: 0 });
+      list.push({ x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: rand(.5, 1.1), age: 0, color });
+    }
+  };
+  function drawSparks(list, dt) {
+    for (let i = list.length - 1; i >= 0; i--) if ((list[i].age += dt) >= list[i].life) list.splice(i, 1);
+    cx.lineWidth = 2;
+    for (const sp of list) {
+      sp.x += sp.vx * dt; sp.y += sp.vy * dt;
+      const fade = 1 - sp.age / sp.life;
+      beam(`rgba(${sp.color ?? "255,200,120"},${fade})`, 12);
+      cx.beginPath(); cx.moveTo(sp.x, sp.y); cx.lineTo(sp.x - sp.vx * .1, sp.y - sp.vy * .1); cx.stroke();
     }
   }
-  function shatter(r, from) {
-    // Push the pieces away from whatever hit this rock, plus a little sideways spread.
-    let dx = r.x - from.x, dy = r.y - from.y; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
-    burst(r.x, r.y, r.size >= SMALLEST * 1.6 ? 12 : 18, 90);
-    if (r.size < SMALLEST * 1.6 || rocks.length >= MAX_ROCKS) return [];
-    const size = r.size * .58;
-    return [1, -1].map(side => {
-      const kick = rand(14, 24), spread = rand(6, 12) * side;
-      return makeRock(r.x + dx * size * .5 - dy * size * side * .6, r.y + dy * size * .5 + dx * size * side * .6, size,
-                      r.vx * .5 + dx * kick - dy * spread, r.vy * .5 + dy * kick + dx * spread, 2);
-    });
+
+  // ----- The lander, coming down to its pad over the mountains -----
+  const lander = {
+    name: "LUNAR LANDER",
+    layout() {
+      this.ridge = []; let y = H * .82;
+      for (let x = 0; x <= W + 40; x += 40) { y = Math.min(H - 12, Math.max(H * .66, y + rand(-36, 36))); this.ridge.push([x, y]); }
+      const padAt = Math.floor(this.ridge.length * .72); // a flat landing pad
+      if (this.ridge[padAt + 1]) this.ridge[padAt + 1][1] = this.ridge[padAt][1];
+    },
+    start() { this.t = 0; },
+    draw(t, dt) {
+      this.t += dt;
+      drawStars(t);
+      // perspective grid floor
+      beam("rgba(20,48,74,1)", 0); cx.lineWidth = 1;
+      const hz = H * .9;
+      for (let i = -12; i <= 12; i++) { cx.beginPath(); cx.moveTo(W / 2 + i * 30, hz); cx.lineTo(W / 2 + i * 160, H); cx.stroke(); }
+      for (let k = 0; k < 5; k++) {
+        const yy = hz + (H - hz) * ((k + (still ? 0 : t * .5) % 1) / 5) ** 1.6;
+        cx.beginPath(); cx.moveTo(0, yy); cx.lineTo(W, yy); cx.stroke();
+      }
+      // mountains and the landing pad
+      const ridge = this.ridge;
+      beam("#ffb347", 10); cx.lineWidth = 1.6;
+      cx.beginPath(); ridge.forEach(([x, y], i) => i ? cx.lineTo(x, y) : cx.moveTo(x, y)); cx.stroke();
+      const pad = Math.floor(ridge.length * .72), [px, py] = ridge[pad] || [W * .7, H * .8];
+      beam("#72ff8f", 12); cx.lineWidth = 3; cx.beginPath(); cx.moveTo(px, py); cx.lineTo(px + 40, py); cx.stroke();
+      // the lander: descends toward the pad, sits a moment, then starts over
+      const cycle = 14, p = still ? .55 : (this.t % cycle) / cycle;
+      // q runs 0 to 1 over the descent and holds at 1 once landed, so the lander sits still on the pad.
+      // Resting height: the feet (ly + 14) sit on the pad, allowing for half of each line's width.
+      const q = Math.min(1, p * 1.15), rest = py - 14 - 2.3;
+      const lx = px + 20 + Math.sin(q * 6) * 30 * (1 - q), ly = H * .12 + (rest - H * .12) * q;
+      beam("#5ce1ff", 12); cx.lineWidth = 1.6;
+      cx.beginPath();
+      cx.moveTo(lx - 9, ly - 8); cx.lineTo(lx + 9, ly - 8); cx.lineTo(lx + 12, ly); cx.lineTo(lx - 12, ly); cx.closePath();
+      cx.moveTo(lx - 10, ly); cx.lineTo(lx - 16, ly + 14); cx.moveTo(lx + 10, ly); cx.lineTo(lx + 16, ly + 14);
+      cx.moveTo(lx - 19, ly + 14); cx.lineTo(lx - 13, ly + 14); cx.moveTo(lx + 13, ly + 14); cx.lineTo(lx + 19, ly + 14);
+      cx.stroke();
+      if (!still && p < .85 && Math.sin(t * 40) > -.3) {
+        beam("#ff4fd8", 14);
+        cx.beginPath(); cx.moveTo(lx - 5, ly + 2); cx.lineTo(lx, ly + 10 + Math.random() * 10); cx.lineTo(lx + 5, ly + 2); cx.stroke();
+      }
+    },
+  };
+
+  // ----- Asteroids: a ship clearing a rock field -----
+  // Rocks come in three sizes: big ones split into two medium, medium into two small, and small ones burst
+  // into sparks. The ship turns to lead the nearest rock, fires, and keeps its distance; if a rock gets it,
+  // it comes apart and returns a moment later, blinking until it is safe.
+  const BIG = 30, SMALLEST = 11, MAX_ROCKS = 16, SHOT = 380;
+  function makeRock(x, y, size, vx, vy) {
+    const n = 10;
+    return { x, y, size, vx, vy, a: rand(0, 6.3), va: rand(-.4, .4) * (BIG / size) ** .5,
+             pts: Array.from({ length: n }, (_, i) => [i / n * Math.PI * 2, size * rand(.7, 1.1)]) };
   }
-  function collide() {
-    for (let i = 0; i < rocks.length; i++) {
-      const a = rocks[i];
-      if (a.immune > 0) continue;
-      for (let j = i + 1; j < rocks.length; j++) {
-        const b = rocks[j];
-        if (b.immune > 0) continue;
-        if (Math.hypot(a.x - b.x, a.y - b.y) < (a.size + b.size) * .8) {
-          const pieces = [...shatter(a, b), ...shatter(b, a)];
-          rocks.splice(j, 1); rocks.splice(i, 1);
-          rocks.push(...pieces);
-          return; // one collision per frame is plenty; the list just changed
+  const asteroids = {
+    name: "ASTEROIDS",
+    layout() {
+      const big = W < 600 ? 3 : 6;
+      this.big = big;
+      this.rocks = Array.from({ length: big + 2 }, (_, i) => {
+        const ang = rand(0, 6.3), sp = rand(12, 26);
+        // Keep clear of where the ship starts.
+        let x, y;
+        do { x = rand(0, W); y = rand(0, H); } while (Math.hypot(x - W * .68, y - H * .5) < 140);
+        return makeRock(x, y, i < big ? rand(BIG, 42) : rand(16, 22), Math.cos(ang) * sp, Math.sin(ang) * sp);
+      });
+      this.ship = { x: W * .68, y: H * .5, vx: 0, vy: 0, a: -Math.PI / 2, alive: true, wait: 0, invul: 1.5, fire: 0, thrust: false };
+      this.shots = []; this.sparks = []; this.debris = []; this.spawn = 0;
+    },
+    start() { if (!this.rocks) this.layout(); },
+    // The shortest way across the wrapping screen.
+    delta(ax, ay, bx, by) {
+      let dx = bx - ax, dy = by - ay;
+      if (dx > W / 2) dx -= W; else if (dx < -W / 2) dx += W;
+      if (dy > H / 2) dy -= H; else if (dy < -H / 2) dy += H;
+      return [dx, dy];
+    },
+    split(r, dirX, dirY) {
+      sparkBurst(this.sparks, r.x, r.y, r.size >= SMALLEST * 1.6 ? 10 : 16, 90);
+      if (r.size < SMALLEST * 1.6 || this.rocks.length >= MAX_ROCKS) return [];
+      const size = r.size * .58;
+      return [1, -1].map(side => makeRock(r.x - dirY * side * size * .5, r.y + dirX * side * size * .5, size,
+        r.vx * .6 + dirX * rand(8, 18) - dirY * side * rand(14, 26), r.vy * .6 + dirY * rand(8, 18) + dirX * side * rand(14, 26)));
+    },
+    step(dt) {
+      const s = this.ship, rocks = this.rocks;
+      for (const r of rocks) { r.x = wrap(r.x + r.vx * dt, -40, W + 80); r.y = wrap(r.y + r.vy * dt, -40, H + 80); r.a += r.va * dt; }
+      // Keep a few big rocks coming in from the edges.
+      this.spawn -= dt;
+      if (this.spawn <= 0 && rocks.filter(r => r.size >= BIG * .9).length < this.big && rocks.length < MAX_ROCKS) {
+        this.spawn = rand(1.5, 3.5);
+        const left = Math.random() < .5, sp = rand(14, 26), ang = rand(-.6, .6);
+        rocks.push(makeRock(left ? -40 : W + 40, rand(0, H), rand(BIG, 42), Math.cos(ang) * sp * (left ? 1 : -1), Math.sin(ang) * sp));
+      }
+      // The ship.
+      if (!s.alive) {
+        s.wait -= dt;
+        if (s.wait <= 0) Object.assign(s, { alive: true, x: W * .68, y: H * .5, vx: 0, vy: 0, invul: 2.2 });
+      } else {
+        s.invul -= dt;
+        let best = null, bd = Infinity;
+        for (const r of rocks) { const [dx, dy] = this.delta(s.x, s.y, r.x, r.y), d = Math.hypot(dx, dy) - r.size; if (d < bd) { bd = d; best = [r, dx, dy]; } }
+        let want = s.a;
+        s.thrust = false;
+        if (best) {
+          const [r, dx, dy] = best, time = Math.hypot(dx, dy) / SHOT;
+          want = Math.atan2(dy + (r.vy - s.vy) * time, dx + (r.vx - s.vx) * time);
+          // Too close: turn tail and burn away.
+          if (bd < 55) { want += Math.PI; s.thrust = true; }
+        }
+        // Drift back towards its home on the right when nothing presses.
+        if (!s.thrust && Math.hypot(s.x - W * .68, s.y - H * .5) > 160) { s.vx += (W * .68 - s.x) * .15 * dt; s.vy += (H * .5 - s.y) * .15 * dt; }
+        let err = Math.atan2(Math.sin(want - s.a), Math.cos(want - s.a));
+        s.a += Math.max(-4 * dt, Math.min(4 * dt, err));
+        if (s.thrust && Math.abs(err) < .5) { s.vx += Math.cos(s.a) * 160 * dt; s.vy += Math.sin(s.a) * 160 * dt; }
+        s.vx *= 1 - .6 * dt; s.vy *= 1 - .6 * dt;
+        s.x = wrap(s.x + s.vx * dt, 0, W); s.y = wrap(s.y + s.vy * dt, 0, H);
+        s.fire -= dt;
+        if (best && !s.thrust && Math.abs(err) < .12 && s.fire <= 0 && this.shots.length < 4) {
+          s.fire = .24;
+          this.shots.push({ x: s.x + Math.cos(s.a) * 12, y: s.y + Math.sin(s.a) * 12, vx: s.vx + Math.cos(s.a) * SHOT, vy: s.vy + Math.sin(s.a) * SHOT, age: 0 });
+        }
+        if (s.invul <= 0)
+          for (const r of rocks) {
+            const [dx, dy] = this.delta(s.x, s.y, r.x, r.y);
+            if (Math.hypot(dx, dy) < r.size * .85 + 7) {
+              s.alive = false; s.wait = 2;
+              sparkBurst(this.sparks, s.x, s.y, 14, 110, "92,225,255");
+              for (let i = 0; i < 5; i++) this.debris.push({ x: s.x, y: s.y, vx: rand(-60, 60), vy: rand(-60, 60), a: rand(0, 6.3), va: rand(-5, 5), len: rand(8, 14), age: 0 });
+              break;
+            }
+          }
+      }
+      // Shots.
+      for (const b of this.shots) { b.x = wrap(b.x + b.vx * dt, 0, W); b.y = wrap(b.y + b.vy * dt, 0, H); b.age += dt; }
+      this.shots = this.shots.filter(b => {
+        if (b.age > .9) return false;
+        const i = rocks.findIndex(r => { const [dx, dy] = this.delta(b.x, b.y, r.x, r.y); return Math.hypot(dx, dy) < r.size * .9; });
+        if (i < 0) return true;
+        const sp = Math.hypot(b.vx, b.vy) || 1;
+        rocks.push(...this.split(rocks.splice(i, 1)[0], b.vx / sp, b.vy / sp));
+        return false;
+      });
+      for (const d of this.debris) { d.x += d.vx * dt; d.y += d.vy * dt; d.a += d.va * dt; d.age += dt; }
+      this.debris = this.debris.filter(d => d.age < 1.6);
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, 1);
+      beam("rgba(213,227,238,.85)", 6); cx.lineWidth = 1.5;
+      for (const r of this.rocks) {
+        cx.beginPath();
+        r.pts.forEach(([ang, rad], i) => { const X = r.x + Math.cos(ang + r.a) * rad, Y = r.y + Math.sin(ang + r.a) * rad; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
+        cx.closePath(); cx.stroke();
+      }
+      const s = this.ship;
+      if (s.alive && (s.invul <= 0 || Math.sin(t * 25) > 0)) {
+        const c = Math.cos(s.a) * 1.4, n = Math.sin(s.a) * 1.4, P = (f, side) => [s.x + c * f - n * side, s.y + n * f + c * side];
+        beam("#5ce1ff", 12); cx.lineWidth = 1.6;
+        cx.beginPath(); cx.moveTo(...P(14, 0)); cx.lineTo(...P(-9, -8)); cx.lineTo(...P(-5, 0)); cx.lineTo(...P(-9, 8)); cx.closePath(); cx.stroke();
+        if (s.thrust && Math.sin(t * 50) > -.2) {
+          beam("#ff4fd8", 12);
+          cx.beginPath(); cx.moveTo(...P(-6, -4)); cx.lineTo(...P(-14 - Math.random() * 6, 0)); cx.lineTo(...P(-6, 4)); cx.stroke();
         }
       }
-    }
+      beam("#ffffff", 8); cx.fillStyle = "#ffffff";
+      for (const b of this.shots) cx.fillRect(b.x - 1.5, b.y - 1.5, 3, 3);
+      beam("rgba(92,225,255,.9)", 10); cx.lineWidth = 1.5;
+      for (const d of this.debris) {
+        const hx = Math.cos(d.a) * d.len / 2, hy = Math.sin(d.a) * d.len / 2;
+        cx.globalAlpha *= 1 - d.age / 1.6;
+        cx.beginPath(); cx.moveTo(d.x - hx, d.y - hy); cx.lineTo(d.x + hx, d.y + hy); cx.stroke();
+        cx.globalAlpha /= Math.max(.001, 1 - d.age / 1.6);
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Invaders: a marching formation against a cannon behind its bunkers -----
+  // The aliens are this site's own designs (three kinds, two frames each), drawn once into small glowing
+  // sprites. The formation steps faster as it thins; the cannon picks a target, lines up, fires, and side-steps
+  // bombs; a saucer crosses the top now and then.
+  const ALIENS = [
+    [["...XXXXX...", "..XXXXXXX..", ".XX..X..XX.", ".XX.XXX.XX.", ".XXXXXXXXX.", "..X.X.X.X..", ".X.X...X.X.", "..........."],
+     ["...XXXXX...", "..XXXXXXX..", ".XX..X..XX.", ".XX.XXX.XX.", ".XXXXXXXXX.", "..X.X.X.X..", "...X.X.X...", "..........."]],
+    [["X.........X", ".X..XXX..X.", "..XXXXXXX..", ".XXX.X.XXX.", "XXXXXXXXXXX", "X..XXXXX..X", "..X.....X..", "..........."],
+     ["X.........X", ".X..XXX..X.", "..XXXXXXX..", ".XXX.X.XXX.", "XXXXXXXXXXX", ".X.XXXXX.X.", "X.X.....X.X", "..........."]],
+    [["....XXX....", ".XXXXXXXXX.", "XXX.XXX.XXX", "XXXXXXXXXXX", "..XX.X.XX..", ".XX.....XX.", "XX.......XX", "..........."],
+     ["....XXX....", ".XXXXXXXXX.", "XXX.XXX.XXX", "XXXXXXXXXXX", "..XX.X.XX..", "..X.....X..", "...X...X...", "..........."]],
+  ];
+  const ALIEN_COLOURS = ["#ff4fd8", "#5ce1ff", "#72ff8f"];
+  const BUNKER = ["....XXXXXXXXXX....", "..XXXXXXXXXXXXXX..", ".XXXXXXXXXXXXXXXX.", "XXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXX",
+                  "XXXXXXXXXXXXXXXXXX", "XXXXXXXXXXXXXXXXXX", "XXXXX........XXXXX", "XXXX..........XXXX", "XXX............XXX"];
+  const spriteCache = new Map();
+  // The outline of a block of lit cells: an edge wherever a lit cell meets an unlit one, so pixel art
+  // reads as wireframe.
+  function outline(lit, w, h, line) {
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        if (!lit(x, y)) continue;
+        if (!lit(x, y - 1)) line(x, y, x + 1, y);
+        if (!lit(x, y + 1)) line(x, y + 1, x + 1, y + 1);
+        if (!lit(x - 1, y)) line(x, y, x, y + 1);
+        if (!lit(x + 1, y)) line(x + 1, y, x + 1, y + 1);
+      }
   }
-  function replenish(dt) {
-    // Keep a few big rocks around: when collisions have used them up, float a new one in from a side.
-    spawnWait -= dt;
-    if (spawnWait > 0 || rocks.filter(r => r.size >= BIG * .9).length >= bigRocks() || rocks.length >= MAX_ROCKS) return;
-    spawnWait = rand(2, 5);
-    const left = Math.random() < .5, [vx, vy] = drift(9, 16);
-    rocks.push(makeRock(left ? -38 : W + 38, rand(0, H * .55), rand(BIG, 40), Math.abs(vx) * (left ? 1 : -1), vy, 1));
+  function sprite(kind, frame, px) {
+    const key = `${kind}/${frame}/${px}`;
+    if (spriteCache.has(key)) return spriteCache.get(key);
+    const rows = ALIENS[kind][frame], pad = 8, c = document.createElement("canvas");
+    c.width = 11 * px + pad * 2; c.height = 8 * px + pad * 2;
+    const g = c.getContext("2d");
+    g.strokeStyle = g.shadowColor = ALIEN_COLOURS[kind]; g.shadowBlur = 8; g.lineWidth = 1.3; g.lineCap = "square";
+    const lit = (x, y) => rows[y]?.[x] === "X";
+    g.beginPath();
+    outline(lit, 11, 8, (x0, y0, x1, y1) => { g.moveTo(pad + x0 * px, pad + y0 * px); g.lineTo(pad + x1 * px, pad + y1 * px); });
+    g.stroke();
+    spriteCache.set(key, c);
+    return c;
   }
+  const invaders = {
+    name: "INVADERS",
+    layout() {
+      const px = this.px = W < 700 ? 2 : 3;
+      this.cw = 16 * px; this.ch = 13 * px;
+      // On a wide screen they keep to the right, clear of the hero's words; on a phone they have it all.
+      this.left = W < 700 ? W * .06 : W * .46; this.right = W - 16;
+      this.cols = Math.max(4, Math.min(9, Math.floor((this.right - this.left) * .72 / this.cw)));
+      this.ground = H - 18; this.gunY = H - 34;
+      this.bunkers = [];
+      const nb = W < 700 ? 2 : 4, span = this.right - this.left;
+      for (let i = 0; i < nb; i++) {
+        const bx = this.left + span * (i + .5) / nb - 9 * px, by = this.gunY - 48 - 10 * px;
+        BUNKER.forEach((r, y) => [...r].forEach((ch, x) => ch === "X" && this.bunkers.push({ x: bx + x * px, y: by + y * px, b: i, gx: x, gy: y })));
+      }
+      this.gun = { x: (this.left + this.right) / 2, alive: true, wait: 0, target: null };
+      this.newWave();
+      this.ufo = null; this.ufoWait = rand(6, 10);
+    },
+    start() { if (!this.aliens) this.layout(); },
+    newWave() {
+      this.aliens = [];
+      for (let r = 0; r < 5; r++) for (let c = 0; c < this.cols; c++) this.aliens.push({ r, c, kind: r === 0 ? 0 : r < 3 ? 1 : 2, alive: true });
+      this.fx = this.left; this.fy = H * .07; this.dir = 1; this.frame = 0; this.stepWait = 0;
+      this.shot = null; this.bombs = []; this.booms = []; this.sparks = this.sparks ?? []; this.restart = 0;
+    },
+    pos(a) { return [this.fx + a.c * this.cw, this.fy + a.r * this.ch]; },
+    step(dt) {
+      const px = this.px, live = this.aliens.filter(a => a.alive);
+      if (this.restart > 0) { this.restart -= dt; if (this.restart <= 0) this.newWave(); return; }
+      if (!live.length) { this.restart = 1.5; return; }
+      // March: a step at a time, faster as the formation thins; down a row at each edge.
+      this.stepWait -= dt;
+      if (this.stepWait <= 0) {
+        this.stepWait = .04 + .5 * live.length / this.aliens.length;
+        this.frame ^= 1;
+        const xs = live.map(a => this.pos(a)[0]), lo = Math.min(...xs), hi = Math.max(...xs) + 11 * px;
+        if ((this.dir > 0 && hi + 3 * px > this.right) || (this.dir < 0 && lo - 3 * px < this.left)) { this.dir *= -1; this.fy += 3 * px; }
+        else this.fx += this.dir * 3 * px;
+        // Down to the bunkers: they've landed, and it starts again.
+        if (Math.max(...live.map(a => this.pos(a)[1])) + 8 * px > this.gunY - 50) { this.restart = 1.2; sparkBurst(this.sparks, this.gun.x, this.gunY, 20, 120, "114,255,143"); return; }
+      }
+      // Bombs from the bottom alien of a column.
+      if (Math.random() < 1.1 * dt && this.bombs.length < 4) {
+        const bottoms = Object.values(live.reduce((m, a) => ((!m[a.c] || m[a.c].r < a.r) && (m[a.c] = a), m), {}));
+        const a = bottoms[Math.floor(Math.random() * bottoms.length)];
+        if (a) { const [x, y] = this.pos(a); this.bombs.push({ x: x + 5.5 * px, y: y + 8 * px }); }
+      }
+      for (const b of this.bombs) b.y += 150 * dt;
+      // The cannon: dodge a bomb overhead, otherwise line up under a target and fire.
+      const g = this.gun;
+      if (!g.alive) { g.wait -= dt; if (g.wait <= 0) g.alive = true; }
+      else {
+        const threat = this.bombs.find(b => b.y > this.gunY - 140 && Math.abs(b.x - g.x) < 16);
+        let want;
+        if (threat) want = g.x + (threat.x < g.x ? 40 : -40);
+        else {
+          if (!g.target || !g.target.alive) {
+            const bottoms = Object.values(live.reduce((m, a) => ((!m[a.c] || m[a.c].r < a.r) && (m[a.c] = a), m), {}));
+            g.target = bottoms[Math.floor(Math.random() * bottoms.length)];
+          }
+          want = g.target ? this.pos(g.target)[0] + 5.5 * px + this.dir * 6 * px : g.x;
+          if (this.ufo && !this.shot && Math.abs(this.ufo.x - g.x) < 140) want = this.ufo.x + this.ufo.dir * 60;
+        }
+        want = Math.max(this.left + 12, Math.min(this.right - 12, want));
+        g.x += Math.max(-150 * dt, Math.min(150 * dt, want - g.x));
+        if (!threat && !this.shot && Math.abs(want - g.x) < 4) this.shot = { x: g.x, y: this.gunY - 10 };
+      }
+      // The cannon's shot.
+      if (this.shot) {
+        const s = this.shot; s.y -= 520 * dt;
+        const hit = live.find(a => { const [x, y] = this.pos(a); return s.x > x && s.x < x + 11 * px && s.y > y && s.y < y + 8 * px; });
+        if (hit) { hit.alive = false; const [x, y] = this.pos(hit); this.booms.push({ x: x + 5.5 * px, y: y + 4 * px, age: 0, color: ALIEN_COLOURS[hit.kind] }); this.shot = null; }
+        else if (this.ufo && Math.abs(s.x - this.ufo.x) < 18 && Math.abs(s.y - this.ufo.y) < 8) {
+          sparkBurst(this.sparks, this.ufo.x, this.ufo.y, 22, 130, "255,79,216"); this.ufo = null; this.shot = null;
+        } else if (s.y < 0) this.shot = null;
+      }
+      // Bunkers wear away under shots and bombs.
+      const chip = (x, y) => {
+        const i = this.bunkers.findIndex(c => x >= c.x - 1 && x <= c.x + px + 1 && y >= c.y - 1 && y <= c.y + px + 1);
+        if (i < 0) return false;
+        this.bunkers = this.bunkers.filter(c => Math.hypot(c.x - this.bunkers[i].x, c.y - this.bunkers[i].y) > px * 1.6);
+        return true;
+      };
+      if (this.shot && chip(this.shot.x, this.shot.y)) this.shot = null;
+      this.bombs = this.bombs.filter(b => {
+        if (chip(b.x, b.y)) return false;
+        if (g.alive && Math.abs(b.x - g.x) < 12 && b.y > this.gunY - 8) {
+          g.alive = false; g.wait = 1.6; g.target = null;
+          sparkBurst(this.sparks, g.x, this.gunY, 18, 120, "114,255,143");
+          return false;
+        }
+        return b.y < this.ground;
+      });
+      // The saucer.
+      this.ufoWait -= dt;
+      if (!this.ufo && this.ufoWait <= 0) {
+        const dir = Math.random() < .5 ? 1 : -1;
+        this.ufo = { x: dir > 0 ? this.left - 30 : this.right + 30, y: H * .07, dir };
+        this.ufoWait = rand(9, 14);
+      }
+      if (this.ufo) { this.ufo.x += this.ufo.dir * 90 * dt; if (this.ufo.x < this.left - 40 || this.ufo.x > this.right + 40) this.ufo = null; }
+      for (const b of this.booms) b.age += dt;
+      this.booms = this.booms.filter(b => b.age < .35);
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, .5);
+      const px = this.px, alpha = cx.globalAlpha;
+      // The formation marches behind the hero's words, so it's drawn a little faint, like the rocks.
+      cx.globalAlpha = alpha * .62;
+      for (const a of this.aliens) {
+        if (!a.alive) continue;
+        const [x, y] = this.pos(a);
+        cx.drawImage(sprite(a.kind, this.frame, px), x - 8, y - 8);
+      }
+      cx.globalAlpha = alpha;
+      // Bursts where aliens were hit.
+      for (const b of this.booms) {
+        beam(b.color, 10); cx.lineWidth = 1.5;
+        const r = 4 + b.age * 40;
+        cx.beginPath();
+        for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; cx.moveTo(b.x + Math.cos(a) * r * .4, b.y + Math.sin(a) * r * .4); cx.lineTo(b.x + Math.cos(a) * r, b.y + Math.sin(a) * r); }
+        cx.stroke();
+      }
+      // Bunkers.
+      const cells = new Map(this.bunkers.map(c => [`${c.b}:${c.gx},${c.gy}`, c]));
+      beam("rgba(114,255,143,.85)", 6); cx.lineWidth = 1.2;
+      cx.beginPath();
+      for (const c of this.bunkers) {
+        const has = (dx, dy) => cells.has(`${c.b}:${c.gx + dx},${c.gy + dy}`);
+        if (!has(0, -1)) { cx.moveTo(c.x, c.y); cx.lineTo(c.x + px, c.y); }
+        if (!has(0, 1)) { cx.moveTo(c.x, c.y + px); cx.lineTo(c.x + px, c.y + px); }
+        if (!has(-1, 0)) { cx.moveTo(c.x, c.y); cx.lineTo(c.x, c.y + px); }
+        if (!has(1, 0)) { cx.moveTo(c.x + px, c.y); cx.lineTo(c.x + px, c.y + px); }
+      }
+      cx.stroke();
+      // The ground and the cannon.
+      beam("rgba(114,255,143,.7)", 6); cx.lineWidth = 1.5;
+      cx.beginPath(); cx.moveTo(this.left - 10, this.ground); cx.lineTo(this.right + 10, this.ground); cx.stroke();
+      const g = this.gun;
+      if (g.alive) {
+        beam("#72ff8f", 12); cx.lineWidth = 1.6;
+        const y = this.gunY;
+        cx.beginPath();
+        cx.moveTo(g.x - 14, y + 8); cx.lineTo(g.x + 14, y + 8); cx.lineTo(g.x + 14, y + 1); cx.lineTo(g.x + 4, y - 2);
+        cx.lineTo(g.x + 2, y - 9); cx.lineTo(g.x - 2, y - 9); cx.lineTo(g.x - 4, y - 2); cx.lineTo(g.x - 14, y + 1); cx.closePath();
+        cx.stroke();
+      }
+      // Shot, bombs (zigzag) and the saucer.
+      beam("#ffffff", 8); cx.lineWidth = 2;
+      if (this.shot) { cx.beginPath(); cx.moveTo(this.shot.x, this.shot.y); cx.lineTo(this.shot.x, this.shot.y + 9); cx.stroke(); }
+      beam("#ffb347", 8); cx.lineWidth = 1.5;
+      for (const b of this.bombs) {
+        const k = Math.floor(b.y / 4) % 2 ? 2 : -2;
+        cx.beginPath(); cx.moveTo(b.x, b.y - 9); cx.lineTo(b.x + k, b.y - 6); cx.lineTo(b.x - k, b.y - 3); cx.lineTo(b.x, b.y); cx.stroke();
+      }
+      if (this.ufo) {
+        const u = this.ufo;
+        beam("#ff4fd8", 12); cx.lineWidth = 1.6;
+        cx.beginPath();
+        cx.moveTo(u.x - 18, u.y + 3); cx.lineTo(u.x - 10, u.y - 3); cx.lineTo(u.x + 10, u.y - 3); cx.lineTo(u.x + 18, u.y + 3); cx.closePath();
+        cx.moveTo(u.x - 6, u.y - 3); cx.lineTo(u.x - 3, u.y - 8); cx.lineTo(u.x + 3, u.y - 8); cx.lineTo(u.x + 6, u.y - 3);
+        cx.stroke();
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  const scenes = [lander, asteroids, invaders];
+  let showing = 0, sceneClock = 0, fading = null; // fading: the scene on its way out, and how far
 
   function layout() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
     W = cv.clientWidth; H = cv.clientHeight;
     cv.width = W * dpr; cv.height = H * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ridge = []; let y = H * .82;
-    for (let x = 0; x <= W + 40; x += 40) { y = Math.min(H - 12, Math.max(H * .66, y + rand(-36, 36))); ridge.push([x, y]); }
-    const padAt = Math.floor(ridge.length * .72); // a flat landing pad
-    if (ridge[padAt + 1]) ridge[padAt + 1][1] = ridge[padAt][1];
-    stars = Array.from({ length: Math.round(W * H / 9000) }, () => [rand(0, W), rand(0, H * .62), rand(.3, 1)]);
-    rocks = Array.from({ length: bigRocks() + 3 }, (_, i) => {
-      const [vx, vy] = drift(8, 16);
-      return makeRock(rand(0, W), rand(0, H * .55), i < bigRocks() ? rand(BIG, 40) : rand(16, 24), vx, vy);
-    });
-    sparks = [];
+    stars = Array.from({ length: Math.round(W * H / 9000) }, () => [rand(0, W), rand(0, H), rand(.3, 1)]);
+    for (const sc of scenes) sc.layout();
+    scenes[showing].start();
   }
-  const beam = (color, blur) => { cx.strokeStyle = color; cx.shadowColor = color; cx.shadowBlur = blur; };
 
   function frame(now) {
     const t = (now - t0) / 1000;
-    // Seconds since the last frame, so the rocks drift at the same speed on 60 Hz and 144 Hz screens.
+    // Seconds since the last frame, so things move at the same speed on 60 Hz and 144 Hz screens.
     // Capped so a long pause (hidden tab, scrolled away) doesn't make them jump.
     const dt = last ? Math.min((now - last) / 1000, .05) : 0;
     last = now;
     cx.clearRect(0, 0, W, H);
     cx.shadowBlur = 0;
-    for (const [x, y, b] of stars) { cx.fillStyle = `rgba(213,227,238,${b * (.6 + .4 * Math.sin(t * 2 + x))})`; cx.fillRect(x, y, 1.5, 1.5); }
 
-    // perspective grid floor
-    beam("rgba(20,48,74,1)", 0); cx.lineWidth = 1;
-    const hz = H * .9;
-    for (let i = -12; i <= 12; i++) { cx.beginPath(); cx.moveTo(W / 2 + i * 30, hz); cx.lineTo(W / 2 + i * 160, H); cx.stroke(); }
-    for (let k = 0; k < 5; k++) {
-      const yy = hz + (H - hz) * ((k + (still ? 0 : t * .5) % 1) / 5) ** 1.6;
-      cx.beginPath(); cx.moveTo(0, yy); cx.lineTo(W, yy); cx.stroke();
-    }
-
-    // asteroids
+    // Every SCENE_SECONDS the next scene takes over, the old one fading out as the new one fades in.
     if (!still) {
-      for (const r of rocks) {
-        // Drift, wrapping around a band 40px wider than the screen on each side so rocks leave and re-enter smoothly.
-        const spanX = W + 80, spanY = H * .6;
-        r.x = (((r.x + 40 + r.vx * dt) % spanX) + spanX) % spanX - 40;
-        r.y = (((r.y + r.vy * dt) % spanY) + spanY) % spanY;
-        r.a += r.va * dt;
-        r.immune -= dt;
+      sceneClock += dt;
+      if (sceneClock > SCENE_SECONDS && !fading) {
+        fading = { scene: scenes[showing], k: 0 };
+        showing = (showing + 1) % scenes.length;
+        scenes[showing].start();
+        sceneClock = 0;
       }
-      collide();
-      replenish(dt);
     }
-    beam("rgba(213,227,238,.85)", 6); cx.lineWidth = 1.5;
-    for (const r of rocks) {
-      cx.beginPath();
-      r.pts.forEach(([ang, rad], i) => { const X = r.x + Math.cos(ang + r.a) * rad, Y = r.y + Math.sin(ang + r.a) * rad; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
-      cx.closePath(); cx.stroke();
+    if (fading) {
+      fading.k += dt / FADE;
+      cx.globalAlpha = Math.max(0, 1 - fading.k);
+      fading.scene.draw(t, dt);
+      if (fading.k >= 1) fading = null;
     }
-
-    // collision sparks
-    sparks = sparks.filter(sp => (sp.age += dt) < sp.life);
-    for (const sp of sparks) {
-      sp.x += sp.vx * dt; sp.y += sp.vy * dt;
-      const fade = 1 - sp.age / sp.life;
-      beam(`rgba(255,200,120,${fade})`, 12);
-      cx.lineWidth = 2;
-      cx.beginPath(); cx.moveTo(sp.x, sp.y); cx.lineTo(sp.x - sp.vx * .1, sp.y - sp.vy * .1); cx.stroke();
-    }
-
-    // mountains and the landing pad
-    beam("#ffb347", 10); cx.lineWidth = 1.6;
-    cx.beginPath(); ridge.forEach(([x, y], i) => i ? cx.lineTo(x, y) : cx.moveTo(x, y)); cx.stroke();
-    const pad = Math.floor(ridge.length * .72), [px, py] = ridge[pad] || [W * .7, H * .8];
-    beam("#72ff8f", 12); cx.lineWidth = 3; cx.beginPath(); cx.moveTo(px, py); cx.lineTo(px + 40, py); cx.stroke();
-
-    // the lander: descends toward the pad, then starts over
-    const cycle = 14, p = still ? .55 : (t % cycle) / cycle;
-    // q runs 0 to 1 over the descent and holds at 1 once landed, so the lander sits still on the pad.
-    // Resting height: the feet (ly + 14) sit on the pad, allowing for half of each line's width.
-    const q = Math.min(1, p * 1.15), rest = py - 14 - 2.3;
-    const lx = px + 20 + Math.sin(q * 6) * 30 * (1 - q), ly = H * .12 + (rest - H * .12) * q;
-    beam("#5ce1ff", 12); cx.lineWidth = 1.6;
-    cx.beginPath();
-    cx.moveTo(lx - 9, ly - 8); cx.lineTo(lx + 9, ly - 8); cx.lineTo(lx + 12, ly); cx.lineTo(lx - 12, ly); cx.closePath();
-    cx.moveTo(lx - 10, ly); cx.lineTo(lx - 16, ly + 14); cx.moveTo(lx + 10, ly); cx.lineTo(lx + 16, ly + 14);
-    cx.moveTo(lx - 19, ly + 14); cx.lineTo(lx - 13, ly + 14); cx.moveTo(lx + 13, ly + 14); cx.lineTo(lx + 19, ly + 14);
-    cx.stroke();
-    if (!still && p < .85 && Math.sin(t * 40) > -.3) {
-      beam("#ff4fd8", 14);
-      cx.beginPath(); cx.moveTo(lx - 5, ly + 2); cx.lineTo(lx, ly + 10 + Math.random() * 10); cx.lineTo(lx + 5, ly + 2); cx.stroke();
-    }
+    cx.globalAlpha = fading ? Math.min(1, fading.k) : 1;
+    scenes[showing].draw(t, dt);
+    cx.globalAlpha = 1;
 
     // fade the left side so the hero text stays readable
     cx.shadowBlur = 0;
@@ -340,6 +658,14 @@
     g.addColorStop(0, "rgba(5,8,13,.82)"); g.addColorStop(1, "rgba(5,8,13,0)");
     cx.fillStyle = g; cx.fillRect(0, 0, W, H);
 
+    // The name of what's playing, small in the corner, like a cabinet's marquee.
+    if (!still) {
+      cx.font = "18px VT323, monospace"; cx.textAlign = "right"; cx.textBaseline = "bottom";
+      cx.shadowColor = "#ffb347"; cx.shadowBlur = 6;
+      cx.fillStyle = `rgba(255,179,71,${fading ? .35 + .35 * Math.abs(1 - 2 * fading.k) : .7})`;
+      cx.fillText(`ATTRACT MODE: ${scenes[showing].name}`, W - 14, H - 8);
+      cx.shadowBlur = 0;
+    }
   }
 
   // One animation loop at most: it stops while the hero is off screen and restarts when it's back.
