@@ -106,6 +106,8 @@
       "blurb": "A life on the Saltwind Sea: sail by the wind, trade, take prizes in broadside battles and boarding duels, rise from Ensign to Duke in four crowns' favour, piece together treasure maps, and retire before your crew mutinies." },
     { "repo": "AVACiv", "genre": "strategy", "original": "Sid Meier's Civilization", "publisher": "MicroProse", "year": 1991, "shot": "Images/AVACiv-late-map.png", "shotFit": "contain",
       "blurb": "Lead an original people from 4000 BC to the stars: found and grow cities, learn sixty-two discoveries, raise wonders, treat or war with rival rulers, and win by conquest, by score, or by launching the Starward Ark." },
+    { "repo": "AVAOrion", "genre": "strategy", "original": "Master of Orion", "publisher": "MicroProse", "year": 1993, "shot": "Images/AVAOrion-galaxy.png", "shotFit": "contain",
+      "blurb": "Lead an original star-faring people from 2300: explore and settle worlds, balance every colony's five sliders, research ninety discoveries, design warships, watch the battles play out, and win the Galactic Council's vote or conquer every rival." },
     { "repo": "AVARadiance", "genre": "rpg", "original": "Pool of Radiance", "publisher": "SSI", "year": 1988, "shot": "Images/AVARadiance-battle.png", "shotFit": "contain",
       "blurb": "A company of six takes back the ruined city of Corvane for its council: first-person streets, tactical grid battles, memorised spells, and the Hollow Regent waiting at the Lumen Well." },
     { "repo": "AVAWizardry", "genre": "rpg", "original": "Wizardry", "publisher": "Sir-Tech", "year": 1981, "shot": "docs/screenshots/07-maze-lit.png", "shotFit": "top",
