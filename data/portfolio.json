@@ -114,6 +114,8 @@
       "blurb": "A twin-stick spider defends its glowing web from gnats, beetles, egg-laying hornets, bombers and slayers. Every kill drops bounty that drifts to the edge: grab them in a row for more each time." },
     { "repo": "AVAMrDo", "genre": "arcade", "style": "maze", "original": "Mr. Do!", "publisher": "Universal", "year": 1982, "shot": "Images/AVAMrDo-digging.png", "shotFit": "contain",
       "blurb": "A clown digs through the garden after the cherries while monsters follow down his tunnels. Drop apples on them, roll the power ball after them, and win the letters of EXTRA." },
+    { "repo": "AVAKungFu", "genre": "arcade", "style": "platform", "original": "Kung-Fu Master", "publisher": "Irem", "year": 1984, "shot": "Images/AVAKungFu-kick.png", "shotFit": "contain",
+      "blurb": "Fight up five floors of a temple to free Mei: shake off clingers, duck and jump the knives, low-kick imps and snakes, and read each keeper's wind-up, from Bo of the Staff to the Jade Master." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
