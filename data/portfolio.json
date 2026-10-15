@@ -124,6 +124,8 @@
       "blurb": "Circle the rim and fire into the depths as squadrons spiral in, form up and dive: warp from planet to planet all the way to Earth, shoot the bright satellite for a double shot, dodge the meteors, and clear the chance stages, all to a driving arrangement of Bach's Toccata." },
     { "repo": "AVAWizardOfWor", "genre": "arcade", "style": "maze", "original": "Wizard of Wor", "publisher": "Midway", "year": 1981, "shot": "Images/AVAWizardOfWor-wizard.png", "shotFit": "contain",
       "blurb": "A dungeon shoot-out: stalk prowlers through mirrored neon corridors while unseen shades and phantoms close in on the radar, then slay the wisp before it flies, and face the wizard himself." },
+    { "repo": "AVAPengo", "genre": "arcade", "style": "maze", "original": "Pengo", "publisher": "Sega", "year": 1982, "shot": "Images/AVAPengo-crush.png", "shotFit": "contain",
+      "blurb": "An ice-block maze game: kick blocks sliding across the ice to squash the mites, shake the walls to daze them, smash their eggs before they hatch, and line up the three star blocks for a big bonus." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
