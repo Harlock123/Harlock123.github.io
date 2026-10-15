@@ -150,6 +150,8 @@
       "blurb": "A colour vector shooter: the one-eyed Commander's fleet builds itself around you, pieces assembling into Raiders and Raiders merging into Marauders, while you dock with add-on modules for more firepower." },
     { "repo": "AVAStargate", "genre": "arcade", "style": "scroller", "original": "Stargate", "publisher": "Williams", "year": 1981, "shot": "Images/AVAStargate-planet.png", "shotFit": "contain",
       "blurb": "A planet-defence scroller: snatch colonists back from the Snatchers before they turn into Changelings, with smart bombs, a cloak, hyperspace and a gate that warps you three waves ahead." },
+    { "repo": "AVAVanguard", "genre": "arcade", "style": "scroller", "original": "Vanguard", "publisher": "SNK", "year": 1981, "shot": "Images/AVAVanguard-band.png", "shotFit": "contain",
+      "blurb": "A cave-flying shooter with four guns: fight through five zones on fuel you only win back by destroying things, surge through enemies from charge pods, and break the Warden's turning shield." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
