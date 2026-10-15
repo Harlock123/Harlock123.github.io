@@ -130,6 +130,8 @@
       "blurb": "A bird-blasting shooter: two waves of swooping Flitters, then great Emberwings whose wings grow back as fast as you shoot them off, then bore through the mothership's hull to reach the Warden. Raise the shield when it gets too hot." },
     { "repo": "AVADKongJr", "genre": "arcade", "style": "platform", "original": "Donkey Kong Jr.", "publisher": "Nintendo", "year": 1982, "shot": "Images/AVADKongJr-jungle-start.png", "shotFit": "contain",
       "blurb": "Climb to free Papa from the Keeper's cage: two vines up fast, one vine down fast, drop fruit on the Nippers, ride over the pit past the Sparks, and push six keys up their chains into the lock." },
+    { "repo": "AVABosconian", "genre": "arcade", "style": "shooter", "original": "Bosconian", "publisher": "Namco", "year": 1981, "shot": "Images/AVABosconian-run.png", "shotFit": "contain",
+      "blurb": "A free-flying space shooter with guns fore and aft: hunt every base on the radar, shoot out its six pods or fire straight down its opening into the core, and don't let the spy ship get away or it's condition red." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
