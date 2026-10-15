@@ -156,6 +156,8 @@
       "blurb": "A vector adventure in three parts: shoot down a station's fleet, dock gently in its bay, then run its maze on foot past Sentries, Embers and Lasers to set the core and escape before it blows." },
     { "repo": "AVAMoonCresta", "genre": "arcade", "style": "shooter", "original": "Moon Cresta", "publisher": "Nichibutsu", "year": 1980, "shot": "Images/AVAMoonCresta-zippers.png", "shotFit": "contain",
       "blurb": "A space shooter whose three-stage rocket is also your lives: dock the next stage for more guns, lose them one at a time to Gogglers, Splitters and Zippers, and dodge the meteor storm." },
+    { "repo": "AVAVenture", "genre": "arcade", "style": "maze", "original": "Venture", "publisher": "Exidy", "year": 1981, "shot": "Images/AVAVenture-goblins.png", "shotFit": "contain",
+      "blurb": "A dungeon raid with a bow: slip past the Lurkers in the halls, then raid each room for its treasure among goblins, spiders, trolls and a fire-breathing dragon, before a Lurker comes in after you." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
