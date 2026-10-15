@@ -183,8 +183,9 @@
   document.fonts?.ready.then(placeholders); // redraw once VT323 has loaded
 
   // ---------- Attract-mode vector scenes ----------
-  // Three little vector games take turns behind the hero, cross-fading every SCENE_SECONDS: the lander
-  // coming down to its pad, a ship clearing an asteroid field, and an invader formation against a cannon.
+  // Little vector games take turns behind the hero, cross-fading every SCENE_SECONDS: the lander coming down
+  // to its pad, a ship clearing an asteroid field, an invader formation against a cannon, a claw on the rim of
+  // a tempest tube, a tank's periscope, a star castle's rings, missiles falling on cities, and a trench run.
   // Each scene keeps its own state and clock, and only the one(s) on screen are stepped.
   const cv = document.getElementById("attract"), cx = cv.getContext("2d");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -931,7 +932,407 @@
     },
   };
 
-  const scenes = [lander, asteroids, invaders, tempest, battlezone];
+  // ----- Star Castle: a ship chipping away at the rotating rings round a cannon -----
+  // Three rings of twelve segments turn in alternate directions. The ship circles outside, firing in; each shot
+  // breaks the first segment it meets (they take two hits). When the gaps line up between the cannon and the
+  // ship the cannon fires a spinning fireball out through them; when a shot gets all the way in, the cannon
+  // goes up and a new castle is built.
+  const SEGS = 12;
+  const castle = {
+    name: "STAR CASTLE",
+    layout() {
+      this.cxC = W < 700 ? W * .5 : W * .68; this.cyC = H * .5;
+      this.R = Math.min(H * .34, W < 700 ? W * .34 : W * .2);
+      if (!this.rings) this.reset();
+    },
+    reset() {
+      this.rings = [[.82, .22, "#ff4a4a"], [.64, -.3, "#ffe14a"], [.46, .4, "#ff4fd8"]]
+        .map(([r, spin, colour]) => ({ r, spin, colour, rot: rand(0, 6.3), segs: new Array(SEGS).fill(2) }));
+      this.cannon = { a: rand(0, 6.3), alive: true, fire: 2.5, boom: 0 };
+      this.ship = this.ship ?? { th: rand(0, 6.3), alive: true, wait: 0, fire: 0 };
+      this.shots = []; this.balls = []; this.sparks = this.sparks ?? [];
+    },
+    start() { if (!this.rings) this.reset(); },
+    // Which segment of a ring is at an angle.
+    segAt(ring, ang) { const k = ((ang - ring.rot) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2); return Math.floor(k / (Math.PI * 2 / SEGS)); },
+    shipAt() { const s = this.ship; return [this.cxC + Math.cos(s.th) * this.R * 1.3, this.cyC + Math.sin(s.th) * this.R * 1.12]; },
+    step(dt) {
+      const s = this.ship, c = this.cannon, R = this.R;
+      for (const g of this.rings) g.rot += g.spin * dt;
+      if (!c.alive) { c.boom -= dt; if (c.boom <= 0) this.reset(); }
+      // The ship circles, nose to the castle, firing in.
+      if (!s.alive) { s.wait -= dt; if (s.wait <= 0) Object.assign(s, { alive: true, th: s.th + 2 }); }
+      else {
+        s.th += .3 * dt;
+        s.fire -= dt;
+        if (s.fire <= 0 && c.alive) {
+          s.fire = .2;
+          const [x, y] = this.shipAt(), d = Math.hypot(this.cxC - x, this.cyC - y);
+          this.shots.push({ x, y, vx: (this.cxC - x) / d * 340, vy: (this.cyC - y) / d * 340 });
+        }
+      }
+      for (const b of this.shots) {
+        b.x += b.vx * dt; b.y += b.vy * dt;
+        const rho = Math.hypot(b.x - this.cxC, b.y - this.cyC), ang = Math.atan2(b.y - this.cyC, b.x - this.cxC);
+        for (const g of this.rings) {
+          if (Math.abs(rho - g.r * R) > 5) continue;
+          const i = this.segAt(g, ang);
+          if (g.segs[i] > 0) { g.segs[i]--; b.dead = true; sparkBurst(this.sparks, b.x, b.y, 4, 60, "255,225,74"); }
+          break;
+        }
+        if (!b.dead && rho < R * .16 && c.alive) {
+          b.dead = true; c.alive = false; c.boom = 2.2; this.balls = [];
+          sparkBurst(this.sparks, this.cxC, this.cyC, 40, 200, "255,120,80");
+          sparkBurst(this.sparks, this.cxC, this.cyC, 24, 120, "255,255,255");
+        }
+      }
+      this.shots = this.shots.filter(b => !b.dead && Math.hypot(b.x - this.cxC, b.y - this.cyC) > R * .1);
+      // The cannon follows the ship and fires out through the gaps when they line up.
+      if (c.alive && s.alive) {
+        const [x, y] = this.shipAt(), want = Math.atan2(y - this.cyC, x - this.cxC), err = angleTo(c.a, want);
+        c.a += Math.max(-1.5 * dt, Math.min(1.5 * dt, err));
+        c.fire -= dt;
+        const clear = this.rings.every(g => g.segs[this.segAt(g, c.a)] === 0);
+        if (clear && Math.abs(err) < .06 && c.fire <= 0) {
+          c.fire = 2;
+          this.balls.push({ x: this.cxC, y: this.cyC, vx: Math.cos(c.a) * 190, vy: Math.sin(c.a) * 190, age: 0 });
+        }
+      }
+      for (const f of this.balls) {
+        f.x += f.vx * dt; f.y += f.vy * dt; f.age += dt;
+        const [x, y] = this.shipAt();
+        if (s.alive && Math.hypot(f.x - x, f.y - y) < 14) {
+          f.dead = true; s.alive = false; s.wait = 1.6;
+          sparkBurst(this.sparks, x, y, 18, 120, "92,225,255");
+        }
+      }
+      this.balls = this.balls.filter(f => !f.dead && f.age < 3);
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, 1);
+      const R = this.R, X = (r, a) => this.cxC + Math.cos(a) * r, Y = (r, a) => this.cyC + Math.sin(a) * r;
+      // The rings: each segment a narrow band, dimmer once it's been hit.
+      for (const g of this.rings) {
+        for (let i = 0; i < SEGS; i++) {
+          if (!g.segs[i]) continue;
+          const a0 = g.rot + i * Math.PI * 2 / SEGS + .04, a1 = a0 + Math.PI * 2 / SEGS - .08, r0 = g.r * R - 4, r1 = g.r * R + 4;
+          beam(g.segs[i] === 2 ? g.colour : `${g.colour}88`, 10); cx.lineWidth = 1.6;
+          cx.beginPath();
+          cx.moveTo(X(r0, a0), Y(r0, a0)); cx.lineTo(X(r1, a0), Y(r1, a0)); cx.lineTo(X(r1, a1), Y(r1, a1)); cx.lineTo(X(r0, a1), Y(r0, a1)); cx.closePath();
+          cx.stroke();
+        }
+      }
+      // The cannon: a pointed eye turning to follow the ship.
+      const c = this.cannon;
+      if (c.alive) {
+        const r = R * .14, a = c.a;
+        beam("#72ff8f", 12); cx.lineWidth = 1.8;
+        cx.beginPath();
+        cx.moveTo(X(r * 1.6, a), Y(r * 1.6, a)); cx.lineTo(X(r, a + 2.3), Y(r, a + 2.3)); cx.lineTo(X(r * .5, a + Math.PI), Y(r * .5, a + Math.PI)); cx.lineTo(X(r, a - 2.3), Y(r, a - 2.3)); cx.closePath();
+        cx.stroke();
+      }
+      // The ship, nose to the castle.
+      const s = this.ship;
+      if (s.alive) {
+        const [x, y] = this.shipAt(), a = Math.atan2(this.cyC - y, this.cxC - x), P = (f, side) => [x + Math.cos(a) * f - Math.sin(a) * side, y + Math.sin(a) * f + Math.cos(a) * side];
+        beam("#5ce1ff", 12); cx.lineWidth = 1.6;
+        cx.beginPath(); cx.moveTo(...P(12, 0)); cx.lineTo(...P(-8, -8)); cx.lineTo(...P(-4, 0)); cx.lineTo(...P(-8, 8)); cx.closePath(); cx.stroke();
+      }
+      beam("#ffffff", 8); cx.lineWidth = 2;
+      cx.beginPath();
+      for (const b of this.shots) { cx.moveTo(b.x, b.y); cx.lineTo(b.x - b.vx * .02, b.y - b.vy * .02); }
+      cx.stroke();
+      // Fireballs, spinning as they come.
+      beam("#ff9a3a", 14); cx.lineWidth = 1.8;
+      for (const f of this.balls) {
+        cx.beginPath();
+        for (let k = 0; k < 4; k++) { const a = f.age * 9 + k * Math.PI / 4; cx.moveTo(f.x - Math.cos(a) * 9, f.y - Math.sin(a) * 9); cx.lineTo(f.x + Math.cos(a) * 9, f.y + Math.sin(a) * 9); }
+        cx.stroke();
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Missile Command: cities under attack, and the counter-missiles that stop what they can -----
+  // Missiles streak down on six cities and three bases, some splitting on the way. The bases fire
+  // counter-missiles at the point where each incoming one will be; they burst into rings that swell and fade,
+  // and anything caught in one goes up in a ring of its own. When the cities are gone, they're rebuilt.
+  const missiles = {
+    name: "MISSILE COMMAND",
+    layout() {
+      this.left = W < 700 ? 14 : W * .42; this.right = W - 14; this.ground = H - 26;
+      this.reset();
+    },
+    reset() {
+      const slots = 9, span = this.right - this.left;
+      this.places = Array.from({ length: slots }, (_, i) => ({ x: this.left + span * (i + .5) / slots, base: i % 4 === 0, alive: true }));
+      this.incoming = []; this.counters = []; this.booms = []; this.sparks = this.sparks ?? [];
+      this.spawn = .5; this.fire = 0; this.rebuild = 0;
+    },
+    start() { if (!this.places) this.layout(); },
+    aimFrom(m) {
+      // Where an incoming missile will be by the time a counter-missile from the nearest base reaches it, and the ring has grown.
+      const bases = this.places.filter(p => p.base && p.alive);
+      if (!bases.length) return null;
+      const base = bases.reduce((a, b) => Math.abs(a.x - m.x) < Math.abs(b.x - m.x) ? a : b);
+      const bx = base.x, by = this.ground - 10;
+      let T = .5, px = m.x, py = m.y;
+      for (let k = 0; k < 4; k++) { px = m.x + m.vx * T; py = m.y + m.vy * T; T = Math.hypot(px - bx, py - by) / 340 + .3; }
+      return py < this.ground - 40 ? { bx, by, px, py } : null;
+    },
+    step(dt) {
+      const ground = this.ground, alive = this.places.filter(p => p.alive);
+      // New attackers, aimed at what's still standing.
+      this.spawn -= dt;
+      if (this.spawn <= 0 && this.incoming.length < 10 && alive.length) {
+        this.spawn = rand(.3, .8);
+        this.launch(rand(this.left, this.right), 0, alive[Math.floor(rand(0, alive.length))], Math.random() < .3);
+      }
+      for (const m of this.incoming) {
+        m.x += m.vx * dt; m.y += m.vy * dt;
+        if (m.split && m.y > m.split) {
+          m.split = 0;
+          for (let k = 0; k < 2 && alive.length; k++) this.launch(m.x, m.y, alive[Math.floor(rand(0, alive.length))], false, m.x, m.y);
+        }
+        if (m.y >= ground - 4) {
+          m.dead = true;
+          this.boom(m.x, ground - 4, 18, "255,74,74");
+          const hit = this.places.find(p => p.alive && Math.abs(p.x - m.x) < 14);
+          if (hit) { hit.alive = false; sparkBurst(this.sparks, hit.x, ground - 6, 16, 90, "255,179,71"); }
+        }
+      }
+      // The defence: a counter-missile at whichever attacker is nearest to landing.
+      this.fire -= dt;
+      if (this.fire <= 0) {
+        const next = this.incoming.filter(m => !m.dead && !m.marked).sort((a, b) => (ground - a.y) / a.vy - (ground - b.y) / b.vy)[0];
+        const aim = next && this.aimFrom(next);
+        if (aim) {
+          this.fire = .5; next.marked = true;
+          const d = Math.hypot(aim.px - aim.bx, aim.py - aim.by);
+          this.counters.push({ x0: aim.bx, y0: aim.by, x: aim.bx, y: aim.by, tx: aim.px, ty: aim.py, vx: (aim.px - aim.bx) / d * 340, vy: (aim.py - aim.by) / d * 340 });
+        }
+      }
+      for (const c of this.counters) {
+        c.x += c.vx * dt; c.y += c.vy * dt;
+        if ((c.tx - c.x) * c.vx + (c.ty - c.y) * c.vy <= 0) { c.dead = true; this.boom(c.tx, c.ty, 30); }
+      }
+      // Rings swell and fade; anything inside one bursts too.
+      for (const b of this.booms) {
+        b.age += dt;
+        const r = b.max * Math.sin(Math.min(1, b.age / 1.4) * Math.PI);
+        for (const m of this.incoming) if (!m.dead && Math.hypot(m.x - b.x, m.y - b.y) < r) { m.dead = true; this.boom(m.x, m.y, 20); }
+      }
+      this.incoming = this.incoming.filter(m => !m.dead);
+      this.counters = this.counters.filter(c => !c.dead);
+      this.booms = this.booms.filter(b => b.age < 1.4);
+      // Everything gone: a pause, then rebuilt.
+      if (!this.places.some(p => p.alive && !p.base) || !this.places.some(p => p.alive && p.base)) {
+        this.rebuild += dt;
+        if (this.rebuild > 2.5) this.reset();
+      }
+    },
+    launch(x, y, target, split, ox = x, oy = y) {
+      const sp = rand(30, 48), d = Math.hypot(target.x - x, this.ground - y);
+      this.incoming.push({ ox, oy, x, y, vx: (target.x - x) / d * sp, vy: (this.ground - y) / d * sp, split: split ? rand(H * .25, H * .5) : 0 });
+    },
+    boom(x, y, max, colour) { this.booms.push({ x, y, max, age: 0, colour }); },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, .7);
+      const g = this.ground;
+      // The ground, with a hill under each base.
+      beam("#ffb347", 8); cx.lineWidth = 1.6;
+      cx.beginPath(); cx.moveTo(this.left - 14, g);
+      for (const p of this.places) if (p.base) { cx.lineTo(p.x - 22, g); cx.lineTo(p.x - 10, g - 10); cx.lineTo(p.x + 10, g - 10); cx.lineTo(p.x + 22, g); }
+      cx.lineTo(this.right + 14, g); cx.stroke();
+      // Cities: a little skyline each.
+      beam("#5ce1ff", 10); cx.lineWidth = 1.4;
+      cx.beginPath();
+      for (const p of this.places) {
+        if (p.base || !p.alive) continue;
+        const x = p.x - 12;
+        cx.moveTo(x, g); cx.lineTo(x, g - 8); cx.lineTo(x + 5, g - 8); cx.lineTo(x + 5, g - 14); cx.lineTo(x + 10, g - 14); cx.lineTo(x + 10, g - 6);
+        cx.lineTo(x + 15, g - 6); cx.lineTo(x + 15, g - 11); cx.lineTo(x + 20, g - 11); cx.lineTo(x + 20, g - 4); cx.lineTo(x + 24, g - 4); cx.lineTo(x + 24, g);
+      }
+      cx.stroke();
+      // Incoming trails, red with a bright head; counter-missiles blue, each with an X where it's going.
+      beam("#ff4a4a", 8); cx.lineWidth = 1.3;
+      cx.beginPath();
+      for (const m of this.incoming) { cx.moveTo(m.ox, m.oy); cx.lineTo(m.x, m.y); }
+      cx.stroke();
+      beam("#5ce1ff", 8);
+      cx.beginPath();
+      for (const c of this.counters) {
+        cx.moveTo(c.x0, c.y0); cx.lineTo(c.x, c.y);
+        cx.moveTo(c.tx - 4, c.ty - 4); cx.lineTo(c.tx + 4, c.ty + 4); cx.moveTo(c.tx + 4, c.ty - 4); cx.lineTo(c.tx - 4, c.ty + 4);
+      }
+      cx.stroke();
+      cx.fillStyle = "#ffffff"; cx.shadowColor = "#ffffff";
+      for (const m of [...this.incoming, ...this.counters]) cx.fillRect(m.x - 1.5, m.y - 1.5, 3, 3);
+      // The rings, flickering through the colours.
+      const flicker = ["255,255,255", "255,79,216", "255,225,74", "92,225,255"];
+      for (const b of this.booms) {
+        const r = b.max * Math.sin(Math.min(1, b.age / 1.4) * Math.PI);
+        beam(`rgba(${b.colour ?? flicker[Math.floor(t * 20 + b.x) % 4]},.9)`, 14); cx.lineWidth = 2;
+        cx.beginPath(); cx.arc(b.x, b.y, Math.max(1, r), 0, Math.PI * 2); cx.stroke();
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Star Wars: a run down the trench to the exhaust port -----
+  // First person, flying low down a trench that streams past in wireframe. Catwalks cross it (the ship dips
+  // under them), turrets along the rims fire, and the ship's lasers converge on them from the corners of the
+  // view. At the end of the run the port comes up on the floor; a torpedo goes in, and the screen goes white.
+  const TRENCH_W = 1.6, TRENCH_H = 2.6, RUN = 210, SPEED = 19;
+  const wars = {
+    name: "STAR WARS",
+    layout() {
+      this.vx = W < 700 ? W * .5 : W * .64; this.vy = H * .46; this.F = Math.min(W, H * 1.6) * .5;
+      if (this.z === undefined) this.start();
+    },
+    start() {
+      this.z = 0; this.camX = 0; this.camY = 1.3; this.done = 0; this.torpedo = null;
+      this.cats = Array.from({ length: 5 }, (_, i) => 35 + i * 34 + rand(-6, 6));
+      this.turrets = Array.from({ length: 8 }, (_, i) => ({ z: 25 + i * 22 + rand(0, 8), side: i % 2 ? 1 : -1, fire: rand(.5, 1.5), dead: false }));
+      this.balls = []; this.lasers = []; this.sparks = []; this.laserWait = 0;
+    },
+    // Camera space (relative to the ship) to the screen, clipping lines that come too near.
+    line(a, b) {
+      let [ax, ay, az] = a, [bx, by, bz] = b;
+      const near = .5;
+      if (az < near && bz < near) return;
+      if (az < near) { const k = (near - az) / (bz - az); ax += (bx - ax) * k; ay += (by - ay) * k; az = near; }
+      if (bz < near) { const k = (near - bz) / (az - bz); bx += (ax - bx) * k; by += (ay - by) * k; bz = near; }
+      cx.moveTo(this.vx + ax / az * this.F, this.vy - ay / az * this.F);
+      cx.lineTo(this.vx + bx / bz * this.F, this.vy - by / bz * this.F);
+    },
+    rel(x, y, z) { return [x - this.camX, y - this.camY, z - this.z]; },
+    screen(x, y, z) { const [a, b, c] = this.rel(x, y, z); return c > .5 ? [this.vx + a / c * this.F, this.vy - b / c * this.F] : null; },
+    step(dt) {
+      if (this.done > 0) { this.done += dt; if (this.done > 3.2) this.start(); return; }
+      this.z += SPEED * dt;
+      // Dip under the next catwalk, then rise again; weave a little.
+      const next = this.cats.find(c => c > this.z);
+      const wantY = next !== undefined && next - this.z < 14 ? .7 : 1.4;
+      this.camY += (wantY - this.camY) * Math.min(1, dt * 3);
+      this.camX = Math.sin(this.z * .05) * .5;
+      // Turrets fire at the ship; the lasers answer the nearest.
+      for (const tu of this.turrets) {
+        const d = tu.z - this.z;
+        if (tu.dead || d < 4 || d > 60) continue;
+        tu.fire -= dt;
+        if (tu.fire <= 0) { tu.fire = rand(1.2, 2.2); this.balls.push({ x: tu.side * TRENCH_W, y: TRENCH_H, z: tu.z, age: 0 }); }
+      }
+      for (const f of this.balls) {
+        f.age += dt;
+        // Coming at the ship: towards its line, and back along the trench faster than it flies.
+        f.x += (this.camX - f.x) * dt * 1.2; f.y += (this.camY - f.y) * dt * 1.2; f.z -= 14 * dt;
+      }
+      this.balls = this.balls.filter(f => f.z > this.z + .6 && f.age < 4);
+      this.laserWait -= dt;
+      const target = this.turrets.filter(tu => !tu.dead && tu.z - this.z > 10 && tu.z - this.z < 40).sort((a, b) => a.z - b.z)[0];
+      if (target && this.laserWait <= 0) {
+        this.laserWait = .45;
+        const p = this.screen(target.side * TRENCH_W, TRENCH_H + .2, target.z);
+        if (p) {
+          this.lasers.push({ x: p[0], y: p[1], age: 0 });
+          if (Math.random() < .6) { target.dead = true; sparkBurst(this.sparks, p[0], p[1], 18, 120, "255,179,71"); }
+        }
+      }
+      for (const l of this.lasers) l.age += dt;
+      this.lasers = this.lasers.filter(l => l.age < .18);
+      // The port: a torpedo goes in.
+      if (!this.torpedo && RUN - this.z < 24) this.torpedo = { z: this.z + 2, y: this.camY - .3, x: this.camX };
+      if (this.torpedo) {
+        const tp = this.torpedo;
+        tp.z += SPEED * 1.8 * dt; tp.y += (0 - tp.y) * dt * 1.4; tp.x += (0 - tp.x) * dt * 2;
+        if (tp.z >= RUN) { this.done = .001; this.torpedo = null; }
+      }
+      if (this.z > RUN - 3) this.z = RUN - 3;
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, .38);
+      if (this.done > 0) {
+        // The flash: rings of light, then sparks, then on to the next run.
+        const k = this.done;
+        for (let i = 0; i < 5; i++) {
+          const r = (k * 260 - i * 50);
+          if (r <= 0) continue;
+          beam(`rgba(255,${200 - i * 30},${120 + i * 20},${Math.max(0, 1 - k / 3)})`, 20); cx.lineWidth = 3;
+          cx.beginPath(); cx.arc(this.vx, this.vy, r, 0, Math.PI * 2); cx.stroke();
+        }
+        if (k < .3) { cx.fillStyle = `rgba(255,255,255,${.5 * (1 - k / .3)})`; cx.fillRect(0, 0, W, H); }
+        return;
+      }
+      const G = "#5c8cff", L = (a, b) => this.line(this.rel(...a), this.rel(...b));
+      // The trench: its edges stream away to the horizon, ribs crossing it every few metres.
+      beam(G, 8); cx.lineWidth = 1.3;
+      cx.beginPath();
+      // (From a few metres ahead, so the nearest lines don't sweep across the whole hero.)
+      const near = this.z + 4, far = this.z + 140;
+      for (const [x, y] of [[-TRENCH_W, 0], [TRENCH_W, 0], [-TRENCH_W, TRENCH_H], [TRENCH_W, TRENCH_H]]) L([x, y, near], [x, y, far]);
+      for (let z = Math.ceil(near / 8) * 8; z < far; z += 8) {
+        L([-TRENCH_W, TRENCH_H, z], [-TRENCH_W, 0, z]); L([-TRENCH_W, 0, z], [TRENCH_W, 0, z]); L([TRENCH_W, 0, z], [TRENCH_W, TRENCH_H, z]);
+        // The surface either side of the rims.
+        L([-TRENCH_W - 2.5, TRENCH_H, z], [-TRENCH_W, TRENCH_H, z]); L([TRENCH_W, TRENCH_H, z], [TRENCH_W + 2.5, TRENCH_H, z]);
+      }
+      cx.stroke();
+      // Catwalks across the trench.
+      beam("#ffe14a", 8); cx.lineWidth = 1.5;
+      cx.beginPath();
+      for (const c of this.cats) if (c > near && c < far) { L([-TRENCH_W, 1.9, c], [TRENCH_W, 1.9, c]); L([-TRENCH_W, 2.2, c], [TRENCH_W, 2.2, c]); }
+      cx.stroke();
+      // Turrets on the rims.
+      beam("#72ff8f", 8); cx.lineWidth = 1.4;
+      cx.beginPath();
+      for (const tu of this.turrets) {
+        if (tu.dead || tu.z < this.z || tu.z > far) continue;
+        const x = tu.side * TRENCH_W, z = tu.z;
+        L([x - .3, TRENCH_H, z], [x - .3, TRENCH_H + .5, z]); L([x - .3, TRENCH_H + .5, z], [x + .3, TRENCH_H + .5, z]);
+        L([x + .3, TRENCH_H + .5, z], [x + .3, TRENCH_H, z]); L([x, TRENCH_H + .5, z], [x - tu.side * .6, TRENCH_H + .7, z]);
+      }
+      cx.stroke();
+      // The exhaust port, on the floor at the end.
+      if (RUN - this.z < 140) {
+        beam("#ff4fd8", 12); cx.lineWidth = 1.8;
+        cx.beginPath();
+        for (const s of [.8, .4]) { L([-s, 0, RUN - s], [s, 0, RUN - s]); L([s, 0, RUN - s], [s, 0, RUN + s]); L([s, 0, RUN + s], [-s, 0, RUN + s]); L([-s, 0, RUN + s], [-s, 0, RUN - s]); }
+        cx.stroke();
+      }
+      // Fireballs coming at the ship.
+      beam("#ff4a4a", 12); cx.lineWidth = 1.6;
+      for (const f of this.balls) {
+        const p = this.screen(f.x, f.y, f.z);
+        if (!p) continue;
+        const r = Math.min(26, 60 / Math.max(1, f.z - this.z));
+        cx.beginPath();
+        for (let k = 0; k < 3; k++) { const a = f.age * 8 + k * Math.PI / 3; cx.moveTo(p[0] - Math.cos(a) * r, p[1] - Math.sin(a) * r); cx.lineTo(p[0] + Math.cos(a) * r, p[1] + Math.sin(a) * r); }
+        cx.stroke();
+      }
+      // The ship's lasers, from the corners of the view to the target.
+      beam("#ff4a4a", 14); cx.lineWidth = 2;
+      cx.beginPath();
+      for (const l of this.lasers) { cx.moveTo(this.vx - W * .3, H); cx.lineTo(l.x, l.y); cx.moveTo(this.vx + W * .3, H); cx.lineTo(l.x, l.y); }
+      cx.stroke();
+      if (this.torpedo) {
+        const p = this.screen(this.torpedo.x, this.torpedo.y, this.torpedo.z);
+        if (p) { beam("#ffffff", 16); cx.fillStyle = "#ffffff"; cx.beginPath(); cx.arc(p[0], p[1], 3, 0, Math.PI * 2); cx.fill(); }
+      }
+      // The sight.
+      beam("rgba(255,225,74,.8)", 6); cx.lineWidth = 1.3;
+      const sx = this.vx, sy = this.vy + 30;
+      cx.beginPath();
+      cx.moveTo(sx - 26, sy); cx.lineTo(sx - 8, sy); cx.moveTo(sx + 8, sy); cx.lineTo(sx + 26, sy);
+      cx.moveTo(sx, sy - 22); cx.lineTo(sx, sy - 8); cx.moveTo(sx, sy + 8); cx.lineTo(sx, sy + 22);
+      cx.stroke();
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  const scenes = [lander, asteroids, invaders, tempest, battlezone, castle, missiles, wars];
   let showing = 0, sceneClock = 0, fading = null; // fading: the scene on its way out, and how far
 
   function layout() {
