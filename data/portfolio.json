@@ -128,6 +128,8 @@
       "blurb": "An ice-block maze game: kick blocks sliding across the ice to squash the mites, shake the walls to daze them, smash their eggs before they hatch, and line up the three star blocks for a big bonus." },
     { "repo": "AVAPhoenix", "genre": "arcade", "style": "shooter", "original": "Phoenix", "publisher": "Amstar / Centuri", "year": 1980, "shot": "Images/AVAPhoenix-emberwings.png", "shotFit": "contain",
       "blurb": "A bird-blasting shooter: two waves of swooping Flitters, then great Emberwings whose wings grow back as fast as you shoot them off, then bore through the mothership's hull to reach the Warden. Raise the shield when it gets too hot." },
+    { "repo": "AVADKongJr", "genre": "arcade", "style": "platform", "original": "Donkey Kong Jr.", "publisher": "Nintendo", "year": 1982, "shot": "Images/AVADKongJr-jungle-start.png", "shotFit": "contain",
+      "blurb": "Climb to free Papa from the Keeper's cage: two vines up fast, one vine down fast, drop fruit on the Nippers, ride over the pit past the Sparks, and push six keys up their chains into the lock." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
