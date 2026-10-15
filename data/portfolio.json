@@ -140,6 +140,8 @@
       "blurb": "A top-down tank battle across boulders, deep ruts and ruined buildings: hold off round after round of enemy tanks alone, or go head to head with a friend, first to five hits." },
     { "repo": "AVAGalaxian", "genre": "arcade", "style": "shooter", "original": "Galaxian", "publisher": "Namco", "year": 1979, "shot": "Images/AVAGalaxian-swarm.png", "shotFit": "contain",
       "blurb": "A swaying swarm of 46 aliens that peel off to dive at your fighter, firing as they come; commanders bring guard escorts, and shooting the escorts first is worth 800." },
+    { "repo": "AVAGorf", "genre": "arcade", "style": "shooter", "original": "Gorf", "publisher": "Midway", "year": 1981, "shot": "Images/AVAGorf-lancers.png", "shotFit": "contain",
+      "blurb": "Five missions against a taunting Overlord: a marching armada under a force field, laser-firing Lancers, a diving swarm, ships out of a warp, and a Dreadnought whose core hides behind a turning shield." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
