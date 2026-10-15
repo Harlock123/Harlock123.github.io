@@ -122,6 +122,8 @@
       "blurb": "A bear gathers the gems of isometric castles, up stairs and along walkways, before the grubs eat them: jump the orbs and walking trees, run from the bees, and wear the magic hat to squash the lot." },
     { "repo": "AVAGyruss", "genre": "arcade", "style": "shooter", "original": "Gyruss", "publisher": "Konami", "year": 1983, "shot": "Images/AVAGyruss-saturn.png", "shotFit": "contain",
       "blurb": "Circle the rim and fire into the depths as squadrons spiral in, form up and dive: warp from planet to planet all the way to Earth, shoot the bright satellite for a double shot, dodge the meteors, and clear the chance stages, all to a driving arrangement of Bach's Toccata." },
+    { "repo": "AVAWizardOfWor", "genre": "arcade", "style": "maze", "original": "Wizard of Wor", "publisher": "Midway", "year": 1981, "shot": "Images/AVAWizardOfWor-wizard.png", "shotFit": "contain",
+      "blurb": "A dungeon shoot-out: stalk prowlers through mirrored neon corridors while unseen shades and phantoms close in on the radar, then slay the wisp before it flies, and face the wizard himself." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
