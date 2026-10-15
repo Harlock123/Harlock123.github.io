@@ -175,6 +175,13 @@
   ],
 
   "tools": [
+    { "repo": "SplitzNJoinz", "name": "Splitz_n_Joinz", "blurb": "Splits a file into numbered chunks of a size you choose, and joins them back into the original.",
+      "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10"],
+      "screen": ["SPLITZ movie.mkv  4.37 GB  max 1 GB", "", "movie.mkv.001   1.00 GB", "movie.mkv.002   1.00 GB", "movie.mkv.003   1.00 GB",
+                 "movie.mkv.004   1.00 GB", "movie.mkv.005   0.37 GB", "5 chunks \u00b7 JOINZ rebuilds the original"],
+      "highlights": ["Chunks of any maximum size, in bytes, KB, MB or GB, named file.001, file.002 and on",
+                     "Point Joinz at any one chunk: it finds the rest and lists any that are missing",
+                     "Never touches the original, and builds a join aside, moving it into place only when complete"] },
     {"repo": "AVASvgMaker", "blurb": "Visio-style diagram editor. Reads .vsdx; exports SVG, PNG, PDF, Mermaid and .vsdx.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 9"], "shot": "Images/overview.png", "highlights": ["167 stencils: flowchart, BPMN, UML, network, electrical, logic and more", "Connectors that route themselves round shapes, and round each other", "Opens Visio, SVG and Mermaid; exports SVG, PNG, PDF and .vsdx"]},
     {"repo": "DirOpusReImagined", "name": "DORI", "blurb": "Directory Opus reimagined: a cross-platform file explorer in .NET and Avalonia.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 8"], "shot": "ScreenShots/Thumbnail_View.png", "highlights": ["Two panels with folder tabs, after the Amiga's Directory Opus", "Compares and syncs folders, by date or by content hash", "Google Drive, OneDrive, Dropbox, S3 and 40 more, through rclone"]},
     {"repo": "AVAQueryBuilder", "blurb": "Graphical query builder for Microsoft SQL Server.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 9", "SQL Server"], "shot": "Screenshots/SS1.png", "shotFit": "top", "highlights": ["Builds SELECT queries as a diagram of tables, joins and filters", "25+ derived fields, GROUP BY with HAVING, sorting, TOP and DISTINCT", "Finds SQL Servers on the network, runs the query and shows the rows"]},
