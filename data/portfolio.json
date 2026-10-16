@@ -197,6 +197,7 @@
   ],
 
   "tools": [
+    {"repo": "AVAUIDesigner", "blurb": "A drag-and-drop WYSIWYG designer for Avalonia .axaml files, like the classic WinForms designer.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10", "Roslyn"], "shot": "docs/screenshots/overview-light.png", "shotFit": "top", "highlights": ["54 Avalonia controls, rendered live with the Fluent theme as you place them", "Snap lines, grid snapping, align and distribute, and two-way sync with the XAML", "Writes event handlers into your code-behind with Roslyn, never overwriting your code"]},
     { "repo": "SplitzNJoinz", "name": "Splitz_n_Joinz", "blurb": "Splits a file into numbered chunks of a size you choose, and joins them back into the original.",
       "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10"],
       "screen": ["SPLITZ movie.mkv  4.37 GB  max 1 GB", "", "movie.mkv.001   1.00 GB", "movie.mkv.002   1.00 GB", "movie.mkv.003   1.00 GB",
