@@ -174,6 +174,8 @@
       "blurb": "A colour vector tank battle: drive a jeep with a swivelling gun through city streets, using the buildings as cover against tanks that take two hits and a gunship whose rockets fly over the rooftops." },
     { "repo": "AVARipOff", "genre": "arcade", "style": "shooter", "original": "Rip Off", "publisher": "Cinematronics", "year": 1980, "shot": "Images/AVARipOff-towing.png", "shotFit": "contain",
       "blurb": "A colour vector defence: guard eight fuel canisters with one tank while runners, gunners and hunters come in from every side to hook them and tow them off the screen. No lives; the game ends when the fuel is gone." },
+    { "repo": "AVACommando", "genre": "arcade", "style": "shooter", "original": "Commando", "publisher": "Capcom", "year": 1985, "shot": "Images/AVACommando-beachhead.png", "shotFit": "contain",
+      "blurb": "Run and gun up a scrolling battlefield to the enemy fort: fire eight ways, lob grenades over sandbags and rivers, blow up pillboxes, free prisoners from their guards, and hold the rush at the gate." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
