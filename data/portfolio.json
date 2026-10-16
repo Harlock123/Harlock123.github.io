@@ -160,6 +160,8 @@
       "blurb": "A dungeon raid with a bow: slip past the Lurkers in the halls, then raid each room for its treasure among goblins, spiders, trolls and a fire-breathing dragon, before a Lurker comes in after you." },
     { "repo": "AVALiberator", "genre": "arcade", "style": "shooter", "original": "Liberator", "publisher": "Atari", "year": 1982, "shot": "Images/AVALiberator-drevan.png", "shotFit": "contain",
       "blurb": "A planet-bombing shooter: four ships and one sight round a world turning in space. Turn it to bring its bases round, bomb them, and blast the rockets and raiders they send at your fleet." },
+    { "repo": "AVABombJack", "genre": "arcade", "style": "platform", "original": "Bomb Jack", "publisher": "Tecmo", "year": 1984, "shot": "Images/AVABombJack-dunes.png", "shotFit": "contain",
+      "blurb": "A leaping, gliding bomb hunt: take all 24 bombs in each of five painted rounds, the lit one for double, while wind-up robots drop in and take to the air as hawks, orbs, saucers and wisps." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
