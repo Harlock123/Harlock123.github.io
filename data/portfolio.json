@@ -192,6 +192,8 @@
       "blurb": "Fly a rescue chopper over the border, shoot open the barracks, land while the hostages run aboard, and fly them home to the pad through tank shells, jets and drifting air mines." },
     { "repo": "AVATimePilot84", "genre": "arcade", "style": "shooter", "original": "Time Pilot '84", "publisher": "Konami", "year": 1984, "shot": "Images/AVATimePilot84-core.png", "shotFit": "contain",
       "blurb": "Wheel a jet round the sky over oceans, deserts, ice, cities and orbit, locking homing missiles onto interceptors and gunships, then knock out a carrier's turrets to open its core." },
+    { "repo": "AVALadyBug", "genre": "arcade", "style": "maze", "original": "Lady Bug", "publisher": "Universal", "year": 1981, "shot": "Images/AVALadyBug-gate.png", "shotFit": "contain",
+      "blurb": "Run a ladybug round a hedged garden eating flowers, swinging revolving gates shut behind you to bar the bugs, spelling SPECIAL and EXTRA in colour-changing letters, and steering clear of the skulls." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
