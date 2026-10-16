@@ -183,9 +183,11 @@
   document.fonts?.ready.then(placeholders); // redraw once VT323 has loaded
 
   // ---------- Attract-mode vector scenes ----------
-  // Little vector games take turns behind the hero, cross-fading every SCENE_SECONDS: the lander coming down
-  // to its pad, a ship clearing an asteroid field, an invader formation against a cannon, a claw on the rim of
-  // a tempest tube, a tank's periscope, a star castle's rings, missiles falling on cities, and a trench run.
+  // Little vector games take turns behind the hero, in a shuffled order, cross-fading every SCENE_SECONDS: the
+  // lander coming down to its pad, a ship clearing an asteroid field, an invader formation against a cannon, a
+  // claw on the rim of a tempest tube, a tank's periscope, a star castle's rings, missiles falling on cities, a
+  // trench run, a muncher in its maze, a marker cutting up a Qix's field, a ship over Defender's mountains,
+  // light cycles on the grid, and a ship fighting Gravitar's gravity.
   // Each scene keeps its own state and clock, and only the one(s) on screen are stepped.
   const cv = document.getElementById("attract"), cx = cv.getContext("2d");
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1332,8 +1334,764 @@
     },
   };
 
-  const scenes = [lander, asteroids, invaders, tempest, battlezone, castle, missiles, wars];
-  let showing = 0, sceneClock = 0, fading = null; // fading: the scene on its way out, and how far
+  // The area a scene plays in: the right-hand part of the hero, clear of the text, or all of it on a phone.
+  const arena = (pad = 16) => {
+    const x0 = W < 700 ? pad : W * .46;
+    return { x0, y0: pad, x1: W - pad, y1: H - pad, w: W - pad - x0, h: H - pad * 2 };
+  };
+
+  // ----- Pac-Man: the muncher clearing a maze while four ghosts hunt it -----
+  // The walls are drawn as outlines, like the cabinet's double-line maze. The muncher heads for the nearest
+  // dot by the shortest way that keeps clear of the ghosts; a power pellet turns the tables for a while, and
+  // the ghosts it eats go back to the middle to start again.
+  const MAZE = [
+    "###################",
+    "#o.......#.......o#",
+    "#.##.###.#.###.##.#",
+    "#.................#",
+    "#.##.#.#####.#.##.#",
+    "#....#...#...#....#",
+    "####.###.#.###.####",
+    "#........ ........#",
+    "#.##.###.#.###.##.#",
+    "#o.#...........#.o#",
+    "#..#.#.#####.#.#..#",
+    "#....#.......#....#",
+    "###################",
+  ];
+  const MW = MAZE[0].length, MH = MAZE.length;
+  const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  const GHOSTS = ["#ff4a4a", "#ffb8ff", "#5ce1ff", "#ffb347"];
+  const walkable = (c, r) => MAZE[r]?.[c] !== undefined && MAZE[r][c] !== "#";
+  const pacman = {
+    name: "PAC-MAN",
+    layout() {
+      const a = arena(20);
+      this.cs = Math.max(8, Math.floor(Math.min(a.w / MW, a.h / MH)));
+      this.ox = a.x0 + (a.w - this.cs * MW) / 2; this.oy = a.y0 + (a.h - this.cs * MH) / 2;
+      if (!this.dots) this.reset(true);
+    },
+    reset(full) {
+      if (full) {
+        this.dots = new Set();
+        MAZE.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === "." || ch === "o") this.dots.add(r * MW + c); }));
+        this.flash = 0;
+      }
+      this.pac = { c: 9, r: 9, nc: 9, nr: 9, p: 1, d: 2, speed: 6 };
+      this.ghosts = GHOSTS.map((colour, i) => ({ colour, c: 9, r: 7, nc: 9, nr: 7, p: 1, d: i % 2 ? 0 : 2, speed: 5.2, wait: i * 1.5, i }));
+      this.power = 0; this.dying = 0; this.sparks = this.sparks ?? [];
+    },
+    start() { if (!this.dots) this.reset(true); },
+    at(e) { return [e.c + (e.nc - e.c) * e.p, e.r + (e.nr - e.r) * e.p]; },
+    // Shortest way from a cell to any target cell, avoiding cells the ghosts are near: the first step's direction.
+    route(c, r, isTarget, avoid) {
+      const seen = new Map([[r * MW + c, -1]]), queue = [[c, r]];
+      while (queue.length) {
+        const [qc, qr] = queue.shift();
+        if ((qc !== c || qr !== r) && isTarget(qc, qr)) {
+          // Back along the way it came to the first step out of the start.
+          let k = qr * MW + qc;
+          while (seen.get(k) !== r * MW + c) k = seen.get(k);
+          const fc = k % MW, fr = Math.floor(k / MW);
+          return DIRS.findIndex(([dc, dr]) => c + dc === fc && r + dr === fr);
+        }
+        for (const [dc, dr] of DIRS) {
+          const nc = qc + dc, nr = qr + dr, k = nr * MW + nc;
+          if (!walkable(nc, nr) || seen.has(k) || avoid(nc, nr)) continue;
+          seen.set(k, qr * MW + qc); queue.push([nc, nr]);
+        }
+      }
+      return -1;
+    },
+    step(dt) {
+      const pac = this.pac;
+      if (this.flash > 0) { this.flash -= dt; if (this.flash <= 0) this.reset(true); return; }
+      if (this.dying > 0) { this.dying -= dt; if (this.dying <= 0) this.reset(false); return; }
+      this.power = Math.max(0, this.power - dt);
+      const ghostNear = (c, r, d) => this.ghosts.some(g => g.wait <= 0 && !g.scared && Math.abs(g.c - c) + Math.abs(g.r - r) <= d);
+      // The muncher: at each cell, the next step towards its target.
+      pac.p += pac.speed * dt;
+      if (pac.p >= 1) {
+        pac.c = pac.nc; pac.r = pac.nr; pac.p = 0;
+        const k = pac.r * MW + pac.c;
+        if (this.dots.delete(k) && MAZE[pac.r][pac.c] === "o") { this.power = 6; for (const g of this.ghosts) g.scared = g.wait <= 0; }
+        let d = -1;
+        if (this.power > 1.5) d = this.route(pac.c, pac.r, (c, r) => this.ghosts.some(g => g.scared && g.c === c && g.r === r), () => false);
+        if (d < 0) d = this.route(pac.c, pac.r, (c, r) => this.dots.has(r * MW + c), (c, r) => ghostNear(c, r, 1));
+        if (d < 0) {
+          // Cornered: whichever way gets furthest from the ghosts.
+          let best = -1;
+          DIRS.forEach(([dc, dr], i) => {
+            if (!walkable(pac.c + dc, pac.r + dr)) return;
+            const room = Math.min(...this.ghosts.map(g => Math.abs(g.c - pac.c - dc) + Math.abs(g.r - pac.r - dr)));
+            if (room > best) { best = room; d = i; }
+          });
+        }
+        if (d >= 0) { pac.d = d; pac.nc = pac.c + DIRS[d][0]; pac.nr = pac.r + DIRS[d][1]; }
+        else { pac.nc = pac.c; pac.nr = pac.r; }
+        if (!this.dots.size) { this.flash = 1.8; return; }
+      }
+      // The ghosts: no turning back; at each cell, the way that brings each nearest its own target.
+      for (const g of this.ghosts) {
+        if (g.wait > 0) { g.wait -= dt; continue; }
+        if (g.scared && this.power <= 0) g.scared = false;
+        g.p += (g.scared ? 3.2 : g.speed) * dt;
+        if (g.p < 1) continue;
+        g.c = g.nc; g.r = g.nr; g.p = 0;
+        const ahead = DIRS[pac.d];
+        const [tc, tr] = g.scared ? [rand(0, MW), rand(0, MH)]
+          : g.i === 0 ? [pac.c, pac.r]
+          : g.i === 1 ? [pac.c + ahead[0] * 4, pac.r + ahead[1] * 4]
+          : g.i === 2 ? [pac.c + rand(-5, 5), pac.r + rand(-4, 4)]
+          : Math.abs(g.c - pac.c) + Math.abs(g.r - pac.r) > 7 ? [pac.c, pac.r] : [0, MH];
+        let best = -1, bd = Infinity;
+        DIRS.forEach(([dc, dr], i) => {
+          if (i === (g.d + 2) % 4 || !walkable(g.c + dc, g.r + dr)) return;
+          const dd = Math.hypot(g.c + dc - tc, g.r + dr - tr);
+          if (dd < bd) { bd = dd; best = i; }
+        });
+        if (best < 0) best = (g.d + 2) % 4;
+        g.d = best; g.nc = g.c + DIRS[best][0]; g.nr = g.r + DIRS[best][1];
+      }
+      // Caught, or eating.
+      const [px, py] = this.at(pac);
+      for (const g of this.ghosts) {
+        if (g.wait > 0) continue;
+        const [gx, gy] = this.at(g);
+        if (Math.hypot(gx - px, gy - py) > .6) continue;
+        const sx = this.ox + (gx + .5) * this.cs, sy = this.oy + (gy + .5) * this.cs;
+        if (g.scared) {
+          sparkBurst(this.sparks, sx, sy, 12, 90, "92,140,255");
+          Object.assign(g, { c: 9, r: 7, nc: 9, nr: 7, p: 1, scared: false, wait: 1.2 });
+        } else {
+          this.dying = 1.6;
+          sparkBurst(this.sparks, this.ox + (px + .5) * this.cs, this.oy + (py + .5) * this.cs, 18, 110, "255,225,74");
+          return;
+        }
+      }
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      const cs = this.cs, ox = this.ox, oy = this.oy;
+      // The walls: blue outlines, flashing white when the maze is cleared.
+      beam(this.flash > 0 && Math.sin(t * 20) > 0 ? "#ffffff" : "#4a7dff", 10); cx.lineWidth = 1.6;
+      cx.beginPath();
+      outline((c, r) => MAZE[r]?.[c] === "#", MW, MH, (x0, y0, x1, y1) => { cx.moveTo(ox + x0 * cs, oy + y0 * cs); cx.lineTo(ox + x1 * cs, oy + y1 * cs); });
+      cx.stroke();
+      // Dots, and the power pellets blinking.
+      beam("#ffd8a0", 6); cx.fillStyle = "#ffd8a0";
+      for (const k of this.dots) {
+        const c = k % MW, r = Math.floor(k / MW), x = ox + (c + .5) * cs, y = oy + (r + .5) * cs;
+        if (MAZE[r][c] === "o") { if (Math.sin(t * 8) > -.3) { cx.beginPath(); cx.arc(x, y, cs * .28, 0, Math.PI * 2); cx.fill(); } }
+        else cx.fillRect(x - 1.5, y - 1.5, 3, 3);
+      }
+      // The ghosts: a dome, a wavy hem and eyes looking the way they go; blue and blinking when scared.
+      for (const g of this.ghosts) {
+        const [gc, gr] = this.at(g), x = ox + (gc + .5) * cs, y = oy + (gr + .5) * cs, R = cs * .42;
+        const fading = g.scared && this.power < 2 && Math.sin(t * 16) > 0;
+        beam(g.scared ? (fading ? "#ffffff" : "#4a7dff") : g.colour, 10); cx.lineWidth = 1.6;
+        cx.beginPath();
+        cx.moveTo(x - R, y + R); cx.lineTo(x - R, y); cx.arc(x, y, R, Math.PI, 0); cx.lineTo(x + R, y + R);
+        for (let k = 1; k <= 4; k++) cx.lineTo(x + R - k * R / 2, y + R - (k % 2 ? R * .35 : 0) * (Math.sin(t * 12) > 0 ? 1 : .4));
+        cx.stroke();
+        const [dc, dr] = DIRS[g.d];
+        cx.shadowBlur = 0; cx.fillStyle = "#f2f2ff";
+        for (const s of [-1, 1]) {
+          cx.beginPath(); cx.arc(x + s * R * .38, y - R * .1, R * .22, 0, Math.PI * 2); cx.fill();
+        }
+        cx.fillStyle = g.scared ? "#ff8a8a" : "#1a2a6a";
+        for (const s of [-1, 1]) cx.fillRect(x + s * R * .38 + dc * R * .1 - 1.5, y - R * .1 + dr * R * .1 - 1.5, 3, 3);
+      }
+      // The muncher: a wedge opening and closing the way it's going; caught, it folds away.
+      const [pc, pr] = this.at(this.pac), x = ox + (pc + .5) * cs, y = oy + (pr + .5) * cs;
+      const face = [0, Math.PI / 2, Math.PI, -Math.PI / 2][this.pac.d];
+      let mouth = this.dying > 0 ? Math.PI * (1 - this.dying / 1.6) * .98 + .02 : .05 + .3 * Math.abs(Math.sin(t * 12));
+      if (this.dying <= 0 || mouth < Math.PI * .97) {
+        beam("#ffe14a", 12); cx.lineWidth = 1.8;
+        cx.beginPath(); cx.moveTo(x, y); cx.arc(x, y, cs * .42, face + mouth, face + Math.PI * 2 - mouth); cx.closePath(); cx.stroke();
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Qix: a marker cutting boxes out of the playfield while the Qix swirls -----
+  // The field is a grid of small cells. The marker runs round the frame, then cuts in, mostly turning towards
+  // the nearer side to box off a corner, until it meets claimed ground; the side away from the Qix is filled in. If the Qix touches the cut while
+  // it's being drawn, the cut is lost. Three quarters claimed, and the field is cleared for another go.
+  const qix = {
+    name: "QIX",
+    layout() {
+      const a = arena(22);
+      this.g = W < 700 ? 6 : 8;
+      this.gw = Math.floor(a.w / this.g); this.gh = Math.floor(a.h / this.g);
+      this.ox = a.x0 + (a.w - this.gw * this.g) / 2; this.oy = a.y0 + (a.h - this.gh * this.g) / 2;
+      this.reset();
+    },
+    reset() {
+      const { gw, gh } = this;
+      this.cells = new Uint8Array(gw * gh); // 0 open, 1 frame or cut, 2+ a fill colour
+      for (let x = 0; x < gw; x++) { this.cells[x] = 1; this.cells[(gh - 1) * gw + x] = 1; }
+      for (let y = 0; y < gh; y++) { this.cells[y * gw] = 1; this.cells[y * gw + gw - 1] = 1; }
+      this.fills = 0;
+      // The frame as a loop, for the marker and the Sparx to run round.
+      this.ring = [];
+      for (let x = 0; x < gw; x++) this.ring.push([x, 0]);
+      for (let y = 1; y < gh; y++) this.ring.push([gw - 1, y]);
+      for (let x = gw - 2; x >= 0; x--) this.ring.push([x, gh - 1]);
+      for (let y = gh - 2; y > 0; y--) this.ring.push([0, y]);
+      this.marker = { i: 0, x: 0, y: 0, mode: "run", goal: 0, path: [], drawn: 0, wait: 0 };
+      this.sparx = rand(0, this.ring.length);
+      const cxm = gw / 2, cym = gh / 2;
+      this.qix = { a: [cxm - 4, cym], b: [cxm + 4, cym + 2], va: [rand(-9, 9), rand(-9, 9)], vb: [rand(-9, 9), rand(-9, 9)], trail: [], clock: 0, hue: 0 };
+      this.sparks = this.sparks ?? []; this.flash = 0; this.colour = 0;
+    },
+    start() { if (!this.cells) this.layout(); },
+    claimed(x, y) { x = Math.floor(x); y = Math.floor(y); return x < 0 || y < 0 || x >= this.gw || y >= this.gh || this.cells[y * this.gw + x] !== 0; },
+    // A cut: in from a frame cell, then on until it meets claimed ground.
+    plan() {
+      const { gw, gh } = this, n = this.ring.length;
+      let best = null, cost = Infinity;
+      for (let tries = 0; tries < 40; tries++) {
+        const i = Math.floor(rand(0, this.ring.length)), [sx, sy] = this.ring[i];
+        const d = sx === 0 ? [1, 0] : sx === gw - 1 ? [-1, 0] : sy === 0 ? [0, 1] : [0, -1];
+        if (this.claimed(sx + d[0], sy + d[1])) continue;
+        // In a way, then (mostly) a turn towards the nearer side, boxing off a corner; now and then straight across.
+        const path = []; let x = sx, y = sy, dir = d, turned = Math.random() < .25;
+        const leg = Math.floor(rand(6, d[0] ? gw * .35 : gh * .45));
+        for (let k = 0; k < 600; k++) {
+          if (!turned && path.length === leg) {
+            dir = d[0] ? [0, y < gh / 2 ? -1 : 1] : [x < gw / 2 ? -1 : 1, 0];
+            turned = true;
+          }
+          const nx = x + dir[0], ny = y + dir[1];
+          if (this.claimed(nx, ny)) break;
+          x = nx; y = ny; path.push([x, y]);
+        }
+        if (path.length < 4) continue;
+        // The best: not far round the frame to get there, and a cut long enough to take a good piece.
+        let ring = Math.abs(i - this.marker.i) % n; ring = Math.min(ring, n - ring);
+        const c = ring / 90 + Math.abs(path.length - 40) / 20 + rand(0, .5);
+        if (c < cost) { cost = c; best = { i, path }; }
+      }
+      return best;
+    },
+    finish() {
+      const { gw, gh } = this, m = this.marker;
+      for (const [x, y] of m.path) this.cells[y * gw + x] = 1;
+      // Flood from the Qix; whatever open ground it can't reach is filled.
+      const q = this.qix, start = [Math.floor((q.a[0] + q.b[0]) / 2), Math.floor((q.a[1] + q.b[1]) / 2)];
+      const reach = new Uint8Array(gw * gh), stack = [start];
+      while (stack.length) {
+        const [x, y] = stack.pop();
+        if (this.claimed(x, y) || reach[y * gw + x]) continue;
+        reach[y * gw + x] = 1;
+        stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+      }
+      const colour = 2 + (this.colour++ % 3);
+      for (let k = 0; k < gw * gh; k++) if (this.cells[k] === 0 && !reach[k]) this.cells[k] = colour;
+      const [ex, ey] = m.path[m.path.length - 1];
+      sparkBurst(this.sparks, this.ox + (ex + .5) * this.g, this.oy + (ey + .5) * this.g, 14, 90, "255,225,74");
+      m.path = []; m.mode = "run"; m.wait = .4;
+      for (const p of [q.a, q.b]) if (this.claimed(p[0], p[1])) { p[0] = start[0] + .5; p[1] = start[1] + .5; }
+      let taken = 0; for (const v of this.cells) if (v) taken++;
+      if (taken / (gw * gh) > .74) this.flash = 2;
+    },
+    step(dt) {
+      if (this.flash > 0) { this.flash -= dt; if (this.flash <= 0) this.reset(); return; }
+      const m = this.marker, q = this.qix, ring = this.ring, n = ring.length;
+      // The Qix: two ends wandering and bouncing off claimed ground, leaving a fan of lines behind.
+      for (const [p, v] of [[q.a, q.va], [q.b, q.vb]]) {
+        v[0] += rand(-30, 30) * dt; v[1] += rand(-30, 30) * dt;
+        const sp = Math.hypot(v[0], v[1]); if (sp > 14) { v[0] *= 14 / sp; v[1] *= 14 / sp; }
+        if (this.claimed(p[0] + v[0] * dt, p[1])) v[0] = -v[0]; else p[0] += v[0] * dt;
+        if (this.claimed(p[0], p[1] + v[1] * dt)) v[1] = -v[1]; else p[1] += v[1] * dt;
+      }
+      if (Math.hypot(q.a[0] - q.b[0], q.a[1] - q.b[1]) > 12) { q.vb[0] += (q.a[0] - q.b[0]) * dt; q.vb[1] += (q.a[1] - q.b[1]) * dt; }
+      q.clock += dt; q.hue = (q.hue + dt * 90) % 360;
+      if (q.clock > .06) { q.clock = 0; q.trail.unshift([[...q.a], [...q.b], q.hue]); q.trail.length = Math.min(q.trail.length, 9); }
+      this.sparx = (this.sparx + dt * 20) % n;
+      if (m.wait > 0) { m.wait -= dt; return; }
+      if (m.mode === "run") {
+        if (!m.plan) m.plan = this.plan();
+        if (!m.plan) { this.flash = 1; return; }
+        // Round the frame the short way to where the cut starts.
+        let diff = (m.plan.i - m.i + n) % n; if (diff > n / 2) diff -= n;
+        const stepCells = dt * 90;
+        if (Math.abs(diff) <= stepCells) { m.i = m.plan.i; m.mode = "cut"; m.path = m.plan.path; m.drawn = 0; m.plan = null; }
+        else m.i = (m.i + Math.sign(diff) * stepCells + n) % n;
+        [m.x, m.y] = ring[Math.floor(m.i) % n];
+      } else {
+        m.drawn += dt * 28;
+        const k = Math.min(m.path.length - 1, Math.floor(m.drawn));
+        [m.x, m.y] = m.path[k];
+        // The Qix touching the cut so far: the cut is lost.
+        const cut = new Set(m.path.slice(0, k + 1).map(([x, y]) => y * this.gw + x));
+        for (let s = 0; s <= 4; s++) {
+          const x = Math.floor(q.a[0] + (q.b[0] - q.a[0]) * s / 4), y = Math.floor(q.a[1] + (q.b[1] - q.a[1]) * s / 4);
+          if (!cut.has(y * this.gw + x)) continue;
+          sparkBurst(this.sparks, this.ox + (m.x + .5) * this.g, this.oy + (m.y + .5) * this.g, 18, 120, "255,79,216");
+          m.mode = "run"; m.path = []; m.wait = 1;
+          return;
+        }
+        if (m.drawn >= m.path.length) this.finish();
+      }
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      const { g, gw, gh, ox, oy } = this;
+      const fills = ["", "", "rgba(74,125,255,.18)", "rgba(255,79,216,.16)", "rgba(114,255,143,.14)"];
+      for (let y = 0; y < gh; y++)
+        for (let x = 0; x < gw; x++) {
+          const v = this.cells[y * gw + x];
+          if (v >= 2) { cx.fillStyle = this.flash > 0 && Math.sin(t * 18) > 0 ? "rgba(255,255,255,.25)" : fills[v]; cx.fillRect(ox + x * g, oy + y * g, g, g); }
+        }
+      // The edges of claimed ground.
+      beam("#5ce1ff", 8); cx.lineWidth = 1.4;
+      cx.beginPath();
+      outline((x, y) => x >= 0 && y >= 0 && x < gw && y < gh && this.cells[y * gw + x] === 0, gw, gh,
+        (x0, y0, x1, y1) => { cx.moveTo(ox + x0 * g, oy + y0 * g); cx.lineTo(ox + x1 * g, oy + y1 * g); });
+      cx.stroke();
+      // The cut being drawn.
+      const m = this.marker;
+      if (m.mode === "cut" && m.path.length) {
+        beam("#ff4a4a", 10); cx.lineWidth = 2;
+        cx.beginPath();
+        const k = Math.min(m.path.length, Math.floor(m.drawn) + 1);
+        const [sx, sy] = this.ring[Math.floor(m.i) % this.ring.length];
+        cx.moveTo(ox + (sx + .5) * g, oy + (sy + .5) * g);
+        for (let i = 0; i < k; i++) cx.lineTo(ox + (m.path[i][0] + .5) * g, oy + (m.path[i][1] + .5) * g);
+        cx.stroke();
+      }
+      // The Qix's fan of lines, its colours shifting.
+      const q = this.qix;
+      q.trail.forEach(([a, b, hue], i) => {
+        beam(`hsla(${hue},100%,65%,${1 - i / 10})`, 10); cx.lineWidth = 1.6;
+        cx.beginPath(); cx.moveTo(ox + a[0] * g, oy + a[1] * g); cx.lineTo(ox + b[0] * g, oy + b[1] * g); cx.stroke();
+      });
+      // The marker, a diamond, and a Sparx running round the frame.
+      const mx = ox + (m.x + .5) * g, my = oy + (m.y + .5) * g;
+      beam("#ffffff", 12); cx.lineWidth = 1.8;
+      cx.beginPath(); cx.moveTo(mx, my - 6); cx.lineTo(mx + 6, my); cx.lineTo(mx, my + 6); cx.lineTo(mx - 6, my); cx.closePath(); cx.stroke();
+      const [zx, zy] = this.ring[Math.floor(this.sparx) % this.ring.length], sxp = ox + (zx + .5) * g, syp = oy + (zy + .5) * g;
+      beam("#ffe14a", 12); cx.lineWidth = 1.4;
+      cx.beginPath();
+      for (let k = 0; k < 4; k++) { const ang = t * 9 + k * Math.PI / 2; cx.moveTo(sxp, syp); cx.lineTo(sxp + Math.cos(ang) * 6, syp + Math.sin(ang) * 6); }
+      cx.stroke();
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Defender: a ship skimming the mountains, saving the humanoids from the landers -----
+  // The world is three screens wide and wraps. Landers drift down to snatch a humanoid and carry it up; the
+  // ship goes for those first, lines up and fires its long laser. A humanoid let go of falls back to the
+  // ground. The scanner along the top shows the whole world.
+  const defender = {
+    name: "DEFENDER",
+    layout() {
+      this.WW = Math.max(1800, W * 3);
+      this.ground = [];
+      let y = H * .86;
+      for (let x = 0; x < this.WW; x += 24) { y = Math.min(H * .96, Math.max(H * .74, y + rand(-18, 18))); this.ground.push(y); }
+      this.ground[this.ground.length - 1] = this.ground[0];
+      if (!this.ship) this.reset();
+    },
+    reset() {
+      this.ship = { x: 0, y: H * .45, vx: 0, face: 1, sx: W * .55, fire: 0 };
+      this.humans = Array.from({ length: 6 }, (_, i) => ({ x: (i + .5) * this.WW / 6 + rand(-60, 60), y: 0, vy: 0, held: null }));
+      this.landers = []; this.lasers = []; this.sparks = this.sparks ?? []; this.spawn = 0; this.bolts = [];
+    },
+    start() { if (!this.ship) this.layout(); },
+    groundAt(x) {
+      const n = this.ground.length, f = (((x % this.WW) + this.WW) % this.WW) / 24, i = Math.floor(f) % n;
+      return this.ground[i] + (this.ground[(i + 1) % n] - this.ground[i]) * (f - Math.floor(f));
+    },
+    dx(a, b) { let d = b - a; const WW = this.WW; d = ((d % WW) + WW) % WW; return d > WW / 2 ? d - WW : d; },
+    step(dt) {
+      const s = this.ship, WW = this.WW;
+      // Landers keep coming, five at most, each after a humanoid.
+      this.spawn -= dt;
+      if (this.spawn <= 0 && this.landers.length < 5) {
+        this.spawn = rand(2, 4);
+        this.landers.push({ x: s.x + rand(W * .6, WW - W * .6), y: H * .3, target: null, carry: null, t: rand(0, 6) });
+      }
+      for (const h of this.humans) {
+        if (h.held) continue;
+        const floor = this.groundAt(h.x) - 8;
+        if (h.y < floor && h.y > 0) { h.vy += 120 * dt; h.y = Math.min(floor, h.y + h.vy * dt); }
+        else { h.y = floor; h.vy = 0; }
+      }
+      for (const l of this.landers) {
+        l.t += dt;
+        if (!l.target || l.target.held && l.target.held !== l) l.target = this.humans.filter(h => !h.held).sort((a, b) => Math.abs(this.dx(l.x, a.x)) - Math.abs(this.dx(l.x, b.x)))[0] ?? null;
+        if (l.carry) {
+          l.y -= 34 * dt;
+          l.carry.x = l.x; l.carry.y = l.y + 16;
+          // At the top, the humanoid is lost; it's back on the ground somewhere a moment later.
+          if (l.y < H * .2) { l.carry.held = null; l.carry.x = rand(0, WW); l.carry.y = 0; l.dead = true; }
+        } else if (l.target) {
+          const d = this.dx(l.x, l.target.x);
+          l.x = ((l.x + Math.sign(d) * Math.min(Math.abs(d), 60 * dt)) % WW + WW) % WW;
+          l.y += (Math.abs(d) < 30 ? 40 : 6 * Math.sin(l.t * 2)) * dt;
+          if (Math.abs(d) < 6 && l.y > l.target.y - 22) { l.carry = l.target; l.target.held = l; }
+        }
+        if (Math.random() < dt * .3 && Math.abs(this.dx(s.x, l.x)) < W * .5) {
+          const ax = this.dx(l.x, s.x), ay = s.y - l.y, d = Math.hypot(ax, ay) || 1;
+          this.bolts.push({ x: l.x, y: l.y, vx: ax / d * 140, vy: ay / d * 140, age: 0 });
+        }
+      }
+      this.landers = this.landers.filter(l => !l.dead);
+      for (const b of this.bolts) { b.x += b.vx * dt; b.y += b.vy * dt; b.age += dt; }
+      this.bolts = this.bolts.filter(b => b.age < 3);
+      // The ship: after a lander carrying someone first, else the nearest; to its height, facing it, laser.
+      const pick = this.landers.slice().sort((a, b) => (a.carry ? 0 : 1) - (b.carry ? 0 : 1) || Math.abs(this.dx(s.x, a.x)) - Math.abs(this.dx(s.x, b.x)))[0];
+      if (pick) {
+        const d = this.dx(s.x, pick.x);
+        s.face = d >= 0 ? 1 : -1;
+        const want = d - s.face * 260;
+        s.vx += Math.sign(want) * Math.min(Math.abs(want) * 2, 600) * dt;
+        s.y += Math.max(-160 * dt, Math.min(160 * dt, pick.y - s.y));
+        s.fire -= dt;
+        if (s.fire <= 0 && Math.abs(pick.y - s.y) < 8 && Math.abs(d) < W * .55) {
+          s.fire = .45;
+          this.lasers.push({ x: s.x + s.face * 18, y: s.y + 2, dir: s.face, len: 0, age: 0 });
+        }
+      } else s.vx += s.face * 200 * dt;
+      s.vx *= 1 - 1.4 * dt;
+      s.vx = Math.max(-520, Math.min(520, s.vx));
+      s.x = ((s.x + s.vx * dt) % WW + WW) % WW;
+      s.y = Math.max(H * .16, Math.min(this.groundAt(s.x) - 30, s.y));
+      // On screen, the ship slides to one side so it faces the open part of the hero.
+      const homeX = W < 700 ? (s.face > 0 ? W * .25 : W * .75) : (s.face > 0 ? W * .55 : W * .9);
+      s.sx += (homeX - s.sx) * Math.min(1, 2 * dt);
+      for (const z of this.lasers) {
+        z.age += dt; z.len = Math.min(W * .6, z.len + 2600 * dt);
+        for (const l of this.landers) {
+          if (l.dead || Math.abs(l.y - z.y) > 12) continue;
+          const d = this.dx(z.x, l.x) * z.dir;
+          if (d < 0 || d > z.len) continue;
+          l.dead = true;
+          if (l.carry) { l.carry.held = null; l.carry.vy = 0; }
+          sparkBurst(this.sparks, this.toScreen(l.x), l.y, 16, 120, "114,255,143");
+        }
+      }
+      this.landers = this.landers.filter(l => !l.dead);
+      this.lasers = this.lasers.filter(z => z.age < .3);
+    },
+    toScreen(x) { return this.ship.sx + this.dx(this.ship.x, x); },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      const s = this.ship;
+      // Stars drift past, slower than the ground.
+      cx.shadowBlur = 0;
+      for (const [x, y, b] of stars) {
+        if (y > H * .7) continue;
+        cx.fillStyle = `rgba(213,227,238,${b * .7})`;
+        cx.fillRect(((x - s.x * .2) % W + W) % W, y, 1.5, 1.5);
+      }
+      // The mountains.
+      beam("#ffb347", 8); cx.lineWidth = 1.5;
+      cx.beginPath();
+      for (let sx = 0; sx <= W + 24; sx += 12) { const y = this.groundAt(s.x + sx - s.sx); sx ? cx.lineTo(sx, y) : cx.moveTo(sx, y); }
+      cx.stroke();
+      // Humanoids.
+      beam("#ff4fd8", 8); cx.lineWidth = 1.5;
+      for (const h of this.humans) {
+        const x = this.toScreen(h.x); if (x < -20 || x > W + 20) continue;
+        cx.beginPath(); cx.moveTo(x, h.y - 8); cx.lineTo(x, h.y + 2); cx.moveTo(x - 4, h.y - 4); cx.lineTo(x + 4, h.y - 4);
+        cx.moveTo(x, h.y + 2); cx.lineTo(x - 3, h.y + 8); cx.moveTo(x, h.y + 2); cx.lineTo(x + 3, h.y + 8); cx.stroke();
+      }
+      // Landers: a dome on legs, green and yellow.
+      for (const l of this.landers) {
+        const x = this.toScreen(l.x); if (x < -30 || x > W + 30) continue;
+        beam("#72ff8f", 10); cx.lineWidth = 1.6;
+        cx.beginPath(); cx.arc(x, l.y, 8, Math.PI, 0); cx.lineTo(x + 10, l.y + 4); cx.lineTo(x - 10, l.y + 4); cx.closePath();
+        cx.moveTo(x - 7, l.y + 4); cx.lineTo(x - 11, l.y + 12); cx.moveTo(x + 7, l.y + 4); cx.lineTo(x + 11, l.y + 12); cx.stroke();
+        beam("#ffe14a", 8); cx.fillStyle = "#ffe14a";
+        cx.fillRect(x - 4 + Math.sin(l.t * 6) * 3, l.y - 3, 3, 3);
+      }
+      beam("#ff8a8a", 8); cx.fillStyle = "#ff8a8a";
+      for (const b of this.bolts) cx.fillRect(this.toScreen(b.x) - 2, b.y - 2, 4, 4);
+      // The laser: a long streak, banded in colours, thinning out at its tip.
+      for (const z of this.lasers) {
+        const x0 = this.toScreen(z.x), fade = 1 - z.age / .3;
+        for (let k = 0; k < 6; k++) {
+          const a = z.len * k / 6, b = z.len * (k + 1) / 6;
+          beam(["#ffffff", "#ff4fd8", "#5ce1ff", "#ffe14a", "#72ff8f", "#ff4a4a"][k], 8);
+          cx.globalAlpha *= fade * (1 - k * .12); cx.lineWidth = 2;
+          cx.beginPath(); cx.moveTo(x0 + a * z.dir, z.y); cx.lineTo(x0 + b * z.dir, z.y); cx.stroke();
+          cx.globalAlpha /= fade * (1 - k * .12);
+        }
+      }
+      // The ship: a long nose, a fin, and its flame behind.
+      const x = s.sx, y = s.y, f = s.face;
+      beam("#f2f2ff", 12); cx.lineWidth = 1.6;
+      cx.beginPath(); cx.moveTo(x + f * 20, y + 2); cx.lineTo(x - f * 4, y - 4); cx.lineTo(x - f * 14, y - 10); cx.lineTo(x - f * 16, y);
+      cx.lineTo(x - f * 16, y + 5); cx.closePath(); cx.stroke();
+      if (Math.abs(s.vx) > 60 && Math.sin(t * 40) > -.3) {
+        beam("#ff4fd8", 12);
+        cx.beginPath(); cx.moveTo(x - f * 16, y); cx.lineTo(x - f * (26 + Math.random() * 10), y + 2); cx.lineTo(x - f * 16, y + 5); cx.stroke();
+      }
+      // The scanner: the whole world at a glance, top right.
+      const sw = Math.min(W * .4, 360), sx0 = W - sw - 16, sy0 = 10, sh = 40;
+      beam("rgba(92,225,255,.5)", 0); cx.lineWidth = 1;
+      cx.strokeRect(sx0, sy0, sw, sh);
+      const toScan = wx => sx0 + sw / 2 + this.dx(s.x, wx) / this.WW * sw;
+      beam("rgba(255,179,71,.7)", 0);
+      cx.beginPath();
+      for (let k = 0; k <= 60; k++) { const wx = s.x - this.WW / 2 + k * this.WW / 60, yy = sy0 + (this.groundAt(wx) / H) * sh; k ? cx.lineTo(toScan(wx), yy) : cx.moveTo(toScan(wx), yy); }
+      cx.stroke();
+      cx.fillStyle = "#72ff8f"; for (const l of this.landers) cx.fillRect(toScan(l.x) - 1.5, sy0 + l.y / H * sh - 1.5, 3, 3);
+      cx.fillStyle = "#ff4fd8"; for (const h of this.humans) cx.fillRect(toScan(h.x) - 1, sy0 + h.y / H * sh - 1, 2, 2);
+      cx.fillStyle = "#ffffff"; cx.fillRect(sx0 + sw / 2 - 2, sy0 + s.y / H * sh - 2, 4, 4);
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Tron: light cycles racing on the grid, each walling the others in -----
+  // Three cycles leave walls behind them and can turn only at right angles. Each looks at the ways it could
+  // go and takes the one with the most room beyond it, now and then cutting across another's path. Whoever
+  // hits a wall de-rezzes; the last one riding wins the round.
+  const tron = {
+    name: "TRON",
+    layout() {
+      const a = arena(18);
+      this.g = W < 700 ? 6 : 8;
+      this.gw = Math.floor(a.w / this.g); this.gh = Math.floor(a.h / this.g);
+      this.ox = a.x0 + (a.w - this.gw * this.g) / 2; this.oy = a.y0 + (a.h - this.gh * this.g) / 2;
+      this.reset();
+    },
+    reset() {
+      const { gw, gh } = this;
+      this.grid = new Int8Array(gw * gh);
+      const starts = [[Math.floor(gw * .2), Math.floor(gh * .5), 0], [Math.floor(gw * .8), Math.floor(gh * .3), 2], [Math.floor(gw * .6), Math.floor(gh * .85), 3]];
+      this.cycles = [["#5ce1ff", "92,225,255"], ["#ffb347", "255,179,71"], ["#72ff8f", "114,255,143"]].map(([colour, rgb], i) => {
+        const [c, r, d] = starts[i];
+        return { colour, rgb, c, r, d, alive: true, fade: 1, trail: [[c, r]], id: i + 1 };
+      });
+      for (const y of this.cycles) this.grid[y.r * gw + y.c] = y.id;
+      this.clock = 0; this.over = 0; this.sparks = this.sparks ?? [];
+    },
+    start() { if (!this.grid) this.layout(); },
+    free(c, r) { return c >= 0 && r >= 0 && c < this.gw && r < this.gh && this.grid[r * this.gw + c] === 0; },
+    // How much room there is beyond a cell, counted up to a limit.
+    room(c, r) {
+      const seen = new Set(), stack = [[c, r]];
+      while (stack.length && seen.size < 220) {
+        const [x, y] = stack.pop(), k = y * this.gw + x;
+        if (seen.has(k) || !this.free(x, y)) continue;
+        seen.add(k);
+        stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+      }
+      return seen.size;
+    },
+    step(dt) {
+      if (this.over > 0) { this.over -= dt; if (this.over <= 0) this.reset(); return; }
+      for (const y of this.cycles) if (!y.alive) y.fade = Math.max(0, y.fade - dt);
+      this.clock += dt * 20;
+      while (this.clock >= 1) {
+        this.clock -= 1;
+        const moves = [];
+        for (const y of this.cycles.filter(y => y.alive)) {
+          const foe = this.cycles.find(o => o !== y && o.alive);
+          let best = -1, score = -Infinity;
+          for (const turn of [0, 1, 3]) {
+            const d = (y.d + turn) % 4, nc = y.c + DIRS[d][0], nr = y.r + DIRS[d][1];
+            if (!this.free(nc, nr)) continue;
+            let s = this.room(nc, nr) + (turn === 0 ? 25 : 0) + rand(0, 20);
+            if (foe && s > 150) s += 30 - Math.min(30, Math.abs(nc - foe.c) + Math.abs(nr - foe.r)) * (Math.random() < .3 ? 1 : 0);
+            if (s > score) { score = s; best = d; }
+          }
+          moves.push([y, best]);
+        }
+        for (const [y, d] of moves) {
+          if (d < 0) { this.derez(y); continue; }
+          if (d !== y.d) y.trail.push([y.c, y.r]);
+          y.d = d; y.c += DIRS[d][0]; y.r += DIRS[d][1];
+        }
+        // Two into the same cell: both go.
+        for (const [y] of moves) {
+          if (!y.alive) continue;
+          if (this.cycles.some(o => o !== y && o.alive && o.c === y.c && o.r === y.r)) this.derez(y);
+          else this.grid[y.r * this.gw + y.c] = y.id;
+        }
+        if (this.cycles.filter(y => y.alive).length <= 1) { this.over = 2.2; break; }
+      }
+      // A wall gone dark is cleared away.
+      for (const y of this.cycles)
+        if (!y.alive && y.fade <= 0 && !y.cleared) { y.cleared = true; for (let k = 0; k < this.grid.length; k++) if (this.grid[k] === y.id) this.grid[k] = 0; }
+    },
+    derez(y) {
+      y.alive = false; y.fade = 1;
+      sparkBurst(this.sparks, this.ox + (y.c + .5) * this.g, this.oy + (y.r + .5) * this.g, 22, 130, y.rgb);
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      const { g, gw, gh, ox, oy } = this;
+      // The grid floor.
+      beam("rgba(30,60,110,.55)", 0); cx.lineWidth = 1;
+      cx.beginPath();
+      for (let x = 0; x <= gw; x += 4) { cx.moveTo(ox + x * g, oy); cx.lineTo(ox + x * g, oy + gh * g); }
+      for (let y = 0; y <= gh; y += 4) { cx.moveTo(ox, oy + y * g); cx.lineTo(ox + gw * g, oy + y * g); }
+      cx.stroke();
+      beam("#5ce1ff", 8); cx.lineWidth = 1.4; cx.strokeRect(ox, oy, gw * g, gh * g);
+      // The walls of light, and the cycles at their heads.
+      for (const y of this.cycles) {
+        if (y.fade <= 0) continue;
+        const flick = y.alive ? 1 : y.fade * (Math.sin(t * 30) > 0 ? 1 : .5);
+        cx.globalAlpha *= flick;
+        beam(y.colour, 12); cx.lineWidth = 2.4;
+        cx.beginPath();
+        y.trail.forEach(([c, r], i) => i ? cx.lineTo(ox + (c + .5) * g, oy + (r + .5) * g) : cx.moveTo(ox + (c + .5) * g, oy + (r + .5) * g));
+        cx.lineTo(ox + (y.c + .5) * g, oy + (y.r + .5) * g);
+        cx.stroke();
+        if (y.alive) {
+          const [dc, dr] = DIRS[y.d], hx = ox + (y.c + .5) * g, hy = oy + (y.r + .5) * g;
+          beam("#ffffff", 14); cx.lineWidth = 2;
+          cx.beginPath(); cx.moveTo(hx - dc * 9 - dr * 3, hy - dr * 9 - dc * 3); cx.lineTo(hx + dc * 4 - dr * 3, hy + dr * 4 - dc * 3);
+          cx.lineTo(hx + dc * 4 + dr * 3, hy + dr * 4 + dc * 3); cx.lineTo(hx - dc * 9 + dr * 3, hy - dr * 9 + dc * 3); cx.closePath(); cx.stroke();
+        }
+        cx.globalAlpha /= flick || 1;
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  // ----- Gravitar: a ship fighting gravity over a planet, knocking out its bunkers -----
+  // Gravity pulls the ship down all the time. It climbs nose-up on its thruster, then turns to aim at the
+  // nearest bunker and fires as it sinks, climbing again before it gets too low. The bunkers fire back.
+  // With every bunker gone, the planet is left behind and a new one comes up.
+  const gravitar = {
+    name: "GRAVITAR",
+    layout() {
+      this.x0 = W < 700 ? 0 : W * .42;
+      this.reset();
+    },
+    reset() {
+      // The ground runs right across; the bunkers sit on flats out to the right, with hills between them.
+      const pts = [], bunkers = [];
+      let x = -10, y = H * .86, since = 9;
+      while (x < W + 30) {
+        if (bunkers.length < 4 && since >= 2 && x > this.x0 + 40 && x < W - 60 && Math.random() < .5) {
+          pts.push([x, y], [x + 46, y]);
+          bunkers.push({ x: x + 23, y, alive: true, fire: rand(1.5, 4), a: -Math.PI / 2 });
+          x += 46; since = 0;
+        } else {
+          since++;
+          y += rand(-70, 70);
+          if (y < H * .58) y = H * .58 + rand(20, 60); else if (y > H * .95) y = H * .95 - rand(20, 60);
+          pts.push([x, y]);
+        }
+        x += rand(26, 52);
+      }
+      this.pts = pts; this.bunkers = bunkers;
+      this.ship = { x: (this.x0 + W) / 2, y: H * .2, vx: 0, vy: 0, a: -Math.PI / 2, alive: true, wait: 0, fire: 0, thrust: false, mode: "climb" };
+      this.shots = []; this.bolts = []; this.sparks = this.sparks ?? []; this.next = 0;
+    },
+    start() { if (!this.pts) this.layout(); },
+    groundAt(x) {
+      const p = this.pts;
+      for (let i = 1; i < p.length; i++) if (p[i][0] >= x) { const [ax, ay] = p[i - 1], [bx, by] = p[i]; return ay + (by - ay) * (x - ax) / Math.max(1, bx - ax); }
+      return H;
+    },
+    step(dt) {
+      const s = this.ship, G = 50;
+      if (this.next > 0) { this.next -= dt; if (this.next <= 0) this.reset(); return; }
+      if (!s.alive) { s.wait -= dt; if (s.wait <= 0) Object.assign(s, { alive: true, x: (this.x0 + W) / 2, y: H * .15, vx: 0, vy: 0, a: -Math.PI / 2, mode: "climb" }); }
+      else {
+        const target = this.bunkers.filter(b => b.alive).sort((a, b) => Math.abs(a.x - s.x) - Math.abs(b.x - s.x))[0];
+        const ground = Math.min(this.groundAt(s.x - 20), this.groundAt(s.x), this.groundAt(s.x + 20));
+        const low = ground - 120, high = Math.max(H * .12, ground - 230);
+        if (s.mode === "attack" && (s.y > low || s.vy > 70)) s.mode = "climb";
+        if (s.mode === "climb" && s.y < high && s.vy < 20) s.mode = "attack";
+        let want = -Math.PI / 2;
+        if (s.mode === "climb") want += target ? Math.max(-.5, Math.min(.5, (target.x - s.x) * .004)) : 0;
+        else if (target) want = Math.atan2(target.y - 6 - s.y, target.x - s.x);
+        const err = angleTo(s.a, want);
+        s.a += Math.max(-3.2 * dt, Math.min(3.2 * dt, err));
+        s.thrust = s.mode === "climb" && Math.abs(err) < .5;
+        if (s.thrust) { s.vx += Math.cos(s.a) * 150 * dt; s.vy += Math.sin(s.a) * 150 * dt; }
+        s.vy += G * dt;
+        s.vx *= 1 - .4 * dt;
+        s.x += s.vx * dt; s.y += s.vy * dt;
+        if (s.x < this.x0 + 20 || s.x > W - 20) { s.vx = -s.vx * .5; s.x = Math.max(this.x0 + 20, Math.min(W - 20, s.x)); }
+        s.y = Math.max(20, s.y);
+        s.fire -= dt;
+        if (s.mode === "attack" && target && Math.abs(err) < .08 && s.fire <= 0) {
+          s.fire = .32;
+          this.shots.push({ x: s.x + Math.cos(s.a) * 12, y: s.y + Math.sin(s.a) * 12, vx: Math.cos(s.a) * 320 + s.vx, vy: Math.sin(s.a) * 320 + s.vy, age: 0 });
+        }
+        if (s.y > this.groundAt(s.x) - 6) this.crash();
+      }
+      // Bunkers turn their guns on the ship and fire now and then.
+      for (const b of this.bunkers) {
+        if (!b.alive) continue;
+        if (s.alive) b.a = Math.atan2(s.y - b.y, s.x - b.x);
+        b.fire -= dt;
+        if (b.fire <= 0 && s.alive) { b.fire = rand(2.2, 4); this.bolts.push({ x: b.x, y: b.y - 8, vx: Math.cos(b.a) * 120, vy: Math.sin(b.a) * 120, age: 0 }); }
+      }
+      for (const z of this.shots) {
+        z.x += z.vx * dt; z.y += z.vy * dt; z.vy += G * .3 * dt; z.age += dt;
+        const hit = this.bunkers.find(b => b.alive && Math.hypot(b.x - z.x, b.y - 6 - z.y) < 14);
+        if (hit) { hit.alive = false; z.dead = true; sparkBurst(this.sparks, hit.x, hit.y - 6, 20, 120, "255,179,71"); }
+        else if (z.y > this.groundAt(z.x) || z.age > 1.6) z.dead = true;
+      }
+      this.shots = this.shots.filter(z => !z.dead);
+      for (const z of this.bolts) {
+        z.x += z.vx * dt; z.y += z.vy * dt; z.age += dt;
+        if (s.alive && Math.hypot(z.x - s.x, z.y - s.y) < 9) { z.dead = true; this.crash(); }
+      }
+      this.bolts = this.bolts.filter(z => !z.dead && z.age < 3.5);
+      if (!this.bunkers.some(b => b.alive) && this.next <= 0) this.next = 2.5;
+    },
+    crash() {
+      const s = this.ship;
+      s.alive = false; s.wait = 2;
+      sparkBurst(this.sparks, s.x, s.y, 18, 120, "92,225,255");
+    },
+    draw(t, dt) {
+      if (!still) this.step(dt);
+      drawStars(t, .7);
+      // The planet's surface.
+      beam("#72ff8f", 10); cx.lineWidth = 1.6;
+      cx.beginPath(); this.pts.forEach(([x, y], i) => i ? cx.lineTo(x, y) : cx.moveTo(x, y)); cx.stroke();
+      // Bunkers: a dome with its gun turned on the ship.
+      for (const b of this.bunkers) {
+        if (!b.alive) continue;
+        beam("#ffb347", 10); cx.lineWidth = 1.6;
+        cx.beginPath(); cx.arc(b.x, b.y, 11, Math.PI, 0); cx.closePath();
+        cx.moveTo(b.x, b.y - 7); cx.lineTo(b.x + Math.cos(b.a) * 17, b.y - 7 + Math.sin(b.a) * 17); cx.stroke();
+      }
+      beam("#ff4fd8", 8); cx.fillStyle = "#ff4fd8";
+      for (const z of this.bolts) { cx.beginPath(); cx.arc(z.x, z.y, 2.5, 0, Math.PI * 2); cx.fill(); }
+      beam("#ffffff", 8); cx.fillStyle = "#ffffff";
+      for (const z of this.shots) cx.fillRect(z.x - 1.5, z.y - 1.5, 3, 3);
+      const s = this.ship;
+      if (s.alive) {
+        const c = Math.cos(s.a), n = Math.sin(s.a), P = (f, side) => [s.x + c * f - n * side, s.y + n * f + c * side];
+        beam("#5ce1ff", 12); cx.lineWidth = 1.6;
+        cx.beginPath(); cx.moveTo(...P(13, 0)); cx.lineTo(...P(-8, -8)); cx.lineTo(...P(-4, 0)); cx.lineTo(...P(-8, 8)); cx.closePath(); cx.stroke();
+        if (s.thrust && Math.sin(t * 50) > -.2) {
+          beam("#ff4fd8", 12);
+          cx.beginPath(); cx.moveTo(...P(-5, -4)); cx.lineTo(...P(-13 - Math.random() * 6, 0)); cx.lineTo(...P(-5, 4)); cx.stroke();
+        }
+      }
+      drawSparks(this.sparks, still ? 0 : dt);
+    },
+  };
+
+  const scenes = [lander, asteroids, invaders, tempest, battlezone, castle, missiles, wars, pacman, qix, defender, tron, gravitar];
+  // The scenes come round in a shuffled order: each plays once before any plays again, and the same one never
+  // plays twice running, even across a reshuffle.
+  let deck = [];
+  function deal(after) {
+    if (!deck.length) {
+      deck = scenes.map((_, i) => i);
+      for (let i = deck.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; }
+      if (deck[deck.length - 1] === after) [deck[0], deck[deck.length - 1]] = [deck[deck.length - 1], deck[0]];
+    }
+    return deck.pop();
+  }
+  let showing = deal(-1), sceneClock = 0, fading = null; // fading: the scene on its way out, and how far
 
   function layout() {
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -1353,12 +2111,12 @@
     cx.clearRect(0, 0, W, H);
     cx.shadowBlur = 0;
 
-    // Every SCENE_SECONDS the next scene takes over, the old one fading out as the new one fades in.
+    // Every SCENE_SECONDS another scene takes over, the old one fading out as the new one fades in.
     if (!still) {
       sceneClock += dt;
       if (sceneClock > SCENE_SECONDS && !fading) {
         fading = { scene: scenes[showing], k: 0 };
-        showing = (showing + 1) % scenes.length;
+        showing = deal(showing);
         scenes[showing].start();
         sceneClock = 0;
       }
