@@ -180,6 +180,8 @@
       "blurb": "Walk a frontier trail with a six-gun in each hand, firing up-left, up or up-right at outlaws, window gunmen and riders, shooting open barrels for boots, a rifle and a horse, and bringing in a wanted man at every hideout." },
     { "repo": "AVASolarQuest", "genre": "arcade", "style": "shooter", "original": "Solar Quest", "publisher": "Cinematronics", "year": 1981, "shot": "Images/AVASolarQuest-survivors.png", "shotFit": "contain",
       "blurb": "A colour vector shooter round a sun whose gravity pulls on everything, ship, enemy and shots alike: shoot down fighters, orbiters, hunters and cruisers, then rescue their crews from escape pods before they fall in." },
+    { "repo": "AVAMarioBros", "genre": "arcade", "style": "platform", "original": "Mario Bros.", "publisher": "Nintendo", "year": 1983, "shot": "Images/AVAMarioBros-bump.png", "shotFit": "contain",
+      "blurb": "Bump the pests over from beneath the ledges they walk on, then kick them off before they get up again: shellbacks, two-bump clawcrabs and hopflies, a jolt block, a fireball and bonus coins, with an original hard-hatted mechanic." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
