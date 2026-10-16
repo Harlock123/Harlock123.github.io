@@ -190,6 +190,8 @@
       "blurb": "Race across the lawn to an ice cream cone before it melts, grabbing peas, pies and melons from the piles and pelting the chefs who climb out of the manholes to stop you, while they throw it right back." },
     { "repo": "AVAChoplifter", "genre": "arcade", "style": "shooter", "original": "Choplifter", "publisher": "Sega", "year": 1985, "shot": "Images/AVAChoplifter-boarding.png", "shotFit": "contain",
       "blurb": "Fly a rescue chopper over the border, shoot open the barracks, land while the hostages run aboard, and fly them home to the pad through tank shells, jets and drifting air mines." },
+    { "repo": "AVATimePilot84", "genre": "arcade", "style": "shooter", "original": "Time Pilot '84", "publisher": "Konami", "year": 1984, "shot": "Images/AVATimePilot84-core.png", "shotFit": "contain",
+      "blurb": "Wheel a jet round the sky over oceans, deserts, ice, cities and orbit, locking homing missiles onto interceptors and gunships, then knock out a carrier's turrets to open its core." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
