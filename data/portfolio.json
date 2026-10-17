@@ -206,6 +206,8 @@
       "blurb": "Dig for diamonds through eight original caves as boulders tumble and roll behind you, dodging fireflies, crushing butterflies into gems, shutting in the slime and dropping rocks through the magic wall." },
     { "repo": "AVAZektor", "genre": "arcade", "style": "shooter", "original": "Zektor", "publisher": "Sega", "year": 1982, "shot": "Images/AVAZektor-fortress.png", "shotFit": "contain",
       "blurb": "Fly a thrust-and-turn fighter over eight vector cities as probes dive on the towers and seekers hunt you down, then break into a fortress of turning rings, while mission control calls it out in a synthesised voice." },
+    { "repo": "AVAGhostsNGoblins", "genre": "arcade", "style": "platform", "original": "Ghosts 'n Goblins", "publisher": "Capcom", "year": 1985, "shot": "Images/AVAGhostsNGoblins-cyclops.png", "shotFit": "contain",
+      "blurb": "Run, jump and throw lances through a graveyard, a haunted village, frozen caverns and a demon's tower to rescue the princess, losing your armour at the first hit and facing a boss at the end of every stage." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
