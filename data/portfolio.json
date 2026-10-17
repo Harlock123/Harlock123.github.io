@@ -228,6 +228,8 @@
       "blurb": "Fly a fighter from the cockpit over ray-marched fractal mountains, land beside downed pilots and open the airlock when they knock, unless the face at the canopy is a Jaggi's, then climb back to the mother ship." },
     { "repo": "AVAKnightLore", "genre": "arcade", "style": "platform", "original": "Knight Lore", "publisher": "Ultimate Play the Game", "year": 1984, "shot": "Images/AVAKnightLore-cauldron.png", "shotFit": "contain",
       "blurb": "Guide the cursed Sabreman through isometric castle rooms of spikes, holes, guards and spiked balls, gathering the charms the wizard's cauldron asks for in daylight, before forty days are out; by night he's a wolf." },
+    { "repo": "AVAExile", "genre": "arcade", "style": "scroller", "original": "Exile", "publisher": "Superior Software", "year": 1988, "shot": "Images/AVAExile-door.png", "shotFit": "contain",
+      "blurb": "Fly a jetpack against gravity and momentum down through caves of water, draughts, coloured doors and their keys, birds, wasps, imps and turrets, carrying your crashed ship's power pods back up to it." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
