@@ -274,6 +274,17 @@
       "blurb": "Trading, docking and dogfights across eight galaxies, rendered in wireframe." }
   ],
 
+  "originals": [
+    { "repo": "AVAAshenReliquary", "kind": "Action RPG", "tags": ["Pathfinder 2e rules", "Isometric", "Dark fantasy"], "status": "In development",
+      "shot": "Images/AVAAshenReliquary-gameplay.png",
+      "blurb": "An isometric dark-fantasy action RPG in the style of Grim Dawn, with character building on Pathfinder 2e rules: walk the Gallows Road from the hanging tree to the refugee camp.",
+      "highlights": [
+        "Six ancestries, backgrounds and classes, with Pathfinder's typed bonuses, degrees of success and conditions in real time",
+        "Loot with runes and affixes, stat comparisons, a trader, shrines, saves and a full HUD",
+        "Flare's open-licensed art, positional OpenAL sound and music from seven free packs"
+      ] }
+  ],
+
   "tools": [
     {"repo": "AVAUIDesigner", "blurb": "A drag-and-drop WYSIWYG designer for Avalonia .axaml files, like the classic WinForms designer.", "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10", "Roslyn"], "shot": "docs/screenshots/overview-light.png", "shotFit": "top", "highlights": ["54 Avalonia controls, rendered live with the Fluent theme as you place them", "Snap lines, grid snapping, align and distribute, and two-way sync with the XAML", "Writes event handlers into your code-behind with Roslyn, never overwriting your code"]},
     { "repo": "SplitzNJoinz", "name": "Splitz_n_Joinz", "blurb": "Splits a file into numbered chunks of a size you choose, and joins them back into the original.",

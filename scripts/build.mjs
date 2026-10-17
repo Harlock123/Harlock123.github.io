@@ -127,6 +127,7 @@ async function gather(list, withShot) {
 }
 const games = await gather(cfg.games, true);
 const tools = await gather(cfg.tools, true);
+const originals = await gather(cfg.originals ?? [], true);
 const work = await gather(cfg.work, false);
 
 // ---------- NuGet ----------
@@ -261,6 +262,25 @@ function toolCard(t) {
       </article>`;
 }
 
+// A game of my own design: like an arcade cabinet, but with its kind and tags in place of the original it
+// follows, a status badge (e.g. "In development") where a remake shows the original's year, and highlights.
+// These always show as full cards, never compact tiles.
+function originalCard(g) {
+  const tube = g.shotFile
+    ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405"${FitStyle(g.shotFit)}>`
+    : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
+  const tags = [g.kind, ...(g.tags ?? [])].filter(Boolean);
+  return `
+      <article class="cab own" id="game-${esc(g.repo)}" data-downloads='${esc(JSON.stringify(g.info.downloads))}'>
+        <div class="tube">${tube}${g.status ? `<span class="year">${esc(g.status)}</span>` : ""}</div>
+        <h3>${esc(g.name)}</h3>
+        ${tags.length ? `<div class="after">${tags.map(esc).join(" · ")}</div>` : ""}
+        <p class="desc">${esc(g.blurb ?? g.info.description ?? "")}</p>
+        ${g.highlights?.length ? `<ul class="highlights">${g.highlights.map(h => `<li>${esc(h)}</li>`).join("")}</ul>` : ""}
+        <div class="acts">${downloadBlock(g)}</div>
+      </article>`;
+}
+
 // "net9.0" reads as ".NET 9"; "netstandard2.0" as ".NET Standard 2.0".
 const framework = f => f.replace(/^net(\d+)\.0(?:-.*)?$/, ".NET $1").replace(/^netstandard/, ".NET Standard ").replace(/^netcoreapp/, ".NET Core ");
 const thousands = n => n.toLocaleString("en-US");
@@ -344,7 +364,8 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
   <div class="wrap">
     <div class="one-up">1UP <b>HARLOCK123</b></div>
     <nav aria-label="Sections">
-      <a href="#games">Games</a>
+      <a href="#games">Games</a>${originals.length ? `
+      <a href="#originals">Originals</a>` : ""}
       <a href="#tools">Tools</a>${packages.length ? `
       <a href="#nuget">NuGet</a>` : ""}
       <a href="#work">Work</a>
@@ -364,7 +385,8 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
     <p class="lede">${esc(p.lede)}</p>
     <ul class="stats">
       <li><b>${games.length}</b>games</li>
-      <li><b>${platformsPerGame}</b>platforms each</li>
+      <li><b>${platformsPerGame}</b>platforms each</li>${originals.length ? `
+      <li><b>${originals.length}</b>${originals.length === 1 ? "original game" : "original games"}</li>` : ""}
       <li><b>${tools.length}</b>tools &amp; controls</li>${packages.length ? `
       <li><b>${packages.length}</b>NuGet packages</li>` : ""}
       <li><b>${oldest}</b>oldest original</li>
@@ -429,7 +451,18 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
     </div>
   </section>
 
-  <section class="block" id="tools" aria-labelledby="tools-title">
+${originals.length ? `  <section class="block" id="originals" aria-labelledby="originals-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="originals-title">Original <em>creations</em></h2>
+        <p>Games of my own design rather than rebuilds of a classic. Builds follow every push, so expect work in progress.</p>
+      </div>
+      <div class="cabinets own">${originals.map(originalCard).join("")}
+      </div>
+    </div>
+  </section>
+
+` : ""}  <section class="block" id="tools" aria-labelledby="tools-title">
     <div class="wrap">
       <div class="sec-head">
         <h2 id="tools-title">The <em>workbench</em></h2>
@@ -519,7 +552,7 @@ if (existsSync(join(root, "images"))) await cp(join(root, "images"), join(dist, 
 await writeFile(join(dist, ".nojekyll"), "");
 if (cfg.cname) await writeFile(join(dist, "CNAME"), cfg.cname + "\n");
 
-console.log(`Built dist/: ${games.length} games, ${tools.length} tools, ${packages.length} NuGet packages, ${work.length} work projects.`);
+console.log(`Built dist/: ${games.length} games, ${originals.length} original games, ${tools.length} tools, ${packages.length} NuGet packages, ${work.length} work projects.`);
 if (failures.length) {
   console.error(`\n${failures.length} repo(s) could not be read:\n  ${failures.join("\n  ")}`);
   process.exit(1);

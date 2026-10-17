@@ -199,15 +199,17 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
 /* Compact tiles: the screen and the name only; the whole tile opens the full card. Scoped to the grid, so
    the card shown in the panel keeps everything. */
 .cab .open { display: none; }
-.compact .cabinets { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 18px 14px; }
-.compact .cabinets .cab { position: relative; }
-.compact .cabinets .cab .desc, .compact .cabinets .cab .acts,
-.compact .cabinets .cab .highlights, .compact .cabinets .cab .nuget-badge { display: none; }
-.compact .cabinets .cab h3 { font-size: 15px; margin: 8px 0 0; overflow-wrap: anywhere; }
-.compact .cabinets .cab .after { font-size: 16px; line-height: 1.2; }
-.compact .cabinets .cab .tube::before, .compact .cabinets .cab .tube::after { width: 10px; height: 10px; }
-.compact .cabinets .cab .tube .year, .compact .cabinets .cab .tube .new { font-size: 16px; top: 4px; padding: 0 5px; }
-.compact .cabinets .cab .tube .year { right: 5px; }
+/* Original games: always full cards, a little wider than a remake's. */
+.cabinets.own { grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); }
+.compact .cabinets:not(.own) { grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr)); gap: 18px 14px; }
+.compact .cabinets:not(.own) .cab { position: relative; }
+.compact .cabinets:not(.own) .cab .desc, .compact .cabinets:not(.own) .cab .acts,
+.compact .cabinets:not(.own) .cab .highlights, .compact .cabinets:not(.own) .cab .nuget-badge { display: none; }
+.compact .cabinets:not(.own) .cab h3 { font-size: 15px; margin: 8px 0 0; overflow-wrap: anywhere; }
+.compact .cabinets:not(.own) .cab .after { font-size: 16px; line-height: 1.2; }
+.compact .cabinets:not(.own) .cab .tube::before, .compact .cabinets:not(.own) .cab .tube::after { width: 10px; height: 10px; }
+.compact .cabinets:not(.own) .cab .tube .year, .compact .cabinets:not(.own) .cab .tube .new { font-size: 16px; top: 4px; padding: 0 5px; }
+.compact .cabinets:not(.own) .cab .tube .year { right: 5px; }
 .compact .cabinets .cab .tube .new { left: 5px; }
 .compact .cabinets .cab .open {
   display: block; position: absolute; inset: 0; z-index: 3; cursor: pointer;
@@ -251,9 +253,9 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
 }
 .tool .screen b { font-weight: 400; color: var(--cyan); text-shadow: 0 0 6px rgba(92,225,255,.5); }
 .tool:hover .window { border-color: var(--cyan); box-shadow: 0 0 22px rgba(92,225,255,.25); }
-.tool .highlights { list-style: none; margin: -4px 0 14px; padding: 0; font-size: 14px; color: var(--dim); }
-.tool .highlights li { position: relative; padding-left: 16px; margin: 3px 0; }
-.tool .highlights li::before { content: "▸"; position: absolute; left: 0; color: var(--green); }
+.tool .highlights, .own .highlights { list-style: none; margin: -4px 0 14px; padding: 0; font-size: 14px; color: var(--dim); }
+.tool .highlights li, .own .highlights li { position: relative; padding-left: 16px; margin: 3px 0; }
+.tool .highlights li::before, .own .highlights li::before { content: "▸"; position: absolute; left: 0; color: var(--green); }
 
 .work { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 24px; }
 .job { border: 1px solid var(--line); background: var(--panel); padding: 20px 22px; min-width: 0; }
