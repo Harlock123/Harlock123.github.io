@@ -232,6 +232,8 @@
       "blurb": "Fly a jetpack against gravity and momentum down through caves of water, draughts, coloured doors and their keys, birds, wasps, imps and turrets, carrying your crashed ship's power pods back up to it." },
     { "repo": "AVAArchon2", "genre": "strategy", "original": "Archon II: Adept", "publisher": "Free Fall Associates", "year": 1984, "shot": "Images/AVAArchon2-war.png", "shotFit": "contain",
       "blurb": "Order's and Chaos's adepts cross a board of Fire, Water, Air and Earth rings, spending mana to call elementals and demons, heal, weaken, imprison and banish, and every meeting is fought out in a real-time arena." },
+    { "repo": "AVAMailOrderMonsters", "genre": "arcade", "style": "shooter", "original": "Mail Order Monsters", "publisher": "Electronic Arts", "year": 1985, "shot": "Images/AVAMailOrderMonsters-catalogue.png", "shotFit": "contain",
+      "blurb": "Order a monster from the catalogue, fit it out with claws, horns, flame, lasers, rockets and acid, and fight Duels and Destruct-o bouts through four leagues for the prize money to buy bigger." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
