@@ -212,6 +212,8 @@
       "blurb": "Fly the Halcyon through four alien strongholds, shooting down red fliers for capsules and spending them on the power gauge for speed, missiles, lasers, trailing drones and a guard, while the ship's computer calls each one out." },
     { "repo": "AVAUridium", "genre": "arcade", "style": "shooter", "original": "Uridium", "publisher": "Hewson", "year": 1986, "shot": "Images/AVAUridium-deck.png", "shotFit": "contain",
       "blurb": "Fly low and fast over eight alien dreadnoughts, rolling on your side through gaps in their towering fences and looping round to turn, then shoot their fuel pods, land on the strip and stop the reactor's lights on a prize." },
+    { "repo": "AVAParadroid", "genre": "arcade", "style": "shooter", "original": "Paradroid", "publisher": "Hewson", "year": 1985, "shot": "Images/AVAParadroid-duel.png", "shotFit": "contain",
+      "blurb": "Clear six decks of a freighter whose droids have turned, as a weak link unit that takes over any droid it beats in a transfer duel of wires and pulses, moving up the classes before each host burns out." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
