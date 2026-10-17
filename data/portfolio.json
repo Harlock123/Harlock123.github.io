@@ -220,6 +220,8 @@
       "blurb": "Fly into a living empire of bone and metal with an indestructible orb that shields, bites and flies off on its own, red, blue and yellow lasers, and a charged beam for bosses like the Hollow Mother and the Serpent." },
     { "repo": "AVAManicMiner", "genre": "arcade", "style": "platform", "original": "Manic Miner", "publisher": "Bug-Byte", "year": 1983, "shot": "Images/AVAManicMiner-pithead.png", "shotFit": "contain",
       "blurb": "Miner Tom works through ten caverns, collecting every key and reaching the portal before the air runs out, past patrolling guardians, conveyors and crumbling ledges, to In the Hall of the Mountain King." },
+    { "repo": "AVASpyVsSpy", "genre": "arcade", "style": "maze", "original": "Spy vs Spy", "publisher": "First Star Software", "year": 1984, "shot": "Images/AVASpyVsSpy-fight.png", "shotFit": "contain",
+      "blurb": "Two spies, one embassy, two views at once: search the furniture for the five secret things, booby-trap furniture and doors with bombs, springs, pails and guns, club the other spy when you meet, and get to the airport first." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
