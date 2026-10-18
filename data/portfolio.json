@@ -250,6 +250,8 @@
       "blurb": "Fly the last AGAV over a solid 3D alien world: lasers for the walkers, tanks and fighters, homing missiles for the great Starglider bird, recharging under the power lines between pylons." },
     { "repo": "AVATetris", "genre": "arcade", "style": "maze", "original": "Tetris", "publisher": "Soviet Academy of Sciences", "year": 1984, "shot": "Images/AVATetris-tetris.png", "shotFit": "contain",
       "blurb": "Turn and slide the seven falling pieces to fill whole rows; four at once scores most. Thirty speeds, a sky for every level over onion domes, and Korobeiniki hurrying when the stack nears the top." },
+    { "repo": "AVAPuzzleBobble", "genre": "arcade", "style": "maze", "original": "Puzzle Bobble", "publisher": "Taito", "year": 1994, "shot": "Images/AVAPuzzleBobble-shot.png", "shotFit": "contain",
+      "blurb": "Aim the launcher and bank bubbles off the walls into the pile: three of a colour burst, whatever's left hanging falls, and the ceiling keeps coming down across thirty rounds." },
     { "repo": "AVALemmings", "genre": "arcade", "style": "maze", "original": "Lemmings", "publisher": "Psygnosis", "year": 1991, "shot": "Images/AVALemmings-builder.png", "shotFit": "contain",
       "blurb": "The lemmings walk straight into any danger: give them skills to climb, float, block, build, bash, mine, dig or go off, and save enough of them across sixteen levels the computer proves before they're kept." },
     { "repo": "AVAPitfall", "genre": "arcade", "style": "platform", "original": "Pitfall!", "publisher": "Activision", "year": 1982, "shot": "Images/AVAPitfall-crocodiles.png", "shotFit": "contain",
