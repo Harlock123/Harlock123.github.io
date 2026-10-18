@@ -212,18 +212,22 @@ function downloadBlock(item) {
 // The filter buttons: arcade games split by style, the rest by genre.
 const STYLES = { shooter: "Shooters", scroller: "Scrolling shooters", maze: "Maze & puzzle", platform: "Platform & action", driving: "Driving & flying" };
 const GENRES = { arcade: "All arcade", rpg: "RPG", strategy: "Strategy", space: "Space sim" };
+// Where a game first came out, if not in the arcades: these get a button of their own, and "All arcade" keeps to
+// the coin-ops. A home game still shows under its style (a computer shooter is still a shooter).
+const ORIGINS = { computer: "Home computer", console: "Console" };
+const HOME = "Home computer & console";
 // The games added most recently get a NEW badge.
 const NEW_COUNT = 5;
 
 function gameCard(g, isNew) {
   const after = g.after ?? `After ${g.original} · ${g.publisher}`;
   // What the search box matches, and what the sort menu sorts by.
-  const search = [g.name, g.original, g.publisher, g.year, GENRES[g.genre], STYLES[g.style], g.genre].filter(Boolean).join(" ").toLowerCase();
+  const search = [g.name, g.original, g.publisher, g.year, GENRES[g.genre], STYLES[g.style], g.genre, ORIGINS[g.origin]].filter(Boolean).join(" ").toLowerCase();
   const tube = g.shotFile
     ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405"${FitStyle(g.shotFit)}>`
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   return `
-      <article class="cab" data-genre="${esc(g.genre)}" data-style="${esc(g.style ?? "")}" data-search="${esc(search)}"
+      <article class="cab" data-genre="${esc(g.genre)}" data-style="${esc(g.style ?? "")}" data-origin="${esc(g.origin ?? "")}" data-search="${esc(search)}"
         data-original="${esc(g.original)}" data-publisher="${esc(g.publisher)}" data-year="${esc(g.year)}" data-created="${esc(g.info.created ?? "")}"
         data-downloads='${esc(JSON.stringify(g.info.downloads))}'>
         <div class="tube">${tube}<span class="year">${esc(g.year)}</span>${isNew ? `<span class="new">NEW</span>` : ""}</div>
@@ -433,8 +437,9 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
 
       <div class="filters" role="group" aria-label="Filter games">
         <button class="chip" data-f="all" aria-pressed="true">All <b>${games.length}</b></button>${[
-          ["arcade", GENRES.arcade, games.filter(g => g.genre === "arcade").length],
+          ["arcade", GENRES.arcade, games.filter(g => g.genre === "arcade" && !g.origin).length],
           ...Object.entries(STYLES).map(([k, l]) => [k, l, games.filter(g => g.style === k).length]),
+          ["home", HOME, games.filter(g => g.origin).length],
           ...["rpg", "strategy", "space"].map(k => [k, GENRES[k], games.filter(g => g.genre === k).length]),
         ].filter(([, , n]) => n > 0).map(([k, l, n]) => `
         <button class="chip${STYLES[k] ? " sub" : ""}" data-f="${k}" aria-pressed="false">${esc(l)} <b>${n}</b></button>`).join("")}

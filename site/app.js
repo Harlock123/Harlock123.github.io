@@ -90,7 +90,12 @@
     const words = search.value.toLowerCase().split(/\s+/).filter(Boolean);
     let shown = 0;
     for (const card of all) {
-      const inGroup = filter === "all" || card.dataset.genre === filter || card.dataset.style === filter;
+      // "All arcade" is the coin-ops only; "home" is everything that first came out on a home computer or console.
+      const d = card.dataset;
+      const inGroup = filter === "all" ? true
+        : filter === "home" ? d.origin !== ""
+        : filter === "arcade" ? d.genre === "arcade" && d.origin === ""
+        : d.genre === filter || d.style === filter;
       const ok = inGroup && words.every(w => card.dataset.search.includes(w));
       card.hidden = !ok;
       if (ok) shown++;
