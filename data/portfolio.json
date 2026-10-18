@@ -236,6 +236,8 @@
       "blurb": "Order a monster from the catalogue, fit it out with claws, horns, flame, lasers, rockets and acid, and fight Duels and Destruct-o bouts through four leagues for the prize money to buy bigger." },
     { "repo": "AVAMercenary", "genre": "arcade", "style": "driving", "original": "Mercenary", "publisher": "Novagen", "year": 1985, "shot": "Images/AVAMercenary-tower.png", "shotFit": "contain",
       "blurb": "Crash-landed in a solid 3D city, fly a skimmer on jobs for the Palyars and the Mechanoids, bringing down relay towers and fetching crates while the other side's drones hunt you, until you can buy passage off Targ." },
+    { "repo": "AVAJetSetWilly", "genre": "arcade", "style": "platform", "original": "Jet Set Willy", "publisher": "Software Projects", "year": 1984, "shot": "Images/AVAJetSetWilly-kitchen.png", "shotFit": "contain",
+      "blurb": "Willy's party is over: put away every flashing item in a 24-room mansion, through doorways and gaps between floors, before midnight, or Maria won't let him into bed." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
