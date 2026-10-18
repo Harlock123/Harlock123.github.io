@@ -304,9 +304,9 @@
       "blurb": "First-person party dungeon crawl with towns, automap, riddles, daily challenges and a map editor." },
     { "repo": "AVABand", "genre": "rpg", "origin": "computer", "original": "Angband", "publisher": "Angband team", "year": 1990, "shot": "screenshots/portfolio-card.png",
       "blurb": "Angband 4.2 in C#. Its game data is checked against 4.2.5 on every build." },
-    { "repo": "AVAFlight-Starflight", "name": "AVAFlight", "genre": "space", "original": "Starflight", "publisher": "Binary Systems", "year": 1986, "shot": "docs/screenshots/08_terrain_vehicle.png",
+    { "repo": "AVAFlight-Starflight", "name": "AVAFlight", "genre": "space", "origin": "computer", "original": "Starflight", "publisher": "Binary Systems", "year": 1986, "shot": "docs/screenshots/08_terrain_vehicle.png",
       "blurb": "Crew, starships, alien diplomacy, planet surveys by terrain vehicle, and real-time combat." },
-    { "repo": "AVAElite", "genre": "space", "original": "Elite", "publisher": "Acornsoft", "year": 1984, "shot": "Images/AVAElite-title.png",
+    { "repo": "AVAElite", "genre": "space", "origin": "computer", "original": "Elite", "publisher": "Acornsoft", "year": 1984, "shot": "Images/AVAElite-title.png",
       "blurb": "Trading, docking and dogfights across eight galaxies, rendered in wireframe." }
   ],
 
