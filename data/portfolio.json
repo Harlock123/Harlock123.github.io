@@ -264,6 +264,8 @@
       "blurb": "One hour to escape the dungeons and climb the palace to the princess: run, leap the gaps, climb the ledges, mind the spikes, choppers and loose floors, open the gates, and duel the guards across eight levels." },
     { "repo": "AVARiverRaid", "genre": "arcade", "style": "scroller", "original": "River Raid", "publisher": "Activision", "year": 1982, "shot": "Images/AVARiverRaid-bridge.png", "shotFit": "contain",
       "blurb": "Fly up a winding river through 48 sections, shooting the ships, helicopters, jets and the bridges in your way, and keep the tank topped up by flying low over the fuel depots." },
+    { "repo": "AVAJetpac", "genre": "arcade", "style": "shooter", "original": "Jetpac", "publisher": "Ultimate Play the Game", "year": 1983, "shot": "Images/AVAJetpac-lift-off.png", "shotFit": "contain",
+      "blurb": "Carry your rocket's sections to the pad, fuel it pod by pod as they fall, and blast off to the next planet, lasering a new kind of alien on every one." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
