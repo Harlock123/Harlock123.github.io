@@ -254,6 +254,8 @@
       "blurb": "The lemmings walk straight into any danger: give them skills to climb, float, block, build, bash, mine, dig or go off, and save enough of them across sixteen levels the computer proves before they're kept." },
     { "repo": "AVAPitfall", "genre": "arcade", "style": "platform", "original": "Pitfall!", "publisher": "Activision", "year": 1982, "shot": "Images/AVAPitfall-crocodiles.png", "shotFit": "contain",
       "blurb": "Twenty minutes to find all 32 treasures in a jungle of 128 screens: jump the logs, fires and cobras, swing over the tar on the vines, hop the crocodiles, and take the tunnel three screens at a time." },
+    { "repo": "AVAHero", "genre": "arcade", "style": "platform", "original": "H.E.R.O.", "publisher": "Activision", "year": 1984, "shot": "Images/AVAHero-laser.png", "shotFit": "contain",
+      "blurb": "Fly your prop-pack down twenty ever-deeper mines to rescue the trapped miners: dynamite the walls, laser the spiders, bats, moths and snakes, and keep clear of the molten rock before your power runs out." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
