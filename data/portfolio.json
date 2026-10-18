@@ -270,6 +270,8 @@
       "blurb": "Fight through the warlord's fortress guard by guard, punching and kicking high, middle or low where each isn't guarding, knock down the eagle, and meet the princess as a friend, not a fighter." },
     { "repo": "AVAPopulous", "genre": "strategy", "original": "Populous", "publisher": "Electronic Arts", "year": 1989, "shot": "Images/AVAPopulous-castles.png", "shotFit": "contain",
       "blurb": "Be a god: raise and lower the land so your people can settle and grow from tents to castles, and call down earthquakes, swamps, volcanoes and Armageddon on the evil god's people." },
+    { "repo": "AVAAmidar", "genre": "arcade", "style": "maze", "original": "Amidar", "publisher": "Konami", "year": 1981, "shot": "Images/AVAAmidar-paint-shop.png", "shotFit": "contain",
+      "blurb": "Paint every line of the board to fill in its boxes while the warriors cross it in their fixed staircases; jump over them, and fill the four corners to turn the tables." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
