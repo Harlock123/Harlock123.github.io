@@ -276,6 +276,8 @@
       "blurb": "Eat a tunnel through the Qotile's shield to call up the Zorlon Cannon, then fire it across and dodge your own shot, hiding from the homing Destroyer Missile in the shimmering Neutral Zone." },
     { "repo": "AVAKlax", "genre": "arcade", "style": "maze", "original": "Klax", "publisher": "Atari Games", "year": 1989, "shot": "Images/AVAKlax-klax.png", "shotFit": "contain",
       "blurb": "Catch the coloured tiles tumbling down the belt on your paddle and flip them into the bin; line up three of a colour across, down or diagonally to make a Klax, before the drop meter fills." },
+    { "repo": "AVARollingThunder", "genre": "arcade", "style": "platform", "original": "Rolling Thunder", "publisher": "Namco", "year": 1986, "shot": "Images/AVARollingThunder-gunfight.png", "shotFit": "contain",
+      "blurb": "Go in after Agent Leila through five Geldra hideouts on two storeys, ducking high shots and jumping low ones, hiding in doorways and raiding BULLETS and ARMS against the clock, and bring down the masked Maboo." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "origin": "computer", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "origin": "computer", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
