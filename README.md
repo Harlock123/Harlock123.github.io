@@ -57,7 +57,8 @@ Behind the hero, `site/app.js` plays little vector attract-mode scenes in turn, 
 seconds (`SCENE_SECONDS`): the lunar lander, a ship clearing an asteroid field, an invader formation
 against a cannon, a claw on the rim of a tempest tube, a battle-tank periscope view, a ship chipping at a
 star castle's rotating rings, missiles falling on cities with counter-missiles bursting among them, and a
-wireframe trench run to an exhaust port. Each is an object in the `scenes` list with `layout`, `start` and `draw`, so another
+wireframe trench run to an exhaust port, among others (Pac-Man, Qix, Defender, Tron, Gravitar, Elite, Tailgunner,
+Red Baron, Omega Race, Black Widow, Major Havoc, Robotron, Centipede, Thrust and Tetris). Each is an object in the `scenes` list with `layout`, `start` and `draw`, so another
 can be added alongside them. A visitor who prefers reduced motion sees one still frame.
 
 ## Building locally
