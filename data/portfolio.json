@@ -280,6 +280,8 @@
       "blurb": "Go in after Agent Leila through five Geldra hideouts on two storeys, ducking high shots and jumping low ones, hiding in doorways and raiding BULLETS and ARMS against the clock, and bring down the masked Maboo." },
     { "repo": "AVASimCity", "genre": "strategy", "origin": "computer", "original": "SimCity", "publisher": "Maxis", "year": 1989, "shot": "Images/AVASimCity-city.png", "shotFit": "contain",
       "blurb": "Be the mayor: zone land for homes, shops and industry, run roads, rails and power to them, balance the budget and grow from village to megalopolis, until the fires, floods, tornadoes and the monster arrive." },
+    { "repo": "AVAPinballConstructionSet", "genre": "arcade", "origin": "computer", "original": "Pinball Construction Set", "publisher": "Electronic Arts", "year": 1983, "shot": "Images/AVAPinballConstructionSet-construction-set.png", "shotFit": "contain",
+      "blurb": "Drag flippers, bumpers, targets, spinners and magnets onto a table, draw and paint the walls, wire up the scoring rules and turn the physics knobs, then play it with up to four friends." },
     { "repo": "AVADungeonMaster", "genre": "rpg", "origin": "computer", "original": "Dungeon Master", "publisher": "FTL Games", "year": 1987, "shot": "Images/AVADungeonMaster-fireball.png", "shotFit": "contain",
       "blurb": "Free four champions from the Hall of Mirrors and take them down the Deepvault in real time: rune magic, torches and hunger, eight levels of puzzles, and Vorthane the Unmade below." },
     { "repo": "AVAMule", "genre": "strategy", "origin": "computer", "original": "M.U.L.E.", "publisher": "Ozark Softscape", "year": 1983, "shot": "Images/AVAMule-auction.png", "shotFit": "contain",
