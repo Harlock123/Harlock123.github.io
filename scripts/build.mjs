@@ -210,7 +210,7 @@ function downloadBlock(item) {
 }
 
 // The filter buttons: arcade games split by style, the rest by genre.
-const STYLES = { shooter: "Shooters", scroller: "Scrolling shooters", maze: "Maze & puzzle", platform: "Platform & action", driving: "Driving & flying" };
+const STYLES = { shooter: "Shooters", scroller: "Scrolling shooters", maze: "Maze & puzzle", platform: "Platform & action", driving: "Driving & flying", sports: "Sports" };
 const GENRES = { arcade: "All arcade", rpg: "RPG", strategy: "Strategy", space: "Space sim" };
 // Where a game first came out, if not in the arcades: these get a button of their own, and "All arcade" keeps to
 // the coin-ops. A home game still shows under its style (a computer shooter is still a shooter).

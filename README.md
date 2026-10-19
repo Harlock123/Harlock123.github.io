@@ -18,7 +18,7 @@ other downloads) is left alone.
 Edit `data/portfolio.json`:
 
 - **games**: `repo`, `genre` (`arcade`, `rpg`, `space` or `strategy`), for an arcade game its `style`
-  (`shooter`, `scroller`, `maze`, `platform` or `driving`), the `original` game, its `publisher` and
+  (`shooter`, `scroller`, `maze`, `platform`, `driving` or `sports`), the `original` game, its `publisher` and
   `year`, a `blurb`, and `shot`: a screenshot's path inside that repo. A game that first came out on a home
   computer or a console, not in the arcades, also has `origin` (`computer` or `console`). The genres and
   styles make the filter buttons, each with its count. **All arcade** counts only the coin-ops (no `origin`);
