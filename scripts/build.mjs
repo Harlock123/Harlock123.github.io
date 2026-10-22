@@ -530,6 +530,7 @@ ${packages.length ? `  <section class="block" id="nuget" aria-labelledby="nuget-
             <dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}
             <dt>GitHub</dt><dd><a href="${esc(p.github)}">${esc(owner)}</a></dd>
             <dt>LinkedIn</dt><dd><a href="${esc(p.linkedin)}">lonnie-watson</a></dd>
+            ${p.x ? `<dt>X</dt><dd><a href="${esc(p.x)}">@${esc(p.x.split("/").pop())}</a></dd>` : ""}
           </dl>
         </div>
       </div>
