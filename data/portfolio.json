@@ -356,6 +356,10 @@
   ],
 
   "tools": [
+    { "repo": "SSHRtm", "blurb": "A real-time, btop-style terminal monitor for a whole fleet of Linux servers, watched over SSH from Windows with nothing to install on the servers.",
+      "kind": "Console application", "tags": ["C#", ".NET 9", "SSH.NET", "Spectre.Console"],
+      "screen": ["SSHRtm  4 servers  1 s poll", "", "web01    CPU  42%  MEM 61%", "db01     CPU  87%  MEM 74%", "app01    CPU  12%  MEM 38%", "cache01  CPU   5%  MEM 22%", "", "Enter: drill in  ·  L: log CSV"],
+      "highlights": ["Polls /proc, df and ps over one persistent SSH session per server, with no agent on the target", "A grid of server tiles, then a detail view of every core, NIC, disk, filesystem and the top processes", "Passwords kept encrypted with Windows DPAPI, and any server's samples logged to CSV with one key"] },
     { "repo": "AVAModeler", "name": "AVA Modeler", "blurb": "A cross-platform recreation of the classic mid-1990s standalone 3D modeler, inspired by LightWave Modeler 4 and 5, with a Layout workspace that animates and ray-traces what you build.",
       "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10", "3D", "Lua"], "shot": "Images/AVAModeler-spaceship.png", "shotFit": "top",
       "highlights": ["The classic quad view, ten foreground/background layers and the Objects, Modify, Multiply and Polygon tools, with booleans, drills and MetaNURBS", "Reads and writes LightWave LWOB objects byte for byte, plus LWO2, OBJ and VideoScape GEO; Lua macros and .NET plugins", "Layout: TCB keyframes, bones, lights and cameras, LWS scenes, and a multithreaded ray tracer"] },
