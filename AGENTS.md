@@ -21,7 +21,8 @@ gh workflow run pages.yml -R Harlock123/Harlock123.github.io   # rebuild and dep
 - The build makes several GitHub API calls per card (about 200 cards), so run it with a token; unauthenticated
   calls hit the rate limit.
 - ImageMagick (`magick`) is optional. With it, screenshots are cropped to 720x405 JPEGs; without it they are copied
-  as they are. GIFs are always copied as they are, so animated ones keep playing; the CSS crops them to 16:9. Keep
+  as they are. GIFs are always copied as they are, so animated ones keep playing; the CSS crops them to 16:9. With
+  ImageMagick a GIF also gets a still of its first frame, which visitors who ask for reduced motion see instead. Keep
   them small (a couple of MB at most), as the page loads every card's picture.
 - `dist/` and `node_modules/` are ignored by git. There are no tests; the build itself is the check.
 

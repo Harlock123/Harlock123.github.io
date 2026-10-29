@@ -70,7 +70,8 @@ async function repoInfo(repo) {
 const hasMagick = (() => { try { execFileSync("magick", ["-version"], { stdio: "ignore" }); return true; } catch { return false; } })();
 
 // Screenshot from the repo, made 16:9 and shrunk; copied as-is when ImageMagick isn't installed, and always for a
-// GIF, so an animated one keeps moving (the page's CSS crops it to 16:9, as FitStyle says).
+// GIF, so an animated one keeps moving (the page's CSS crops it to 16:9, as FitStyle says). A GIF also gets a still
+// JPEG of its first frame, for visitors who ask for reduced motion. Returns { file, still }.
 // "fit" says how a picture of another shape becomes 16:9: cropped from the middle (the default), cropped
 // keeping the top ("top") or the bottom ("bottom") for games with their readouts there, or one end of a
 // very wide picture ("left", "right"), or shown whole
@@ -80,21 +81,35 @@ async function screenshot(repo, branch, path, fit = "center") {
   const raw = await gh(`repos/${owner}/${repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${branch}`,
                        "application/vnd.github.raw");
   await mkdir(join(dist, "shots"), { recursive: true });
-  if (!hasMagick || extname(path).toLowerCase() === ".gif") {
+  const gif = extname(path).toLowerCase() === ".gif";
+  const shape = fit === "contain"
+    ? ["-resize", "720x405", "-background", "black", "-gravity", "center"]
+    : ["-resize", "720x405^", "-gravity", FITS[fit] ?? "center"];
+  const jpeg = (from, to) => execFileSync("magick", [from, ...shape, "-extent", "720x405", "-quality", "78", "-strip", join(dist, to)]);
+  if (!hasMagick || gif) {
     const name = `shots/${repo}${extname(path).toLowerCase()}`;
     await writeFile(join(dist, name), raw);
-    return name;
+    if (!gif || !hasMagick) return { file: name, still: null };
+    const still = `shots/${repo}-still.jpg`;
+    jpeg(`${join(dist, name)}[0]`, still);
+    return { file: name, still };
   }
   const src = join(dist, "shots", `${repo}.src${extname(path)}`);
   const name = `shots/${repo}.jpg`;
   await writeFile(src, raw);
-  const shape = fit === "contain"
-    ? ["-resize", "720x405", "-background", "black", "-gravity", "center"]
-    : ["-resize", "720x405^", "-gravity", FITS[fit] ?? "center"];
-  execFileSync("magick", [src, ...shape, "-extent", "720x405", "-quality", "78", "-strip", join(dist, name)]);
+  jpeg(src, name);
   await rm(src);
-  return name;
+  return { file: name, still: null };
 }
+
+// A card's picture: an <img>, or for an animated GIF a <picture> that gives the still to visitors who ask for
+// reduced motion.
+const ShotImg = (item, alt) => {
+  const img = `<img src="${esc(item.shotFile)}" alt="${esc(alt)}" loading="lazy" width="720" height="405"${FitStyle(item.shotFit)}>`;
+  return item.shotStill
+    ? `<picture><source srcset="${esc(item.shotStill)}" media="(prefers-reduced-motion: reduce)">${img}</picture>`
+    : img;
+};
 
 // Matches the fit in the browser too, for when the picture was copied as-is.
 const FitStyle = fit => fit === "contain" ? ' style="object-fit: contain"'
@@ -118,7 +133,7 @@ async function gather(list, withShot) {
     try {
       const info = await repoInfo(item.repo);
       const shot = withShot && item.shot ? await screenshot(item.repo, info.branch, item.shot, item.shotFit) : null;
-      out.push({ ...item, name: item.name ?? item.repo, info, shotFile: shot });
+      out.push({ ...item, name: item.name ?? item.repo, info, shotFile: shot?.file ?? null, shotStill: shot?.still ?? null });
     } catch (e) {
       failures.push(`${item.repo}: ${e.message}`);
       console.warn(`warning: ${item.repo}: ${e.message}`);
@@ -225,7 +240,7 @@ function gameCard(g, isNew) {
   // What the search box matches, and what the sort menu sorts by.
   const search = [g.name, g.original, g.publisher, g.year, GENRES[g.genre], STYLES[g.style], g.genre, ORIGINS[g.origin]].filter(Boolean).join(" ").toLowerCase();
   const tube = g.shotFile
-    ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405"${FitStyle(g.shotFit)}>`
+    ? ShotImg(g, `${g.name} gameplay`)
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   return `
       <article class="cab" data-genre="${esc(g.genre)}" data-style="${esc(g.style ?? "")}" data-origin="${esc(g.origin ?? "")}" data-search="${esc(search)}"
@@ -246,7 +261,7 @@ function toolCard(t) {
   // A tool without a screenshot can give "screen": a few lines of text drawn in its window instead,
   // the first of them a heading row.
   const shot = t.shotFile
-    ? `<img src="${esc(t.shotFile)}" alt="${esc(t.name)} screenshot" loading="lazy" width="720" height="405"${FitStyle(t.shotFit)}>`
+    ? ShotImg(t, `${t.name} screenshot`)
     : t.screen?.length
       ? `<pre class="screen" role="img" aria-label="${esc(t.name)} at work">${t.screen.map((l, i) => i === 0 ? `<b>${esc(l)}</b>` : esc(l)).join("\n")}</pre>`
       : "";
@@ -272,7 +287,7 @@ function toolCard(t) {
 // These always show as full cards, never compact tiles.
 function originalCard(g) {
   const tube = g.shotFile
-    ? `<img src="${esc(g.shotFile)}" alt="${esc(g.name)} gameplay" loading="lazy" width="720" height="405"${FitStyle(g.shotFit)}>`
+    ? ShotImg(g, `${g.name} gameplay`)
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   const tags = [g.kind, ...(g.tags ?? [])].filter(Boolean);
   return `
