@@ -69,7 +69,8 @@ async function repoInfo(repo) {
 
 const hasMagick = (() => { try { execFileSync("magick", ["-version"], { stdio: "ignore" }); return true; } catch { return false; } })();
 
-// Screenshot from the repo, made 16:9 and shrunk; copied as-is when ImageMagick isn't installed.
+// Screenshot from the repo, made 16:9 and shrunk; copied as-is when ImageMagick isn't installed, and always for a
+// GIF, so an animated one keeps moving (the page's CSS crops it to 16:9, as FitStyle says).
 // "fit" says how a picture of another shape becomes 16:9: cropped from the middle (the default), cropped
 // keeping the top ("top") or the bottom ("bottom") for games with their readouts there, or one end of a
 // very wide picture ("left", "right"), or shown whole
@@ -79,7 +80,7 @@ async function screenshot(repo, branch, path, fit = "center") {
   const raw = await gh(`repos/${owner}/${repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${branch}`,
                        "application/vnd.github.raw");
   await mkdir(join(dist, "shots"), { recursive: true });
-  if (!hasMagick) {
+  if (!hasMagick || extname(path).toLowerCase() === ".gif") {
     const name = `shots/${repo}${extname(path).toLowerCase()}`;
     await writeFile(join(dist, name), raw);
     return name;
