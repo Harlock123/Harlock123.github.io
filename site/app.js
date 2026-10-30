@@ -4715,3 +4715,36 @@
     });
   }
 })();
+
+// Cards with several animated pictures take them in turn: each plays through (twice or more if it's
+// short, so it shows for at least 8 seconds), then the next starts from its first frame. They start once
+// the card scrolls into view, which is when the others are fetched; with reduced motion nothing turns.
+(() => {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const tubes = [...document.querySelectorAll(".tube, .pane")].filter(t => t.querySelectorAll("img[data-ms]").length > 1);
+  if (!tubes.length) return;
+  let restart = 0;
+  const run = tube => {
+    const imgs = [...tube.querySelectorAll("img[data-ms]")];
+    const urls = imgs.map(img => img.dataset.src ?? img.getAttribute("src"));
+    urls.slice(1).forEach(u => { new Image().src = u; });
+    let i = 0;
+    const show = () => {
+      const ms = Number(imgs[i].dataset.ms) || 6000;
+      setTimeout(() => {
+        const next = (i + 1) % imgs.length;
+        // A new address (the same file, a new fragment) starts the GIF from its first frame.
+        imgs[next].src = `${urls[next]}#${++restart}`;
+        imgs[next].hidden = false;
+        imgs[i].hidden = true;
+        i = next;
+        show();
+      }, ms * Math.max(1, Math.ceil(8000 / ms)));
+    };
+    show();
+  };
+  const seen = new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) { seen.unobserve(e.target); run(e.target); }
+  });
+  tubes.forEach(t => seen.observe(t));
+})();

@@ -367,7 +367,7 @@
         "Flare's open-licensed art, positional OpenAL sound and music from seven free packs"
       ] },
     { "repo": "AVAModeler", "name": "AVA Modeler", "kind": "3D modeler", "tags": ["C#", "Avalonia", ".NET 10", "3D", "Lua", "MCP"], "status": "In development",
-      "shot": "samples/mcp/carbon.gif", "alt": "A carbon atom AVA Modeler built and animated for Claude",
+      "shot": ["samples/mcp/carbon.gif", "samples/knight/knight.gif"], "alt": "Animations rendered in AVA Modeler: a carbon atom Claude built and a chess knight turning on a table",
       "blurb": "A cross-platform recreation of the classic mid-1990s standalone 3D modeler, inspired by LightWave Modeler 4 and 5, with a Layout workspace that animates and ray-traces what you build, and Claude built in: ask in the AI Chat panel and watch it model, stage and render.",
       "highlights": [
         "The classic quad view, ten layers and the Objects, Modify, Multiply and Polygon tools, with booleans, drills and MetaNURBS; LightWave LWOB byte for byte, plus LWO2, OBJ, GEO and LWS scenes",

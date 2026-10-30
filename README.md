@@ -38,7 +38,8 @@ NEW badge.
   the game filters, the search or the high-score table.
 - **tools**: `repo`, a `blurb`, its `kind` and `tags`, three `highlights`, and `shot`: a screenshot's path
   inside that repo (an animated GIF plays on the card, or shows its first frame to visitors who ask for
-  reduced motion). A tool without a screenshot can give `screen` instead: a few lines of text drawn in
+  reduced motion). Any card's `shot` can also be a list of GIFs, which the card plays in turn, each through
+  to its end (at least 8 seconds) before the next starts from its first frame. A tool without a screenshot can give `screen` instead: a few lines of text drawn in
   its window, the first of them a heading.
 - **work**: `name`, `kind`, `blurb`, plus `repo` for a public repo or `"private": true`, and any `links`.
 - **nuget**: the NuGet account (`owner`). Every package it owns is listed in the "On NuGet" section with

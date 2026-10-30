@@ -77,38 +77,72 @@ const hasMagick = (() => { try { execFileSync("magick", ["-version"], { stdio: "
 // very wide picture ("left", "right"), or shown whole
 // ("contain") with black filling the sides, for games on a black screen.
 const FITS = { center: "center", top: "north", bottom: "south", left: "west", right: "east" };
-async function screenshot(repo, branch, path, fit = "center") {
+// How long an animated GIF takes to play once, in milliseconds, from its frames' delays (a delay under 2
+// hundredths plays as 10, as browsers do). Walks the blocks rather than searching, so image data can't fool it.
+function gifDuration(buf) {
+  let at = 13, ms = 0;
+  if (buf[10] & 0x80) at += 3 * (2 << (buf[10] & 7));
+  const skipBlocks = () => { while (at < buf.length && buf[at] !== 0) at += buf[at] + 1; at++; };
+  while (at < buf.length) {
+    const kind = buf[at++];
+    if (kind === 0x21) {
+      const label = buf[at++];
+      if (label === 0xf9 && buf[at] === 4) { const d = buf[at + 2] | (buf[at + 3] << 8); ms += (d < 2 ? 10 : d) * 10; }
+      skipBlocks();
+    } else if (kind === 0x2c) {
+      const packed = buf[at + 8];
+      at += 9;
+      if (packed & 0x80) at += 3 * (2 << (packed & 7));
+      at++;
+      skipBlocks();
+    } else break;
+  }
+  return ms;
+}
+
+// A card's picture: fetched from the repo, cropped to 720×405 as a JPEG, or for an animated GIF copied as it
+// is with a still of its first frame (and how long it plays). The second and later pictures of a card that
+// alternates between several are numbered after the repo.
+async function screenshot(repo, branch, path, fit = "center", index = 0) {
   const raw = await gh(`repos/${owner}/${repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${branch}`,
                        "application/vnd.github.raw");
   await mkdir(join(dist, "shots"), { recursive: true });
   const gif = extname(path).toLowerCase() === ".gif";
+  const base = index ? `${repo}-${index + 1}` : repo;
+  const ms = gif ? gifDuration(Buffer.from(raw)) : 0;
   const shape = fit === "contain"
     ? ["-resize", "720x405", "-background", "black", "-gravity", "center"]
     : ["-resize", "720x405^", "-gravity", FITS[fit] ?? "center"];
   const jpeg = (from, to) => execFileSync("magick", [from, ...shape, "-extent", "720x405", "-quality", "78", "-strip", join(dist, to)]);
   if (!hasMagick || gif) {
-    const name = `shots/${repo}${extname(path).toLowerCase()}`;
+    const name = `shots/${base}${extname(path).toLowerCase()}`;
     await writeFile(join(dist, name), raw);
-    if (!gif || !hasMagick) return { file: name, still: null };
-    const still = `shots/${repo}-still.jpg`;
+    if (!gif || !hasMagick) return { file: name, still: null, ms };
+    const still = `shots/${base}-still.jpg`;
     jpeg(`${join(dist, name)}[0]`, still);
-    return { file: name, still };
+    return { file: name, still, ms };
   }
-  const src = join(dist, "shots", `${repo}.src${extname(path)}`);
-  const name = `shots/${repo}.jpg`;
+  const src = join(dist, "shots", `${base}.src${extname(path)}`);
+  const name = `shots/${base}.jpg`;
   await writeFile(src, raw);
   jpeg(src, name);
   await rm(src);
-  return { file: name, still: null };
+  return { file: name, still: null, ms };
 }
 
 // A card's picture: an <img>, or for an animated GIF a <picture> that gives the still to visitors who ask for
-// reduced motion.
+// reduced motion. A card with a list of shots shows the first, and app.js takes it in turns with the others
+// (each with how long it plays, data-ms), which wait hidden; with reduced motion only the first's still shows.
 const ShotImg = (item, alt) => {
-  const img = `<img src="${esc(item.shotFile)}" alt="${esc(alt)}" loading="lazy" width="720" height="405"${FitStyle(item.shotFit)}>`;
-  return item.shotStill
+  const reel = item.reel?.length > 1;
+  const ms = s => reel ? ` data-ms="${s.ms || 6000}"` : "";
+  const img = `<img src="${esc(item.shotFile)}" alt="${esc(alt)}" loading="lazy" width="720" height="405"${FitStyle(item.shotFit)}${ms(item.reel?.[0] ?? {})}>`;
+  const first = item.shotStill
     ? `<picture><source srcset="${esc(item.shotStill)}" media="(prefers-reduced-motion: reduce)">${img}</picture>`
     : img;
+  if (!reel) return first;
+  return first + item.reel.slice(1).map(s =>
+    `<img data-src="${esc(s.file)}" alt="${esc(alt)}" width="720" height="405" hidden${FitStyle(item.shotFit)}${ms(s)}>`).join("");
 };
 
 // Matches the fit in the browser too, for when the picture was copied as-is.
@@ -132,8 +166,12 @@ async function gather(list, withShot) {
     if (!item.repo) { out.push(item); continue; }
     try {
       const info = await repoInfo(item.repo);
-      const shot = withShot && item.shot ? await screenshot(item.repo, info.branch, item.shot, item.shotFit) : null;
-      out.push({ ...item, name: item.name ?? item.repo, info, shotFile: shot?.file ?? null, shotStill: shot?.still ?? null });
+      // "shot" is a path, or a list of them for a card that takes its pictures in turn.
+      const paths = withShot && item.shot ? [item.shot].flat() : [];
+      const reel = [];
+      for (const [i, path] of paths.entries()) reel.push(await screenshot(item.repo, info.branch, path, item.shotFit, i));
+      const shot = reel[0];
+      out.push({ ...item, name: item.name ?? item.repo, info, shotFile: shot?.file ?? null, shotStill: shot?.still ?? null, reel });
     } catch (e) {
       failures.push(`${item.repo}: ${e.message}`);
       console.warn(`warning: ${item.repo}: ${e.message}`);
