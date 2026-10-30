@@ -31,9 +31,10 @@ button in the header switches to the full cards, and the page remembers the choi
 a search box matches the name, original, publisher and year, and a menu sorts them: newest first (by
 the repo's creation date), by original title, by year, or by publisher. The five newest games carry a
 NEW badge.
-- **originals**: games of my own design, shown as full cards in their own section between the games and
-  the tools: `repo`, a `kind` and `tags` (shown where a remake shows its original), a `status` badge for
-  the screenshot's corner (e.g. "In development"), a `blurb`, three `highlights`, and `shot`. They aren't in
+- **originals**: work in progress, shown as full cards in the "Work in progress" section between the games
+  and the tools: games of my own design, and bigger projects still under way (AVA Modeler). Each has `repo`, a `kind` and `tags` (shown where a
+  remake shows its original), a `status` badge for the screenshot's corner (e.g. "In development"), a
+  `blurb`, three `highlights`, `shot`, and optionally `alt` for the picture (default "<name> gameplay"). They aren't in
   the game filters, the search or the high-score table.
 - **tools**: `repo`, a `blurb`, its `kind` and `tags`, three `highlights`, and `shot`: a screenshot's path
   inside that repo (an animated GIF plays on the card, or shows its first frame to visitors who ask for

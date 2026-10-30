@@ -282,12 +282,12 @@ function toolCard(t) {
       </article>`;
 }
 
-// A game of my own design: like an arcade cabinet, but with its kind and tags in place of the original it
+// A work in progress (a game of my own design, or a bigger project under way): like an arcade cabinet, but with its kind and tags in place of the original it
 // follows, a status badge (e.g. "In development") where a remake shows the original's year, and highlights.
 // These always show as full cards, never compact tiles.
 function originalCard(g) {
   const tube = g.shotFile
-    ? ShotImg(g, `${g.name} gameplay`)
+    ? ShotImg(g, g.alt ?? `${g.name} gameplay`)
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   const tags = [g.kind, ...(g.tags ?? [])].filter(Boolean);
   return `
@@ -385,7 +385,7 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
     <div class="one-up">1UP <b>HARLOCK123</b></div>
     <nav aria-label="Sections">
       <a href="#games">Games</a>${originals.length ? `
-      <a href="#originals">Originals</a>` : ""}
+      <a href="#originals">In progress</a>` : ""}
       <a href="#tools">Tools</a>${packages.length ? `
       <a href="#nuget">NuGet</a>` : ""}
       <a href="#work">Work</a>
@@ -406,7 +406,7 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
     <ul class="stats">
       <li><b>${games.length}</b>games</li>
       <li><b>${platformsPerGame}</b>platforms each</li>${originals.length ? `
-      <li><b>${originals.length}</b>${originals.length === 1 ? "original game" : "original games"}</li>` : ""}
+      <li><b>${originals.length}</b>in progress</li>` : ""}
       <li><b>${tools.length}</b>tools &amp; controls</li>${packages.length ? `
       <li><b>${packages.length}</b>NuGet packages</li>` : ""}
       <li><b>${oldest}</b>oldest original</li>
@@ -475,8 +475,8 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
 ${originals.length ? `  <section class="block" id="originals" aria-labelledby="originals-title">
     <div class="wrap">
       <div class="sec-head">
-        <h2 id="originals-title">Original <em>creations</em></h2>
-        <p>Games of my own design rather than rebuilds of a classic. Builds follow every push, so expect work in progress.</p>
+        <h2 id="originals-title">Work in <em>progress</em></h2>
+        <p>Bigger projects still under way: a game of my own design, and a 3D modeling suite with Claude built in. Builds follow every push, so expect rough edges.</p>
       </div>
       <div class="cabinets own">${originals.map(originalCard).join("")}
       </div>
@@ -574,7 +574,7 @@ if (existsSync(join(root, "images"))) await cp(join(root, "images"), join(dist, 
 await writeFile(join(dist, ".nojekyll"), "");
 if (cfg.cname) await writeFile(join(dist, "CNAME"), cfg.cname + "\n");
 
-console.log(`Built dist/: ${games.length} games, ${originals.length} original games, ${tools.length} tools, ${packages.length} NuGet packages, ${work.length} work projects.`);
+console.log(`Built dist/: ${games.length} games, ${originals.length} in progress, ${tools.length} tools, ${packages.length} NuGet packages, ${work.length} work projects.`);
 if (failures.length) {
   console.error(`\n${failures.length} repo(s) could not be read:\n  ${failures.join("\n  ")}`);
   process.exit(1);
