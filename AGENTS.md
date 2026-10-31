@@ -53,7 +53,7 @@ gh workflow run pages.yml -R Harlock123/Harlock123.github.io   # rebuild and dep
 - **The genre, style and origin values are fixed lists** (`GENRES`, `STYLES`, `ORIGINS` in `build.mjs`). A new value
   needs adding there, or its games get no filter button.
 - **Games go in `games`; the owner's own designs and bigger projects still under way in `originals`**, which the page
-  shows as "Work in progress" (Ashen Reliquary, AVA Modeler). Originals are left out of the game filters and
+  shows as "Work in progress" (Ashen Reliquary, AVA Modeler, CirqAvalonia). Originals are left out of the game filters and
   search. A home-computer or console game gets `origin`, so it counts under "Home computer & console".
 - **Escape everything.** Text from the JSON and the API goes through `esc` (or `href` for URLs) in the templates.
 - **Cache busting.** `style.css` and `app.js` are linked with a hash of their contents, so edit those files in `site/`,

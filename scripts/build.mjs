@@ -514,7 +514,7 @@ ${originals.length ? `  <section class="block" id="originals" aria-labelledby="o
     <div class="wrap">
       <div class="sec-head">
         <h2 id="originals-title">Work in <em>progress</em></h2>
-        <p>Bigger projects still under way: a game of my own design, and a 3D modeling suite with Claude built in. Builds follow every push, so expect rough edges.</p>
+        <p>Bigger projects still under way: a game of my own design, and a 3D modeling suite and a circuit simulator, both with Claude built in. New versions come often, so expect rough edges.</p>
       </div>
       <div class="cabinets own">${originals.map(originalCard).join("")}
       </div>
