@@ -391,6 +391,11 @@
   ],
 
   "tools": [
+    { "repo": "AVAHexEdit", "blurb": "A hex editor for files of any size, with an inspector that reads the bytes at the caret every common way and structure templates that name and colour each field of a file.",
+      "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10", "Hex editor"], "shot": ["docs/images/AVAHexEdit-png.png", "docs/images/AVAHexEdit-compare.png"], "shotFit": "top",
+      "highlights": ["Opens multi-gigabyte files at once and edits them in overwrite or insert mode, with undo all the way back and safe saving",
+                     "Structure templates for PNG, BMP, GIF, WAV, ZIP, ELF and PE executables and LightWave objects, or your own in a few lines",
+                     "Find and replace hex, text or numbers, checksums from CRC-32 to SHA-512, and a side-by-side compare of two files"] },
     { "repo": "SSHRtm", "blurb": "A real-time, btop-style terminal monitor for a whole fleet of Linux servers, watched over SSH from Windows with nothing to install on the servers.",
       "kind": "Console application", "tags": ["C#", ".NET 9", "SSH.NET", "Spectre.Console"],
       "screen": ["SSHRtm  4 servers  1 s poll", "", "web01    CPU  42%  MEM 61%", "db01     CPU  87%  MEM 74%", "app01    CPU  12%  MEM 38%", "cache01  CPU   5%  MEM 22%", "", "Enter: drill in  ·  L: log CSV"],
