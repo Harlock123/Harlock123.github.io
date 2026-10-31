@@ -384,7 +384,7 @@
         "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time"
       ] },
     { "repo": "AVASerMonitor", "blurb": "A serial monitor and live plotter: point it at an Arduino, a Pico, an ESP32, a USB-serial adapter or a USB HID device and watch what it says, as text or hex, and as live graphs.",
-      "kind": "Serial monitor", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "status": "In development", "shot": "docs/images/AVASerMonitor-demo.png", "shotFit": "top",
+      "kind": "Serial monitor", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "status": "In development", "shot": ["docs/images/AVASerMonitor-demo.png", "docs/images/AVASerMonitor-hex.png"], "shotFit": "top",
       "highlights": ["Serial ports, USB-serial adapters and boards (named by maker and product on Linux), and USB HID devices read directly, with any baud rate, framing and flow control, DTR, RTS and a board reset",
                      "A terminal in text or hex with millisecond timestamps, and sending text with line endings and escapes or hex bytes, with history",
                      "A live plotter that reads lines the way the Arduino Serial Plotter does, so sketches plot unchanged, with CSV export and recording to a log or raw bytes"] }
