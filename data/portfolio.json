@@ -382,15 +382,15 @@
         "191 parts: RLC, diodes, transistors, op-amps, the 555, regulators, 74xx and 4000 logic, buses, sensors and dev boards",
         "Transient, frequency response, DC sweeps, noise, stability, poles and zeros, FFT, tolerance and protocol decoding, plus a cirq command line for CI",
         "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time"
-      ] }
+      ] },
+    { "repo": "AVASerMonitor", "blurb": "A serial monitor and live plotter: point it at an Arduino, a Pico, an ESP32, a USB-serial adapter or a USB HID device and watch what it says, as text or hex, and as live graphs.",
+      "kind": "Serial monitor", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "status": "In development", "shot": "docs/images/AVASerMonitor-demo.png", "shotFit": "top",
+      "highlights": ["Serial ports, USB-serial adapters and boards (named by maker and product on Linux), and USB HID devices read directly, with any baud rate, framing and flow control, DTR, RTS and a board reset",
+                     "A terminal in text or hex with millisecond timestamps, and sending text with line endings and escapes or hex bytes, with history",
+                     "A live plotter that reads lines the way the Arduino Serial Plotter does, so sketches plot unchanged, with CSV export and recording to a log or raw bytes"] }
   ],
 
   "tools": [
-    { "repo": "AVASerMonitor", "blurb": "A serial monitor and live plotter: point it at an Arduino, a Pico, an ESP32, a USB-serial adapter or a USB HID device and watch what it says, as text or hex, and as live graphs.",
-      "kind": "Application", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "shot": "docs/images/AVASerMonitor-demo.png", "shotFit": "top",
-      "highlights": ["Serial ports, USB-serial adapters and boards (named by maker and product on Linux), and USB HID devices read directly, with any baud rate, framing and flow control, DTR, RTS and a board reset",
-                     "A terminal in text or hex with millisecond timestamps, and sending text with line endings and escapes or hex bytes, with history",
-                     "A live plotter that reads lines the way the Arduino Serial Plotter does, so sketches plot unchanged, with CSV export and recording to a log or raw bytes"] },
     { "repo": "SSHRtm", "blurb": "A real-time, btop-style terminal monitor for a whole fleet of Linux servers, watched over SSH from Windows with nothing to install on the servers.",
       "kind": "Console application", "tags": ["C#", ".NET 9", "SSH.NET", "Spectre.Console"],
       "screen": ["SSHRtm  4 servers  1 s poll", "", "web01    CPU  42%  MEM 61%", "db01     CPU  87%  MEM 74%", "app01    CPU  12%  MEM 38%", "cache01  CPU   5%  MEM 22%", "", "Enter: drill in  ·  L: log CSV"],
