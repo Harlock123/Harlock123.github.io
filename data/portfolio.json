@@ -366,6 +366,15 @@
         "Loot with runes and affixes, stat comparisons, a trader, shrines, saves and a full HUD",
         "Flare's open-licensed art, positional OpenAL sound and music from seven free packs"
       ] },
+    { "repo": "AVAWorldOfAngBand", "name": "AVA World of AngBand", "kind": "Roguelike", "tags": ["Angband", "Pathfinder 2e rules", "Isometric", "Dark fantasy"], "status": "In development",
+      "shot": ["docs/images/WorldOfAngBand-fight.png", "docs/images/WorldOfAngBand-gallows-road.png"],
+      "alt": "AVA World of AngBand: a turn-based fight on the first level with the rolls in the message log, and the Gallows Road outside Gallowmere's gate",
+      "blurb": "AVABand's Angband and Ashen Reliquary in one game: ten years after the Cinder Throne, a hundred levels of Angband 4.2.5's generated dungeon go down beneath the Reliquary, played turn by turn as a Pathfinder 2e hero in Flare's isometric art, with Ashen Reliquary's province outside the town's gates.",
+      "highlights": [
+        "All of Angband's monsters, spells, items, egos and artifacts in Pathfinder's terms, renamed for the Ashen setting, on Angband's energy system with three-action rounds",
+        "Seven classes with their abilities and feats, a story carried on from Ashen Reliquary through five altar choices to an epilogue, mythic tiers, and permadeath",
+        "Ashen Reliquary's 18 wild zones above the shaft, with their creatures, people, readings and Lantern Rifts; daily and weekly challenges, mods, and balance bots that play it to the bottom"
+      ] },
     { "repo": "AVAModeler", "name": "AVA Modeler", "kind": "3D modeler", "tags": ["C#", "Avalonia", ".NET 10", "3D", "Lua", "MCP"], "status": "In development",
       "shot": ["samples/mcp/carbon.gif", "samples/knight/knight.gif"], "alt": "Animations rendered in AVA Modeler: a carbon atom Claude built and a chess knight turning on a table",
       "blurb": "A cross-platform recreation of the classic mid-1990s standalone 3D modeler, inspired by LightWave Modeler 4 and 5, with a Layout workspace that animates and ray-traces what you build, and Claude built in: ask in the AI Chat panel and watch it model, stage and render.",
