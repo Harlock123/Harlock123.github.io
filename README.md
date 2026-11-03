@@ -17,6 +17,9 @@ other downloads) is left alone.
 
 Edit `data/portfolio.json`:
 
+- **profile**: the hero's `name`, `title` and `lede`, the `about` paragraphs and `card`, the `photo`, the links
+  (`github`, `linkedin`, `x`), and the PDFs behind the hero's buttons: `resume`, and optionally `brief` (the AI
+  agents brief), both paths under `static/`.
 - **games**: `repo`, `genre` (`arcade`, `rpg`, `space` or `strategy`), for an arcade game its `style`
   (`shooter`, `scroller`, `maze`, `platform`, `driving` or `sports`), the `original` game, its `publisher` and
   `year`, a `blurb`, and `shot`: a screenshot's path inside that repo. A game that first came out on a home

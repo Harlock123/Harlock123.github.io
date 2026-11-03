@@ -451,7 +451,8 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
     </ul>
     <div class="ctas">
       <a class="btn primary" href="#games">▶ Press start</a>
-      <a class="btn" href="${href(p.resume)}">Résumé (PDF)</a>
+      <a class="btn" href="${href(p.resume)}">Résumé (PDF)</a>${p.brief ? `
+      <a class="btn" href="${href(p.brief)}">AI agents brief (PDF)</a>` : ""}
       <a class="btn ghost" href="${esc(p.github)}">GitHub</a>
     </div>
   </div>
