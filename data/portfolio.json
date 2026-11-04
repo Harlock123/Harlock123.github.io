@@ -462,7 +462,7 @@
     { "name": "Code Generation API", "kind": "REST service", "repo": "CodeGenAPI",
       "blurb": "CODE Complete's generation as a RESTful API for enterprise deployment." },
     { "name": "AI Agents in Client Software", "kind": "Brief",
-      "blurb": "Two pages on letting AI agents work inside the tools we build for clients, through MCP as in AVA Modeler and CirqAvalonia, with locally run models where PHI and PII rule out the cloud.",
+      "blurb": "Two pages on letting AI agents work inside the tools we build for clients, through MCP as in AVA Modeler, CirqAvalonia and X12 Explorer, with locally run models where PHI and PII rule out the cloud.",
       "links": [["Brief PDF", "docs/AI-Agents-in-Client-Software.pdf"], ["Word", "docs/AI-Agents-in-Client-Software.docx"]] }
   ]
 }
