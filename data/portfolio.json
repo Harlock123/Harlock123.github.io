@@ -387,9 +387,9 @@
     { "repo": "CIRQAvalonia", "name": "CirqAvalonia", "kind": "Circuit simulator", "tags": ["C#", "Avalonia", ".NET 10", "SPICE", "MCP"], "status": "In development",
       "shot": ["docs/images/35-ai-chat.png", "docs/images/36-ai-chat-bode.png", "docs/images/01-overview.png"], "shotFit": "top",
       "alt": "CirqAvalonia at work: Claude building and running a 555 astable and an RC low-pass in the AI Chat, and the editor with its live oscilloscope",
-      "blurb": "An electronic circuit simulator: draw a schematic from 211 parts and watch it run on a live oscilloscope, with a SPICE-style analog solver and event-driven logic in one simulation, and Claude built in: ask in the AI Chat panel and watch it place, wire, probe and run a circuit, then read you the numbers.",
+      "blurb": "An electronic circuit simulator: draw a schematic from 227 parts and watch it run on a live oscilloscope, with a SPICE-style analog solver and event-driven logic in one simulation, and Claude built in: ask in the AI Chat panel and watch it place, wire, probe and run a circuit, then read you the numbers.",
       "highlights": [
-        "211 parts: RLC, lamps, diodes, transistors and Darlingtons, op-amps, the 555, regulators, flip-flops, 74xx and 4000 logic, NeoPixel strips, keypads, buses, sensors, and Arduino, Raspberry Pi, Pico and ESP32 boards",
+        "227 parts: RLC, lamps, diodes, transistors and Darlingtons, op-amps, the 555, regulators, flip-flops, 74xx and 4000 logic, EPROMs and RAM, a 6502 and 65C02 with the 6522 and 6551, NeoPixel strips, keypads, buses, sensors, and Arduino, Raspberry Pi, Pico and ESP32 boards",
         "Transient, frequency response, DC sweeps, noise, stability, poles and zeros, FFT, tolerance and protocol decoding, plus a cirq command line for CI",
         "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time"
       ] },
