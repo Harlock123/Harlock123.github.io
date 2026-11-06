@@ -385,12 +385,13 @@
         "An AI Chat panel and an MCP server let Claude, a local model through Ollama or LM Studio, or another agent model, light, animate and render with the same tools, live in the open window, with chat history kept only if you choose"
       ] },
     { "repo": "AVALightWave", "name": "AVALightWave", "kind": "3D scene and animation", "tags": ["C#", "Avalonia", ".NET 10", "3D", "MCP"], "status": "In development",
-      "shot": ["Images/AVALightWave-layout.png", "Images/AVALightWave-render.png", "Images/AVALightWave-chat.png"], "alt": "AVALightWave: the Layout view with a bouncing ball keyed in the graph editor, its ray-traced render, and Claude staging a pawn and a crate from the AI Chat",
+      "shot": ["Images/AVALightWave-quad.png", "Images/AVALightWave-effects.png", "Images/AVALightWave-render-queue.png"], "alt": "AVALightWave: four view panes over the graph editor, a ray-traced render with a lens flare under a spotlight, and the Render Queue with a 60-frame job done",
       "blurb": "A re-imagining of classic LightWave Layout, the scene, animation and render program that shipped beside the modeler: load objects, stage, light, key and ray-trace them in a program of its own, linked live to AVA Modeler by a hub as the original two programs were, with Claude built in.",
       "highlights": [
-        "The Layout view with its Objects, Bones, Lights and Cameras edit modes, Move, Rotate, Size and Stretch, numeric requesters, a row of panels, the timeline, graph editor, dope sheet and a Scene Editor, saving LWS scenes and loading LWOB, LWO2, OBJ, glTF and STL objects",
-        "A hub joins it to AVA Modeler: Edit in Modeler sends an object across and every save comes straight back into the scene, while each program still works alone",
-        "Built on AVA Modeler's engine as a git submodule, one copy shared: bones with IK, paths, the ray tracer and MP4 and GIF output, with 41 Layout-only MCP tools and five recipes for Claude or another agent"
+        "The Layout view in one, two or four panes drawn with OpenGL, with Clone Item, Load from Scene, motion files, auto-save with recovery, Make Preview, an Images panel, Lua macros and a Scene Editor, saving LWS scenes and loading LWOB, LWO2, OBJ, glTF and STL objects",
+        "Lens flares, volumetric lights, shadow maps, object dissolve and compositing in the ray tracer, and a render farm in a shared folder that render nodes on other machines work through, ScreamerNet-style",
+        "A graph editor with TCB, linear, stepped and Bezier keys, copy and paste and time scaling; motion modifiers, morph targets and Skelegons to Bones in one step",
+        "Linked live to AVA Modeler through a hub: an edit there shows up in the scene as it's made, with the hub's state on both status bars. Built on AVA Modeler's engine as a git submodule, with 60 MCP tools and twelve recipes for Claude or another agent"
       ] },
     { "repo": "CIRQAvalonia", "name": "CirqAvalonia", "kind": "Circuit simulator", "tags": ["C#", "Avalonia", ".NET 10", "SPICE", "MCP"], "status": "In development",
       "shot": ["docs/images/35-ai-chat.png", "docs/images/36-ai-chat-bode.png", "docs/images/01-overview.png"], "shotFit": "top",
