@@ -377,12 +377,12 @@
         "Ashen Reliquary's 18 wild zones above the shaft, with their creatures, people, readings and Lantern Rifts; daily and weekly challenges, mods, and balance bots that play it to the bottom"
       ] },
     { "repo": "AVAHack", "name": "AVAHack", "kind": "Dungeon crawler", "tags": ["First person", "Real time", "d20 rules", "Dark fantasy"], "status": "In development",
-      "shot": ["Images/AVAHack-crypt.png", "Images/AVAHack-bestiary.png", "Images/AVAHack-waystone.png"],
-      "alt": "AVAHack: a skeleton in the crypt beneath Harrowgate, the bestiary of creatures drawn in code, and a Waystone's merchant",
-      "blurb": "A real-time, grid-based first-person dungeon crawler in the tradition of Legend of Grimrock and Dungeon Hack: lead a party of up to four into the Hollow beneath Harrowgate, a seeded twelve-level Delve that rearranges itself each time the town's bell tolls, with d20 character building and skills that grow as you use them.",
+      "shot": ["Images/AVAHack-crypt.png", "Images/AVAHack-stacks.png", "Images/AVAHack-bestiary.png"],
+      "alt": "AVAHack: a skeleton in the crypt beneath Harrowgate, a candlelit hall of the Ossuary Stacks, and the bestiary of creatures drawn in code",
+      "blurb": "A real-time, grid-based first-person dungeon crawler in the tradition of Legend of Grimrock and Dungeon Hack: lead a party of up to four into the Hollow beneath Harrowgate, a seeded Delve of up to twenty-four levels in six regions that rearranges itself each time the town's bell tolls, with d20 character building and skills that grow as you use them.",
       "highlights": [
         "Eight ancestries, ten callings and eight backgrounds, d20 rolls and saves, 22 skills that rise with use and carry perk trees, and experience for every kill",
-        "58 creatures in ten families, elites and named champions, five scripted bosses, 20 kinds of trap, 15 vaults, and Waystones with a merchant, a trainer, a shrine and a stash",
+        "71 creatures in twelve families, elites and named champions, six scripted bosses, 20 kinds of trap, 15 vaults, and Waystones with a merchant, a trainer, a shrine and a stash; in the Ossuary Stacks noise wakes the dead, candlelight gives you away and the Archivist reads by his candles",
         "Alchemy with hidden reagent effects, cooking, Smithing and Enchanting, food and water; pixel-art creatures, icons and portraits drawn in code, CC0 textures, and synthesised positional sound"
       ] },
     { "repo": "AVAModeler", "name": "AVA Modeler", "kind": "3D modeler", "tags": ["C#", "Avalonia", ".NET 10", "3D", "Lua", "MCP"], "status": "In development",
