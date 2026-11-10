@@ -410,7 +410,7 @@
       "highlights": [
         "335 parts: RLC, lamps, diodes, transistors and Darlingtons, op-amps, the 555, regulators, flip-flops, 126 74xx and 4000 chips from gates to the 74181 ALU, one-shots and analog muxes, EPROMs and RAM, a 6502, a 65C02 and the C64's 6510 with the 6522, 6551, 6526 CIA and SID, a 68000 with the 68681, 68230 and 68901, a 6809 with the 6821 and 6850, a Z80 with the PIO, CTC, SIO and DART, an 8085 with the 8155, 8255, 8251, 8253 and 8259, NeoPixel strips, keypads, buses, sensors, and Arduino, Raspberry Pi, Pico and ESP32 boards",
         "Transient, frequency response, DC sweeps, noise, stability, poles and zeros, FFT, tolerance and protocol decoding, plus a cirq command line for CI",
-        "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time"
+        "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time, with the API use counted as it goes: tokens, an estimated cost per turn, daily and monthly totals and a budget"
       ] },
     { "repo": "AVASerMonitor", "blurb": "A serial monitor and live plotter: point it at an Arduino, a Pico, an ESP32, a USB-serial adapter or a USB HID device and watch what it says, as text or hex, and as live graphs.",
       "kind": "Serial monitor", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "status": "In development", "shot": ["docs/images/AVASerMonitor-demo.png", "docs/images/AVASerMonitor-hex.png"], "shotFit": "top",
