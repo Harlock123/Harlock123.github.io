@@ -401,7 +401,7 @@
         "The Layout view in one, two or four panes drawn with OpenGL, with Clone Item, Load from Scene, motion files, auto-save with recovery, Make Preview, an Images panel, Lua macros and a Scene Editor, saving LWS scenes and loading LWOB, LWO2, OBJ, glTF, STL and 3MF objects",
         "Lens flares, volumetric lights, shadow maps, object dissolve, particles as blobs, fluids, smoke, sparks or object copies that collide, hair combed with the mouse that swings with its bones, cloth and compositing in the ray tracer, and a render farm in a shared folder that render nodes on other machines work through, ScreamerNet-style",
         "A graph editor with TCB, linear, stepped and Bezier keys, copy and paste and time scaling; motion modifiers, morph targets and Skelegons to Bones in one step",
-        "Linked live to AVA Modeler through a hub: an edit there shows up in the scene as it's made, with the hub's state on both status bars. Built on AVA Modeler's engine as a git submodule, with 64 MCP tools and twelve recipes for Claude or another agent"
+        "Linked live to AVA Modeler through a hub: an edit there shows up in the scene as it's made, with the hub's state on both status bars. Built on AVA Modeler's engine as a git submodule, with 64 MCP tools and twelve recipes for Claude or another agent, and an AI Chat that counts the API use as it goes: tokens, an estimated cost per turn, daily and monthly totals and a budget"
       ] },
     { "repo": "CIRQAvalonia", "name": "CirqAvalonia", "kind": "Circuit simulator", "tags": ["C#", "Avalonia", ".NET 10", "SPICE", "MCP"], "status": "In development",
       "shot": ["docs/images/35-ai-chat.png", "docs/images/36-ai-chat-bode.png", "docs/images/01-overview.png"], "shotFit": "top",
