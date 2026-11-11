@@ -264,8 +264,10 @@ function downloadBlock(item) {
 }
 
 // The filter buttons: arcade games split by style, the rest by genre.
-const STYLES = { shooter: "Shooters", scroller: "Scrolling shooters", maze: "Maze & puzzle", platform: "Platform & action", driving: "Driving & flying", sports: "Sports" };
-const GENRES = { arcade: "All arcade", rpg: "RPG", strategy: "Strategy", space: "Space sim" };
+const STYLES = { shooter: "Shooters", scroller: "Scrolling shooters", maze: "Maze & puzzle", platform: "Platform & action", driving: "Driving & flying", sports: "Sports", fighting: "Fighting" };
+const GENRES = { arcade: "All arcade", rpg: "RPG", strategy: "Strategy", space: "Space sim", adventure: "Adventure" };
+// Games of my own design ("own": true) get a button of their own, and stay out of "All arcade" and the table of originals.
+const OWN = "Original games";
 // Where a game first came out, if not in the arcades: these get a button of their own, and "All arcade" keeps to
 // the coin-ops. A home game still shows under its style (a computer shooter is still a shooter).
 const ORIGINS = { computer: "Home computer", console: "Console" };
@@ -274,14 +276,14 @@ const HOME = "Home computer & console";
 const NEW_COUNT = 5;
 
 function gameCard(g, isNew) {
-  const after = g.after ?? `After ${g.original} · ${g.publisher}`;
+  const after = g.after ?? (g.own ? "An original game" : `After ${g.original} · ${g.publisher}`);
   // What the search box matches, and what the sort menu sorts by.
-  const search = [g.name, g.original, g.publisher, g.year, GENRES[g.genre], STYLES[g.style], g.genre, ORIGINS[g.origin]].filter(Boolean).join(" ").toLowerCase();
+  const search = [g.name, g.original, g.publisher, g.year, GENRES[g.genre], STYLES[g.style], g.genre, ORIGINS[g.origin], g.own ? "original own" : ""].filter(Boolean).join(" ").toLowerCase();
   const tube = g.shotFile
     ? ShotImg(g, `${g.name} gameplay`)
     : `<canvas data-placeholder="${esc(g.placeholder ?? "elite")}" role="img" aria-label="${esc(g.name)} placeholder art" width="720" height="405"></canvas>`;
   return `
-      <article class="cab" data-genre="${esc(g.genre)}" data-style="${esc(g.style ?? "")}" data-origin="${esc(g.origin ?? "")}" data-search="${esc(search)}"
+      <article class="cab" data-genre="${esc(g.genre)}" data-style="${esc(g.style ?? "")}" data-origin="${esc(g.origin ?? "")}" data-own="${g.own ? "1" : ""}" data-search="${esc(search)}"
         data-original="${esc(g.original)}" data-publisher="${esc(g.publisher)}" data-year="${esc(g.year)}" data-created="${esc(g.info.created ?? "")}"
         data-downloads='${esc(JSON.stringify(g.info.downloads))}'>
         <div class="tube">${tube}<span class="year">${esc(g.year)}</span>${isNew ? `<span class="new">NEW</span>` : ""}</div>
@@ -382,11 +384,11 @@ function workCard(j) {
 }
 
 const ordinal = n => n + ((n % 100 >= 11 && n % 100 <= 13) ? "th" : ({ 1: "st", 2: "nd", 3: "rd" }[n % 10] ?? "th"));
-const scoreRows = [...games].sort((a, b) => a.year - b.year || a.original.localeCompare(b.original)).map((g, i) => `
+const scoreRows = games.filter(g => !g.own).sort((a, b) => a.year - b.year || a.original.localeCompare(b.original)).map((g, i) => `
             <tr><td>${ordinal(i + 1)}</td><td>${esc(g.year)}</td><td>${esc(g.original)}</td><td><a href="#game-${esc(g.repo)}">${esc(g.name)}</a></td></tr>`).join("");
 
 const p = cfg.profile;
-const oldest = Math.min(...games.map(g => g.year));
+const oldest = Math.min(...games.filter(g => !g.own).map(g => g.year));
 const newest = new Set([...games].filter(g => g.info.created).sort((a, b) => b.info.created.localeCompare(a.info.created)).slice(0, NEW_COUNT).map(g => g.repo));
 const platformsPerGame = Math.max(0, ...games.map(g => Object.keys(g.info.downloads).length));
 const built = new Date().toISOString().slice(0, 10);
@@ -492,10 +494,11 @@ try { if (localStorage.getItem("view") !== "full") document.documentElement.clas
 
       <div class="filters" role="group" aria-label="Filter games">
         <button class="chip" data-f="all" aria-pressed="true">All <b>${games.length}</b></button>${[
-          ["arcade", GENRES.arcade, games.filter(g => g.genre === "arcade" && !g.origin).length],
+          ["arcade", GENRES.arcade, games.filter(g => g.genre === "arcade" && !g.origin && !g.own).length],
           ...Object.entries(STYLES).map(([k, l]) => [k, l, games.filter(g => g.style === k).length]),
           ["home", HOME, games.filter(g => g.origin).length],
-          ...["rpg", "strategy", "space"].map(k => [k, GENRES[k], games.filter(g => g.genre === k).length]),
+          ...["rpg", "strategy", "space", "adventure"].map(k => [k, GENRES[k], games.filter(g => g.genre === k).length]),
+          ["own", OWN, games.filter(g => g.own).length],
         ].filter(([, , n]) => n > 0).map(([k, l, n]) => `
         <button class="chip${STYLES[k] ? " sub" : ""}" data-f="${k}" aria-pressed="false">${esc(l)} <b>${n}</b></button>`).join("")}
       </div>
@@ -596,7 +599,7 @@ ${packages.length ? `  <section class="block" id="nuget" aria-labelledby="nuget-
 <footer>
   <div class="wrap">
     <span class="stamp">Built ${built} from GitHub${packages.length ? " and NuGet" : ""}</span>
-    <span>Unofficial fan recreations; not affiliated with the original publishers. Trademarks belong to their owners.</span>
+    <span>The remakes are unofficial fan recreations, not affiliated with the original publishers. Trademarks belong to their owners.</span>
   </div>
 </footer>
 </div>

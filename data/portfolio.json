@@ -355,7 +355,17 @@
     { "repo": "AVAFlight-Starflight", "name": "AVAFlight", "genre": "space", "origin": "computer", "original": "Starflight", "publisher": "Binary Systems", "year": 1986, "shot": "docs/screenshots/08_terrain_vehicle.png",
       "blurb": "Crew, starships, alien diplomacy, planet surveys by terrain vehicle, and real-time combat." },
     { "repo": "AVAElite", "genre": "space", "origin": "computer", "original": "Elite", "publisher": "Acornsoft", "year": 1984, "shot": "Images/AVAElite-title.png",
-      "blurb": "Trading, docking and dogfights across eight galaxies, rendered in wireframe." }
+      "blurb": "Trading, docking and dogfights across eight galaxies, rendered in wireframe." },
+    { "repo": "AVASalvo", "genre": "strategy", "own": true, "original": "Salvo", "publisher": "Lonnie Watson", "year": 2026, "shot": "Images/AVASalvo-craters.png",
+      "blurb": "An artillery duel for two to four tanks: set the angle and power, judge the wind, and dig the hills out from under each other." },
+    { "repo": "AVASteelRing", "genre": "arcade", "style": "fighting", "own": true, "original": "Steel Ring", "publisher": "Lonnie Watson", "year": 2026, "shot": "Images/AVASteelRing-hit.png",
+      "blurb": "One-on-one fighting: four fighters with stick-motion specials and supers, blocking high and low, combos, and a ladder against the computer." },
+    { "repo": "AVADeepVault", "genre": "arcade", "style": "shooter", "own": true, "original": "Deep Vault", "publisher": "Lonnie Watson", "year": 2026, "shot": "Images/AVADeepVault-firefight.png",
+      "blurb": "A first-person raycaster: four levels of a mining company's vault, brass sentries and iron hounds, keys, doors and treasure." },
+    { "repo": "AVALanternHouse", "genre": "adventure", "own": true, "original": "Lantern House", "publisher": "Lonnie Watson", "year": 2026, "shot": "Images/AVALanternHouse-lamp.png",
+      "blurb": "A parser text adventure: a gale, a dark lighthouse, and a ship due past the reef at midnight. Relight the lamp in time." },
+    { "repo": "AVAPitchSide", "genre": "arcade", "style": "sports", "own": true, "original": "Pitch Side", "publisher": "Lonnie Watson", "year": 2026, "shot": "Images/AVAPitchSide-play.png",
+      "blurb": "Fast top-down football, eleven a side: aftertouch, slide tackles, set pieces and keepers, a cup against the computer or a friend." }
   ],
 
   "originals": [
