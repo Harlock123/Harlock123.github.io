@@ -404,13 +404,15 @@
         "Linked live to AVA Modeler through a hub: an edit there shows up in the scene as it's made, with the hub's state on both status bars. Built on AVA Modeler's engine as a git submodule, with 64 MCP tools and twelve recipes for Claude or another agent, and an AI Chat that counts the API use as it goes: tokens, an estimated cost per turn, daily and monthly totals and a budget"
       ] },
     { "repo": "CIRQAvalonia", "name": "CirqAvalonia", "kind": "Circuit simulator", "tags": ["C#", "Avalonia", ".NET 10", "SPICE", "MCP"], "status": "In development",
-      "shot": ["docs/images/35-ai-chat.png", "docs/images/36-ai-chat-bode.png", "docs/images/01-overview.png"], "shotFit": "top",
-      "alt": "CirqAvalonia at work: Claude building and running a 555 astable and an RC low-pass in the AI Chat, and the editor with its live oscilloscope",
+      "shot": ["docs/images/35-ai-chat.png", "docs/images/36-ai-chat-bode.png",
+        "docs/images/64-protoboard.png", "docs/images/01-overview.png"], "shotFit": "top",
+      "alt": "CirqAvalonia at work: Claude building and running a 555 astable and an RC low-pass in the AI Chat, an LED chaser built on a breadboard in the protoboard view, and the editor with its live oscilloscope",
       "blurb": "An electronic circuit simulator: draw a schematic from 335 parts and watch it run on a live oscilloscope, with a SPICE-style analog solver and event-driven logic in one simulation, and Claude built in: ask in the AI Chat panel and watch it place, wire, probe and run a circuit, then read you the numbers.",
       "highlights": [
         "335 parts: RLC, lamps, diodes, transistors and Darlingtons, op-amps, the 555, regulators, flip-flops, 126 74xx and 4000 chips from gates to the 74181 ALU, one-shots and analog muxes, EPROMs and RAM, a 6502, a 65C02 and the C64's 6510 with the 6522, 6551, 6526 CIA and SID, a 68000 with the 68681, 68230 and 68901, a 6809 with the 6821 and 6850, a Z80 with the PIO, CTC, SIO and DART, an 8085 with the 8155, 8255, 8251, 8253 and 8259, NeoPixel strips, keypads, buses, sensors, and Arduino, Raspberry Pi, Pico and ESP32 boards",
         "Transient, frequency response, DC sweeps, noise, stability, poles and zeros, FFT, tolerance and protocol decoding, plus a cirq command line for CI",
-        "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time, with the API use counted as it goes: tokens, an estimated cost per turn, daily and monthly totals and a budget"
+        "An AI Chat panel and an MCP server let Claude and other agents build, wire, probe and simulate circuits live in the open window, one undo step at a time, with the API use counted as it goes: tokens, an estimated cost per turn, daily and monthly totals and a budget",
+        "A protoboard view (F11) shows the same circuit built on white breadboards: chips across the channel, resistors with their real colour bands, LEDs lit by the simulation, coloured jumpers routed round the parts, and the supplies and generators on the bench, checked against the schematic and arranged by hand or by Claude"
       ] },
     { "repo": "AVASerMonitor", "blurb": "A serial monitor and live plotter: point it at an Arduino, a Pico, an ESP32, a USB-serial adapter or a USB HID device and watch what it says, as text or hex, and as live graphs.",
       "kind": "Serial monitor", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "status": "In development", "shot": ["docs/images/AVASerMonitor-demo.png", "docs/images/AVASerMonitor-hex.png"], "shotFit": "top",
