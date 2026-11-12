@@ -436,7 +436,8 @@
       "highlights": [
         "Linked text frames and columns, master pages with page numbers, facing pages and spreads, paragraph styles, tabs with leaders, drop caps, hyphenation, kerning, small caps and text wrap that follows a shape",
         "Pictures (SVG kept as vector, EPS), Bézier paths, groups, rotation, tables, CMYK and spot colour swatches with tints, spelling in American or British English, find and replace, a story editor and a table of contents",
-        "Vector PDF with the fonts embedded, PNG, printing and saddle-stitched booklets, all drawn by the same code as the screen; templates, placing Markdown, undo all the way back, and a 28-page user guide"
+        "For long documents: character styles, keep-with-next and widow and orphan control, footnotes at the foot of the column, tables that run on with their header rows repeated, numbering sections, layers, a baseline grid and text on a path",
+        "Vector PDF with the fonts embedded, bleed and crop marks, PNG, printing and saddle-stitched booklets, all drawn by the same code as the screen; linked pictures, autosave and recovery, templates, placing Markdown, undo all the way back, and a user guide"
       ] }
   ],
 
