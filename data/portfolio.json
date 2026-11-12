@@ -428,7 +428,16 @@
       "kind": "Serial monitor", "tags": ["C#", "Avalonia", ".NET 10", "Serial", "USB HID"], "status": "In development", "shot": ["docs/images/AVASerMonitor-demo.png", "docs/images/AVASerMonitor-hex.png"], "shotFit": "top",
       "highlights": ["Serial ports, USB-serial adapters and boards (named by maker and product on Linux), and USB HID devices read directly, with any baud rate, framing and flow control, DTR, RTS and a board reset",
                      "A terminal in text or hex with millisecond timestamps, and sending text with line endings and escapes or hex bytes, with history",
-                     "A live plotter that reads lines the way the Arduino Serial Plotter does, so sketches plot unchanged, with CSV export and recording to a log or raw bytes"] }
+                     "A live plotter that reads lines the way the Arduino Serial Plotter does, so sketches plot unchanged, with CSV export and recording to a log or raw bytes"] },
+    { "repo": "AVAPageStream", "kind": "Desktop publishing", "tags": ["C#", "Avalonia", ".NET 10", "PDF", "Typesetting"], "status": "In development",
+      "shot": ["docs/images/AVAPageStream-layout.png", "docs/images/AVAPageStream-spread.png", "docs/images/AVAPageStream-table.png"], "shotFit": "top",
+      "alt": "AVAPageStream: a newsletter page with a drop cap, a picture and a pull quote the two columns wrap round, a facing document's two-page spread, and a table with a shaded header row",
+      "blurb": "A re-imagining of PageStream, the frame-based desktop publishing program many first met on the Amiga: draw frames on a page, pour text into them and link them so a story flows from column to column and page to page, then export a PDF or print a booklet.",
+      "highlights": [
+        "Linked text frames and columns, master pages with page numbers, facing pages and spreads, paragraph styles, tabs with leaders, drop caps, hyphenation, kerning, small caps and text wrap that follows a shape",
+        "Pictures (SVG kept as vector, EPS), Bézier paths, groups, rotation, tables, CMYK and spot colour swatches with tints, spelling in American or British English, find and replace, a story editor and a table of contents",
+        "Vector PDF with the fonts embedded, PNG, printing and saddle-stitched booklets, all drawn by the same code as the screen; templates, placing Markdown, undo all the way back, and a 28-page user guide"
+      ] }
   ],
 
   "tools": [
