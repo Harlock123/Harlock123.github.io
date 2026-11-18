@@ -59,6 +59,9 @@ Downloads need no configuration. The build picks each repo's rolling `latest` re
 otherwise its newest release, and offers the `.zip` / `.tar.gz` for each platform it finds
 (`win-x64`, `linux-arm64`, …).
 
+Each card also shows the version of the repo's newest full release: its tag, such as `v0.2.1`, linked to the release
+page (never a draft, a pre-release or the rolling `latest`). A repo with no full release yet shows none.
+
 PDFs, the résumé and the portrait live in `static/` and are copied to the site root as-is. Page styles
 and behaviour are in `site/style.css` and `site/app.js`.
 

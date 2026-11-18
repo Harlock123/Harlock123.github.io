@@ -53,17 +53,24 @@ function pickRelease(releases) {
       ?? null;
 }
 
+// The version a card shows: the newest full release by its own tag (never the rolling "latest" build, which has none).
+function pickVersion(releases) {
+  return releases.find(r => !r.draft && !r.prerelease && r.tag_name !== "latest") ?? null;
+}
+
 async function repoInfo(repo) {
   const meta = await gh(`repos/${owner}/${repo}`);
-  let release = null;
+  let release = null, version = null;
   if (!meta.private) {
     const releases = await gh(`repos/${owner}/${repo}/releases?per_page=20`);
     release = pickRelease(releases);
+    version = pickVersion(releases);
   }
   return {
     url: meta.html_url, description: meta.description, branch: meta.default_branch, private: meta.private,
     pushed: meta.pushed_at, created: meta.created_at, stars: meta.stargazers_count,
     releaseUrl: release?.html_url ?? null, releaseTag: release?.tag_name ?? null, downloads: downloads(release),
+    version: version ? { tag: version.tag_name, url: version.html_url, date: version.published_at } : null,
   };
 }
 
@@ -248,15 +255,25 @@ for (const t of tools)
 const packageDownloads = packages.reduce((n, p) => n + p.downloads, 0);
 
 // ---------- Render ----------
+// "v0.2.1" (a tag without its v gets one), linking to that release's page; nothing for a repo with no full release.
+function versionBadge(item) {
+  const v = item.info?.version;
+  if (!v?.tag) return "";
+  const label = /^\d/.test(v.tag) ? `v${v.tag}` : v.tag;
+  const when = v.date ? ` · released ${v.date.slice(0, 10)}` : "";
+  return `<a class="version-badge" href="${esc(v.url)}" title="The newest release${esc(when)}">${esc(label)}</a>`;
+}
+
 function downloadBlock(item) {
   const d = item.info?.downloads ?? {};
   const rids = Object.keys(PLATFORMS).filter(r => d[r]);
   const source = `<a class="btn" href="${esc(item.info.url)}">Source</a>`;
-  if (!rids.length) return source;
+  const version = versionBadge(item);
+  if (!rids.length) return source + version;
   const first = rids.includes("win-x64") ? "win-x64" : rids[0]; // what visitors without JavaScript see
   return `
         <a class="btn primary dl" href="${esc(d[first])}" data-releases="${esc(item.info.releaseUrl)}">⬇ ${esc(PLATFORMS[first])}</a>
-        ${source}
+        ${source}${version}
         <details>
           <summary>All ${rids.length} builds</summary>
           <ul>${rids.map(r => `<li><a href="${esc(d[r])}">${esc(PLATFORMS[r])}</a></li>`).join("")}</ul>

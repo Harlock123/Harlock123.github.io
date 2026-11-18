@@ -295,6 +295,13 @@ section.block { padding-block: clamp(56px, 8vw, 96px) 0; }
   color: var(--green); border: 1px solid rgba(114,255,143,.45);
 }
 .nuget-badge:hover { box-shadow: 0 0 10px rgba(114,255,143,.4); }
+/* The newest release's version, beside a card's Source button. */
+.version-badge {
+  align-self: center; padding: 2px 8px; text-decoration: none;
+  font-family: var(--hud); font-size: 17px; letter-spacing: .04em;
+  color: var(--cyan); border: 1px solid rgba(92,225,255,.45);
+}
+.version-badge:hover { box-shadow: 0 0 10px rgba(92,225,255,.4); }
 
 /* ---------- High-score table ---------- */
 .scores-box { overflow-x: auto; border: 1px solid var(--line); background: #000; padding: 20px clamp(12px, 3vw, 32px); }

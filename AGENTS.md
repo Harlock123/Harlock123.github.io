@@ -48,7 +48,8 @@ gh workflow run pages.yml -R Harlock123/Harlock123.github.io   # rebuild and dep
 - **Every repo must be readable.** If any entry's repo (or its `shot` path on the default branch) can't be fetched,
   the build lists it and exits 1, which fails the workflow. Check the name and the screenshot path before pushing.
 - **Downloads are found, not configured.** The build takes the `latest` release if there is one, else the newest
-  full release, and matches asset names containing a RID such as `win-x64`. A card added before its repo has a
+  full release, and matches asset names containing a RID such as `win-x64`. The version badge (`versionBadge`, from
+  `pickVersion`) is the newest full release's tag, never `latest`: tag a release to change it. A card added before its repo has a
   release shows no downloads until the next build.
 - **The genre, style and origin values are fixed lists** (`GENRES`, `STYLES`, `ORIGINS` in `build.mjs`). A new value
   needs adding there, or its games get no filter button.
