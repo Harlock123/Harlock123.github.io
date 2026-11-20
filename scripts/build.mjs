@@ -58,10 +58,50 @@ function pickVersion(releases) {
   return releases.find(r => !r.draft && !r.prerelease && r.tag_name !== "latest") ?? null;
 }
 
+// A repo's release is only read once its builds on main or a release tag have finished: a build refreshing the
+// rolling "latest" release replaces its files one at a time (gh release upload --clobber), so reading it part way
+// through would lose platforms from the card. All the waiting in one site build shares one budget; past it, the
+// release is read as it stands (the repo's release job asks for a fresh site build when it ends anyway).
+const WAIT_BUDGET_MS = Number(process.env.RELEASE_WAIT_MINUTES ?? 20) * 60_000;
+const WAIT_POLL_MS = 30_000;
+const STALE_RUN_MS = 90 * 60_000;
+const waitUntil = Date.now() + WAIT_BUDGET_MS;
+const self = process.env.GITHUB_REPOSITORY?.split("/")[1];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function releaseBuilds(repo, branch) {
+  const runs = [];
+  for (const status of ["in_progress", "queued"]) {
+    const r = await gh(`repos/${owner}/${repo}/actions/runs?status=${status}&per_page=20`);
+    runs.push(...(r.workflow_runs ?? []));
+  }
+  // A run started long ago is stuck (one has sat "queued" for days), not uploading: don't wait on it.
+  const fresh = run => Date.now() - Date.parse(run.run_started_at ?? run.created_at) < STALE_RUN_MS;
+  return runs.filter(run => fresh(run) && (run.head_branch === branch || /^v\d/.test(run.head_branch ?? "")));
+}
+
+async function waitForReleaseBuilds(repo, branch) {
+  if (repo === self) return; // this site's own build is always running while it builds
+  let announced = false;
+  while (true) {
+    let running;
+    try { running = await releaseBuilds(repo, branch); } catch { return; } // no Actions to ask about: read as it stands
+    if (!running.length) return;
+    if (Date.now() + WAIT_POLL_MS > waitUntil) {
+      console.warn(`warning: ${repo}: still building (${running.map(r => r.name).join(", ")}); reading its release as it stands`);
+      return;
+    }
+    if (!announced) console.log(`${repo}: waiting for ${running.map(r => `${r.name} on ${r.head_branch}`).join(", ")} to finish…`);
+    announced = true;
+    await sleep(WAIT_POLL_MS);
+  }
+}
+
 async function repoInfo(repo) {
   const meta = await gh(`repos/${owner}/${repo}`);
   let release = null, version = null;
   if (!meta.private) {
+    await waitForReleaseBuilds(repo, meta.default_branch);
     const releases = await gh(`repos/${owner}/${repo}/releases?per_page=20`);
     release = pickRelease(releases);
     version = pickVersion(releases);

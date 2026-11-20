@@ -51,6 +51,10 @@ gh workflow run pages.yml -R Harlock123/Harlock123.github.io   # rebuild and dep
   full release, and matches asset names containing a RID such as `win-x64`. The version badge (`versionBadge`, from
   `pickVersion`) is the newest full release's tag, never `latest`: tag a release to change it. A card added before its repo has a
   release shows no downloads until the next build.
+- **The build waits for releases being uploaded.** Before reading a repo's releases, `waitForReleaseBuilds` waits
+  while that repo has an Actions run in progress or queued on its default branch or a `v*` tag (a build refreshing
+  `latest` replaces its files one by one, so reading part way through loses platforms). One shared budget of 20
+  minutes (`RELEASE_WAIT_MINUTES`), polled every 30 s; runs started over 90 minutes ago count as stuck and are ignored.
 - **The genre, style and origin values are fixed lists** (`GENRES`, `STYLES`, `ORIGINS` in `build.mjs`). A new value
   needs adding there, or its games get no filter button.
 - **Games go in `games`; bigger projects still under way in `originals`**, which the page
